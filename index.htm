@@ -71,10 +71,10 @@
                     </button>
                 </div>
                 <div class="col text-end">
-                    <button type="button" class="btn" style="--bs-btn-padding-x: .2rem;">
+                    <button type="button" id="clearItemButton" class="btn" style="--bs-btn-padding-x: .2rem;">
                         <i class="fs-2 bi bi-trash3 text-danger"></i>
                     </button>
-                    <button type="button" class="btn" style="--bs-btn-padding-x: .2rem;">
+                    <button type="button" id="editItemButton" class="btn" data-bs-toggle="button" style="--bs-btn-padding-x: .2rem;">
                         <i class="fs-2 bi bi-pencil-square"></i>
                     </button>
                 </div>
@@ -94,7 +94,7 @@
                             $('<button>')
                                 .addClass('btn')
                                 .attr({ type: 'button' })
-                                .css({ '--bs-btn-padding-x': '.2rem', marginRight: '0.5rem' })
+                                .css({ '--bs-btn-padding-x': '.2rem', marginRight: '0.5rem', display: 'none' })
                                 .on({
                                     click: function() {
                                         $(this).parent().remove();
@@ -136,11 +136,27 @@
                             $('<button>')
                                 .addClass('btn')
                                 .attr({ type: 'button' })
-                                .css({ '--bs-btn-padding-x': '.2rem', marginLeft: '0.5rem' })
+                                .css({ '--bs-btn-padding-x': '.2rem', marginLeft: '0.5rem', display: 'none' })
                                 .append(
                                     $('<i>')
                                         .addClass('fs-2 bi bi-list text-secondary'))));
             }});
+        $('#editItemButton').on({
+            click: function() {
+                let active = $(this).hasClass('active');
+                $(this).children().addClass(active ? 'bi-check-lg text-success' : 'bi-pencil-square')
+                $(this).children().removeClass(active ? 'bi-pencil-square' : 'bi-check-lg text-success')
+                $('#addItemButton, #clearItemButton').each(function() {
+                    $(this).css({ display: active ? 'none' : '' })
+                })
+                $('#itemListContainer > *').find('button, input, select').each(function() {
+                    $(this).attr({ disabled: active })
+                })
+                $('#itemListContainer > * > :first-child, #itemListContainer > * > :last-child').each(function() {
+                    $(this).attr({ disabled: false })
+                    $(this).css({ display: active ? '' : 'none' })
+                })
+            }})
     </script>
 </body>
 
