@@ -95,6 +95,11 @@
                                 .addClass('btn')
                                 .attr({ type: 'button' })
                                 .css({ '--bs-btn-padding-x': '.2rem', marginRight: '0.5rem' })
+                                .on({
+                                    click: function() {
+                                        $(this).parent().remove();
+                                    }
+                                })
                                 .append(
                                     $('<i>')
                                         .addClass('fs-2 bi bi-dash-circle-fill text-danger')),
@@ -135,8 +140,7 @@
                                 .append(
                                     $('<i>')
                                         .addClass('fs-2 bi bi-list text-secondary'))));
-            }
-        })
+            }});
     </script>
 </body>
 
