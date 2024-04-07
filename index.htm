@@ -182,28 +182,29 @@
                                             .addClass('col text-end')
                                             .append(
                                                 this.createIconButton('bi-trash3 text-danger'),
-                                                this.createIconButton('bi-pencil-square')))));
+                                                this.createIconButton('bi-pencil-square')
+                                                    .attr({ 'data-ui-name': 'editItemsButton', 'data-toggle-state': 'off' })
+                                                    .click(function () {
+                                                        const toggleState = $(this).attr('data-toggle-state') == 'off' ? true : false;
+                                                        $(this).attr({ 'data-toggle-state': toggleState ? 'on' : 'off' })
+                                                        $(this).children().addClass(toggleState ? 'bi-check-lg text-success' : 'bi-pencil-square');
+                                                        $(this).children().removeClass(toggleState ? 'bi-pencil-square' : 'bi-check-lg text-success');
+                                                        const $rootPane = $(this).closest('[data-ui-name="shoppingListPane"]');
+                                                        $rootPane.find('[data-ui-name="addItemButton"]').css({ display: toggleState ? 'none' : '' });
+                                                        $rootPane.find('[data-ui-name="clearItemsButton"]').css({ display: toggleState ? '' : 'none' });
+                                                        $rootPane.find('[data-ui-name="itemPane"]').find('button, input, select').each(function () {
+                                                            $(this).attr({ disabled: toggleState });
+                                                        })
+                                                        $rootPane.find('[data-ui-name="itemPane"]').children(':first-child, :last-child').each(function () {
+                                                            $(this).attr({ disabled: false });
+                                                            $(this).css({ display: toggleState ? '' : 'none' });
+                                                        })
+                                                    })))));
             }
         }
         $(function () {
             $('[data-ui-name="body"]').append(ElementFactory.createShoppingList())
         })
-        $('#editItemButton').on({
-            click: function() {
-                let active = $(this).hasClass('active');
-                $(this).children().addClass(active ? 'bi-check-lg text-success' : 'bi-pencil-square')
-                $(this).children().removeClass(active ? 'bi-pencil-square' : 'bi-check-lg text-success')
-                $('#addItemButton, #clearItemButton').each(function() {
-                    $(this).css({ display: active ? 'none' : '' })
-                })
-                $('#itemListContainer > *').find('button, input, select').each(function() {
-                    $(this).attr({ disabled: active })
-                })
-                $('#itemListContainer > * > :first-child, #itemListContainer > * > :last-child').each(function() {
-                    $(this).attr({ disabled: false })
-                    $(this).css({ display: active ? '' : 'none' })
-                })
-            }})
     </script>
 </body>
 
