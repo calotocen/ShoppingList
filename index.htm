@@ -101,6 +101,7 @@
             static createShoppingItem() {
                 return $('<div>')
                     .addClass('d-flex flex-row align-items-center')
+                    .attr({ 'data-ui-name': 'itemPane' })
                     .append(
                         $('<button>')
                             .addClass('btn')
@@ -172,16 +173,30 @@
                                             .addClass('col')
                                             .append(
                                                 this.createIconButton('bi-plus-circle')
+                                                    .attr({ 'data-ui-name': 'addItemButton' })
                                                     .click(function () {
                                                         $(this)
                                                             .closest('[data-ui-name="shoppingListPane"]')
                                                             .find('[data-ui-name="itemsPane"]')
                                                             .append(ElementFactory.createShoppingItem())
+                                                    }),
+                                                this.createIconButton('bi-trash3 text-danger')
+                                                    .attr({ 'data-ui-name': 'clearItemsButton' })
+                                                    .css({ display: 'none' })
+                                                    .click(function () {
+                                                        const ret = window.confirm('リスト内の項目をすべて削除しますか？');
+                                                        if (ret) {
+                                                            const $rootPane = $(this).closest('[data-ui-name="shoppingListPane"]');
+                                                            $rootPane.find('[data-ui-name="itemPane"]').remove();
+                                                            const $editItemsButton = $rootPane.find('[data-ui-name="editItemsButton"]');
+                                                            if ($editItemsButton.attr('data-toggle-state') == 'on') {
+                                                                $editItemsButton.click();
+                                                            }
+                                                        }
                                                     })),
                                         $('<div>')
                                             .addClass('col text-end')
                                             .append(
-                                                this.createIconButton('bi-trash3 text-danger'),
                                                 this.createIconButton('bi-pencil-square')
                                                     .attr({ 'data-ui-name': 'editItemsButton', 'data-toggle-state': 'off' })
                                                     .click(function () {
