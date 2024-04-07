@@ -127,7 +127,15 @@
                             .click(function () {
                                 $(this).parent().remove();
                             }),
-                        IconButton.create('bi-square'),
+                        IconToggleButton.create('bi-square')
+                            .click(function () {
+                                const toggleState = IconToggleButton.toggle($(this));
+
+                                const iconParameters = ['bi-square', 'bi-check-square-fill text-success'];
+                                const $icon = IconToggleButton.icon($(this));
+                                $icon.addClass(iconParameters[Number(toggleState)]);
+                                $icon.removeClass(iconParameters[Number(!toggleState)]);
+                            }),
                         $('<input>')
                             .addClass('form-control border-0')
                             .attr({ type: 'text', placeholder: '品名' })
