@@ -87,44 +87,50 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        class ElementFactory {
-            static createIconButton(icon_options) {
+        class IconButton {
+            static create(iconParameters) {
                 return $('<button>')
                     .addClass('btn')
                     .attr({ type: 'button' })
                     .css({ '--bs-btn-padding-x': '.2rem' })
-                    .append(
-                        $('<i>')
-                            .addClass(`fs-2 bi ${icon_options}`)
-                    );
+                    .append($('<i>').addClass(`fs-2 bi ${iconParameters}`));
             }
-            static createShoppingItem() {
-                return $('<div>')
+
+            static icon($iconButton) {
+                return $iconButton.children();
+            }
+        }
+        class IconToggleButton {
+            static create(iconParameters) {
+                return IconButton.create(iconParameters)
+                    .attr({ 'data-toggle-state': 'off' })
+            }
+
+            static icon($iconButton) {
+                return IconButton.icon($iconButton);
+            }
+
+            static toggle($iconButton) {
+                $iconButton.attr({ 'data-toggle-state': $iconButton.attr('data-toggle-state') == 'on' ? 'off' : 'on' });
+                return $iconButton.attr('data-toggle-state') == 'on';
+            }
+        }
+        class ShoppingItemView {
+            constructor() {
+                self = this
+                this.root = $('<div>')
                     .addClass('d-flex flex-row align-items-center')
                     .attr({ 'data-ui-name': 'itemPane' })
                     .append(
-                        $('<button>')
-                            .addClass('btn')
-                            .attr({ type: 'button' })
-                            .css({ '--bs-btn-padding-x': '.2rem', marginRight: '0.5rem', display: 'none' })
-                            .on({
-                                click: function () {
-                                    $(this).parent().remove();
-                                }
-                            })
-                            .append(
-                                $('<i>')
-                                    .addClass('fs-2 bi bi-dash-circle-fill text-danger')),
-                        $('<button>')
-                            .addClass('btn')
-                            .attr({ type: 'button' })
-                            .css({ '--bs-btn-padding-x': '.2rem' })
-                            .append(
-                                $('<i>')
-                                    .addClass('fs-2 bi bi-square')),
+                        IconButton.create('bi-dash-circle-fill text-danger')
+                            .css({ marginRight: '0.5rem', display: 'none' })
+                            .click(function () {
+                                $(this).parent().remove();
+                            }),
+                        IconButton.create('bi-square'),
                         $('<input>')
                             .addClass('form-control border-0')
-                            .attr({ type: 'text', placeholder: '食材' })
+                            .attr({ type: 'text', placeholder: '品名' })
                             .css({ marginRight: '6px' }), // prevent the border that appears when making a selection from being missing.
                         $('<div>')
                             .addClass('input-group')
@@ -132,7 +138,7 @@
                             .append(
                                 $('<input>')
                                     .addClass('form-control border-0')
-                                    .attr({ type: 'number', placeholder: '数', inputmode: 'numeric' })
+                                    .attr({ type: 'number', placeholder: '量', inputmode: 'numeric' })
                                     .css({ minWidth: '3.9rem', maxWidth: '3.9rem', textAlign: 'right' }),
                                 $('<select>')
                                     .addClass('form-select border-0 text-white bg-secondary')
@@ -145,80 +151,74 @@
                                             .attr({ value: 'g' })
                                             .text('g'),
                                     )),
-                        $('<button>')
-                            .addClass('btn')
-                            .attr({ type: 'button' })
-                            .css({ '--bs-btn-padding-x': '.2rem', marginLeft: '0.5rem', display: 'none' })
-                            .append(
-                                $('<i>')
-                                    .addClass('fs-2 bi bi-list text-secondary')));
-
+                        IconButton.create('bi-list text-secondary')
+                            .css({ marginLeft: '0.5rem', display: 'none' }));
             }
-            static createShoppingList() {
-                return $('<div>')
+        }
+        class ShoppingListView {
+            constructor() {
+                const self = this;
+                this.addButton = IconButton.create('bi-plus-circle')
+                    .click(function () {
+                        self.items.append(self.createItem());
+                    });
+                this.editButton = IconToggleButton.create('bi-pencil-square')
+                    .click(function () {
+                        const toggleState = IconToggleButton.toggle($(this));
+
+                        const iconParameters = ['bi-pencil-square', 'bi-check-lg text-success'];
+                        const $icon = IconToggleButton.icon($(this));
+                        $icon.addClass(iconParameters[Number(toggleState)]);
+                        $icon.removeClass(iconParameters[Number(!toggleState)]);
+
+                        self.addButton.css({ display: toggleState ? 'none' : '' });
+                        self.clearButton.css({ display: toggleState ? '' : 'none' });
+                        self.items.find('button, input, select').attr({ disabled: toggleState });
+                        self.items.children().find(':first-child, :last-child')
+                            .attr({ disabled: false })
+                            .css({ display: toggleState ? '' : 'none' });
+                    });
+                this.clearButton = IconButton.create('bi-trash3 text-danger')
+                    .css({ display: 'none' })
+                    .click(function () {
+                        const ret = window.confirm('リスト内の項目をすべて削除しますか？');
+                        if (!ret) return;
+
+                        self.items.children().remove();
+                        if (self.editButton.attr('data-toggle-state') == 'on') {
+                            self.editButton.click();
+                        }
+                    });
+                this.root = $('<div>')
                     .addClass('container-fluid')
-                    .attr({ 'data-ui-name': 'shoppingListPane' })
                     .append(
                         $('<div>')
-                            .addClass('container-fluid')
-                            .attr({ 'data-ui-name': 'itemsPane' }),
+                            .addClass('container-fluid'),
                         $('<div>')
                             .addClass('container-fluid')
-                            .attr({ 'data-ui-name': 'controlPane' })
                             .append(
                                 $('<div>')
                                     .addClass('row')
                                     .append(
                                         $('<div>')
                                             .addClass('col')
-                                            .append(
-                                                this.createIconButton('bi-plus-circle')
-                                                    .attr({ 'data-ui-name': 'addItemButton' })
-                                                    .click(function () {
-                                                        $(this)
-                                                            .closest('[data-ui-name="shoppingListPane"]')
-                                                            .find('[data-ui-name="itemsPane"]')
-                                                            .append(ElementFactory.createShoppingItem())
-                                                    }),
-                                                this.createIconButton('bi-trash3 text-danger')
-                                                    .attr({ 'data-ui-name': 'clearItemsButton' })
-                                                    .css({ display: 'none' })
-                                                    .click(function () {
-                                                        const ret = window.confirm('リスト内の項目をすべて削除しますか？');
-                                                        if (ret) {
-                                                            const $rootPane = $(this).closest('[data-ui-name="shoppingListPane"]');
-                                                            $rootPane.find('[data-ui-name="itemPane"]').remove();
-                                                            const $editItemsButton = $rootPane.find('[data-ui-name="editItemsButton"]');
-                                                            if ($editItemsButton.attr('data-toggle-state') == 'on') {
-                                                                $editItemsButton.click();
-                                                            }
-                                                        }
-                                                    })),
+                                            .append(this.addButton, this.clearButton),
                                         $('<div>')
                                             .addClass('col text-end')
-                                            .append(
-                                                this.createIconButton('bi-pencil-square')
-                                                    .attr({ 'data-ui-name': 'editItemsButton', 'data-toggle-state': 'off' })
-                                                    .click(function () {
-                                                        const toggleState = $(this).attr('data-toggle-state') == 'off' ? true : false;
-                                                        $(this).attr({ 'data-toggle-state': toggleState ? 'on' : 'off' })
-                                                        $(this).children().addClass(toggleState ? 'bi-check-lg text-success' : 'bi-pencil-square');
-                                                        $(this).children().removeClass(toggleState ? 'bi-pencil-square' : 'bi-check-lg text-success');
-                                                        const $rootPane = $(this).closest('[data-ui-name="shoppingListPane"]');
-                                                        $rootPane.find('[data-ui-name="addItemButton"]').css({ display: toggleState ? 'none' : '' });
-                                                        $rootPane.find('[data-ui-name="clearItemsButton"]').css({ display: toggleState ? '' : 'none' });
-                                                        $rootPane.find('[data-ui-name="itemPane"]').find('button, input, select').each(function () {
-                                                            $(this).attr({ disabled: toggleState });
-                                                        })
-                                                        $rootPane.find('[data-ui-name="itemPane"]').children(':first-child, :last-child').each(function () {
-                                                            $(this).attr({ disabled: false });
-                                                            $(this).css({ display: toggleState ? '' : 'none' });
-                                                        })
-                                                    })))));
+                                            .append(this.editButton))));
+
+            }
+
+            get items() {
+                return this.root.children(':first-child')
+            }
+
+            createItem() {
+                return (new ShoppingItemView).root
             }
         }
         $(function () {
-            $('[data-ui-name="body"]').append(ElementFactory.createShoppingList());
+            $('[data-ui-name="body"]').append((new ShoppingListView()).root);
         })
     </script>
 </body>
