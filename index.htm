@@ -98,24 +98,86 @@
                             .addClass(`fs-2 bi ${icon_options}`)
                     );
             }
+            static createShoppingItem() {
+                return $('<div>')
+                    .addClass('d-flex flex-row align-items-center')
+                    .append(
+                        $('<button>')
+                            .addClass('btn')
+                            .attr({ type: 'button' })
+                            .css({ '--bs-btn-padding-x': '.2rem', marginRight: '0.5rem', display: 'none' })
+                            .on({
+                                click: function () {
+                                    $(this).parent().remove();
+                                }
+                            })
+                            .append(
+                                $('<i>')
+                                    .addClass('fs-2 bi bi-dash-circle-fill text-danger')),
+                        $('<button>')
+                            .addClass('btn')
+                            .attr({ type: 'button' })
+                            .css({ '--bs-btn-padding-x': '.2rem' })
+                            .append(
+                                $('<i>')
+                                    .addClass('fs-2 bi bi-square')),
+                        $('<input>')
+                            .addClass('form-control border-0')
+                            .attr({ type: 'text', placeholder: '食材' })
+                            .css({ marginRight: '6px' }), // prevent the border that appears when making a selection from being missing.
+                        $('<div>')
+                            .addClass('input-group')
+                            .css({ minWidth: '8rem', maxWidth: '8rem' })
+                            .append(
+                                $('<input>')
+                                    .addClass('form-control border-0')
+                                    .attr({ type: 'number', placeholder: '数', inputmode: 'numeric' })
+                                    .css({ minWidth: '3.9rem', maxWidth: '3.9rem', textAlign: 'right' }),
+                                $('<select>')
+                                    .addClass('form-select border-0 text-white bg-secondary')
+                                    .css({ minWidth: '4.1rem', maxWidth: '4.1rem' })
+                                    .append(
+                                        $('<option>')
+                                            .attr({ value: '個', selected: true })
+                                            .text('個'),
+                                        $('<option>')
+                                            .attr({ value: 'g' })
+                                            .text('g'),
+                                    )),
+                        $('<button>')
+                            .addClass('btn')
+                            .attr({ type: 'button' })
+                            .css({ '--bs-btn-padding-x': '.2rem', marginLeft: '0.5rem', display: 'none' })
+                            .append(
+                                $('<i>')
+                                    .addClass('fs-2 bi bi-list text-secondary')));
+
+            }
             static createShoppingList() {
                 return $('<div>')
                     .addClass('container-fluid')
-                    .data({ 'ui-name': 'shoppingListPane' })
+                    .attr({ 'data-ui-name': 'shoppingListPane' })
                     .append(
                         $('<div>')
                             .addClass('container-fluid')
-                            .data({ 'ui-name': 'itemsPane' }),
+                            .attr({ 'data-ui-name': 'itemsPane' }),
                         $('<div>')
                             .addClass('container-fluid')
-                            .data({ 'ui-name': 'controlPane' })
+                            .attr({ 'data-ui-name': 'controlPane' })
                             .append(
                                 $('<div>')
                                     .addClass('row')
                                     .append(
                                         $('<div>')
                                             .addClass('col')
-                                            .append(this.createIconButton('bi-plus-circle')),
+                                            .append(
+                                                this.createIconButton('bi-plus-circle')
+                                                    .click(function () {
+                                                        $(this)
+                                                            .closest('[data-ui-name="shoppingListPane"]')
+                                                            .find('[data-ui-name="itemsPane"]')
+                                                            .append(ElementFactory.createShoppingItem())
+                                                    })),
                                         $('<div>')
                                             .addClass('col text-end')
                                             .append(
@@ -123,65 +185,9 @@
                                                 this.createIconButton('bi-pencil-square')))));
             }
         }
-        $(function() {
+        $(function () {
             $('[data-ui-name="body"]').append(ElementFactory.createShoppingList())
         })
-        $('#addItemButton').on({
-            click: function() {
-                $('#itemListContainer').append(
-                    $('<div>')
-                        .addClass('d-flex flex-row align-items-center')
-                        .append(
-                            $('<button>')
-                                .addClass('btn')
-                                .attr({ type: 'button' })
-                                .css({ '--bs-btn-padding-x': '.2rem', marginRight: '0.5rem', display: 'none' })
-                                .on({
-                                    click: function() {
-                                        $(this).parent().remove();
-                                    }
-                                })
-                                .append(
-                                    $('<i>')
-                                        .addClass('fs-2 bi bi-dash-circle-fill text-danger')),
-                            $('<button>')
-                                .addClass('btn')
-                                .attr({ type: 'button' })
-                                .css({ '--bs-btn-padding-x': '.2rem' })
-                                .append(
-                                    $('<i>')
-                                        .addClass('fs-2 bi bi-square')),
-                            $('<input>')
-                                .addClass('form-control border-0')
-                                .attr({ type: 'text', placeholder: '食材' })
-                                .css({ marginRight: '6px' }), // prevent the border that appears when making a selection from being missing.
-                            $('<div>')
-                                .addClass('input-group')
-                                .css({ minWidth: '8rem', maxWidth: '8rem' })
-                                .append(
-                                    $('<input>')
-                                        .addClass('form-control border-0')
-                                        .attr({ type: 'number', placeholder: '数', inputmode: 'numeric' })
-                                        .css({ minWidth: '3.9rem', maxWidth: '3.9rem', textAlign: 'right' }),
-                                    $('<select>')
-                                        .addClass('form-select border-0 text-white bg-secondary')
-                                        .css({ minWidth: '4.1rem', maxWidth: '4.1rem' })
-                                        .append(
-                                            $('<option>')
-                                                .attr({ value: '個', selected: true })
-                                                .text('個'),
-                                            $('<option>')
-                                                .attr({ value: 'g' })
-                                                .text('g'),
-                                        )),
-                            $('<button>')
-                                .addClass('btn')
-                                .attr({ type: 'button' })
-                                .css({ '--bs-btn-padding-x': '.2rem', marginLeft: '0.5rem', display: 'none' })
-                                .append(
-                                    $('<i>')
-                                        .addClass('fs-2 bi bi-list text-secondary'))));
-            }});
         $('#editItemButton').on({
             click: function() {
                 let active = $(this).hasClass('active');
