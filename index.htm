@@ -174,7 +174,7 @@
                         self.addButton.css({ display: toggleState ? 'none' : '' });
                         self.clearButton.css({ display: toggleState ? '' : 'none' });
                         self.items.find('button, input, select').attr({ disabled: toggleState });
-                        self.items.children().find(':first-child, :last-child')
+                        self.items.children().children(':first-child, :last-child')
                             .attr({ disabled: false })
                             .css({ display: toggleState ? '' : 'none' });
                     });
