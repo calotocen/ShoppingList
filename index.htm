@@ -154,16 +154,17 @@
                 super($('<div>'));
                 const self = this
                 this.shoppingList = shoppingList;
+                this.removeButton = new IconButton('bi-dash-circle-fill text-danger');
+                this.removeButton.$element
+                    .css({ marginRight: '0.5rem' })
+                    .hide()
+                    .click(function () {
+                        shoppingList.removeItem(self);
+                    });
                 this.$element
                     .addClass('d-flex flex-row align-items-center')
-                    .attr({ 'data-ui-name': 'itemPane' })
                     .append(
-                        (new IconButton('bi-dash-circle-fill text-danger'))
-                            .$element
-                            .css({ marginRight: '0.5rem', display: 'none' })
-                            .click(function () {
-                                $(this).parent().remove();
-                            }),
+                        this.removeButton.$element,
                         (new ToggleIconButton('bi-square', 'bi-check-square-fill text-success')).$element,
                         $('<input>')
                             .addClass('form-control border-0')
@@ -197,22 +198,24 @@
             constructor() {
                 super($('<div>'))
                 const self = this;
+                this.items = [];
                 this.addButton = new IconButton('bi-plus-circle');
                 this.addButton.$element.click(function () {
-                    self.items.append(self.createItem());
+                    self.addItem(new ShoppingItem(self));
                 });
                 this.editButton = new ToggleIconButton('bi-pencil-square', 'bi-check-lg text-success');
                 this.editButton.$element.click(function () {
                     const toggleState = self.editButton.toggleState;
 
-                    self.addButton.$element.css({ display: toggleState ? 'none' : '' });
-                    self.clearButton.$element.css({ display: toggleState ? '' : 'none' });
-                    self.items.find('input, select').attr({ disabled: toggleState });
-                    self.items.children().children(':nth-child(5n + 2)').each(function () {
-                        Component.getInstance($(this)).disable(toggleState);
+                    self.addButton.$element.toggle();
+                    self.clearButton.$element.toggle();
+                    self.items.forEach(item => {
+                        item.$element.find('input, select').attr({ disabled: toggleState });
+                        item.$element.children(':eq(1)').each(function () {
+                            Component.getInstance($(this)).disable(toggleState);
+                        });
+                        item.$element.children(':first-child, :last-child').toggle();
                     });
-                    self.items.children().children(':first-child, :last-child')
-                        .css({ display: toggleState ? '' : 'none' });
                 });
                 this.clearButton = new IconButton('bi-trash3 text-danger');
                 this.clearButton.$element
@@ -220,11 +223,7 @@
                     .click(function () {
                         const ret = window.confirm('リスト内の項目をすべて削除しますか？');
                         if (!ret) return;
-
-                        self.items.children().remove();
-                        if (self.editButton.attr('data-toggle-state') == 'on') {
-                            self.editButton.click();
-                        }
+                        self.removeAllItems();
                     });
                 this.$element
                     .addClass('container-fluid')
@@ -243,11 +242,21 @@
                                         $('<div>')
                                             .addClass('col text-end')
                                             .append(this.editButton.$element))));
-
             }
 
-            get items() {
-                return this.root.children(':first-child')
+            addItem(shoppingItem) {
+                this.items.push(shoppingItem);
+                this.$element.children(':first-child').append(shoppingItem.$element);
+            }
+
+            removeItem(shoppingItem) {
+                this.items = this.items.filter(item => item != shoppingItem);
+                shoppingItem.$element.remove();
+            }
+
+            removeAllItems() {
+                this.items.forEach(item => item.$element.remove());
+                this.items = [];
             }
 
             createItem() {
