@@ -193,8 +193,9 @@
                             .css({ marginLeft: '0.5rem', display: 'none' }));
             }
         }
-        class ShoppingListView {
+        class ShoppingList extends Component {
             constructor() {
+                super($('<div>'))
                 const self = this;
                 this.addButton = new IconButton('bi-plus-circle');
                 this.addButton.$element.click(function () {
@@ -225,7 +226,7 @@
                             self.editButton.click();
                         }
                     });
-                this.root = $('<div>')
+                this.$element
                     .addClass('container-fluid')
                     .append(
                         $('<div>')
@@ -254,7 +255,7 @@
             }
         }
         $(function () {
-            $('[data-ui-name="body"]').append((new ShoppingListView()).root);
+            $('[data-ui-name="body"]').append((new ShoppingList()).$element);
         })
     </script>
 </body>
