@@ -87,34 +87,68 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        class IconButton {
-            static create(iconParameters) {
-                return $('<button>')
-                    .addClass('btn')
+        class Component {
+            static getInstance($element) {
+                return $element.data('instance');
+            }
+
+            constructor($element) {
+                this.$element = $element.data({ instance: this });
+                this.enabled = true;
+            }
+
+            enable(enabled = true) {
+                this.$element.attr({ disabled: !enabled });
+                this.enabled = enabled;
+            }
+            disable(disabled = true) {
+                this.enable(!disabled);
+            }
+        }
+
+        class IconButton extends Component {
+            constructor(iconClass) {
+                super($('<button>'))
+                this.$element
                     .attr({ type: 'button' })
+                    .addClass('btn')
                     .css({ '--bs-btn-padding-x': '.2rem', '--bs-btn-border-width': '0px' })
-                    .append($('<i>').addClass(`fs-2 bi ${iconParameters}`));
+                    .append(
+                        $('<i>')
+                            .addClass(`fs-2 bi ${iconClass}`));
+                this._iconClass = iconClass;
             }
 
-            static icon($iconButton) {
-                return $iconButton.children();
+            enable(enabled = true) {
+                if (enabled) {
+                    this.$element.children().removeClass('text-muted');
+                } else {
+                    this.$element.children().addClass('text-muted');
+                }
+                super.enable(enabled);
             }
         }
-        class IconToggleButton {
-            static create(iconParameters) {
-                return IconButton.create(iconParameters)
-                    .attr({ 'data-toggle-state': 'off' })
+
+        class ToggleIconButton extends IconButton {
+            constructor(offIconClass, onIconClass) {
+                super(offIconClass);
+                this.$element.click(function () {
+                    const toggleIconButton = $(this).data('instance');
+                    toggleIconButton.toggle();
+                });
+                this.toggleState = false;
+                this._offIconClass = offIconClass;
+                this._onIconClass = onIconClass;
             }
 
-            static icon($iconButton) {
-                return IconButton.icon($iconButton);
-            }
-
-            static toggle($iconButton) {
-                $iconButton.attr({ 'data-toggle-state': $iconButton.attr('data-toggle-state') == 'on' ? 'off' : 'on' });
-                return $iconButton.attr('data-toggle-state') == 'on';
+            toggle(toggleState = !this.toggleState) {
+                this.$element.children().removeClass(this._iconClass);
+                this._iconClass = toggleState ? this._onIconClass : this._offIconClass;
+                this.$element.children().addClass(this._iconClass);
+                this.toggleState = toggleState;
             }
         }
+
         class ShoppingItemView {
             constructor() {
                 self = this
@@ -122,20 +156,13 @@
                     .addClass('d-flex flex-row align-items-center')
                     .attr({ 'data-ui-name': 'itemPane' })
                     .append(
-                        IconButton.create('bi-dash-circle-fill text-danger')
+                        (new IconButton('bi-dash-circle-fill text-danger'))
+                            .$element
                             .css({ marginRight: '0.5rem', display: 'none' })
                             .click(function () {
                                 $(this).parent().remove();
                             }),
-                        IconToggleButton.create('bi-square')
-                            .click(function () {
-                                const toggleState = IconToggleButton.toggle($(this));
-
-                                const iconParameters = ['bi-square', 'bi-check-square-fill text-success'];
-                                const $icon = IconToggleButton.icon($(this));
-                                $icon.addClass(iconParameters[Number(toggleState)]);
-                                $icon.removeClass(iconParameters[Number(!toggleState)]);
-                            }),
+                        (new ToggleIconButton('bi-square', 'bi-check-square-fill text-success')).$element,
                         $('<input>')
                             .addClass('form-control border-0')
                             .attr({ type: 'text', placeholder: '品名' })
@@ -159,34 +186,33 @@
                                             .attr({ value: 'g' })
                                             .text('g'),
                                     )),
-                        IconButton.create('bi-list text-secondary')
+                        (new IconButton('bi-list text-secondary'))
+                            .$element
                             .css({ marginLeft: '0.5rem', display: 'none' }));
             }
         }
         class ShoppingListView {
             constructor() {
                 const self = this;
-                this.addButton = IconButton.create('bi-plus-circle')
-                    .click(function () {
-                        self.items.append(self.createItem());
-                    });
-                this.editButton = IconToggleButton.create('bi-pencil-square')
-                    .click(function () {
-                        const toggleState = IconToggleButton.toggle($(this));
+                this.addButton = new IconButton('bi-plus-circle');
+                this.addButton.$element.click(function () {
+                    self.items.append(self.createItem());
+                });
+                this.editButton = new ToggleIconButton('bi-pencil-square', 'bi-check-lg text-success');
+                this.editButton.$element.click(function () {
+                    const toggleState = self.editButton.toggleState;
 
-                        const iconParameters = ['bi-pencil-square', 'bi-check-lg text-success'];
-                        const $icon = IconToggleButton.icon($(this));
-                        $icon.addClass(iconParameters[Number(toggleState)]);
-                        $icon.removeClass(iconParameters[Number(!toggleState)]);
-
-                        self.addButton.css({ display: toggleState ? 'none' : '' });
-                        self.clearButton.css({ display: toggleState ? '' : 'none' });
-                        self.items.find('button, input, select').attr({ disabled: toggleState });
-                        self.items.children().children(':first-child, :last-child')
-                            .attr({ disabled: false })
-                            .css({ display: toggleState ? '' : 'none' });
+                    self.addButton.$element.css({ display: toggleState ? 'none' : '' });
+                    self.clearButton.$element.css({ display: toggleState ? '' : 'none' });
+                    self.items.find('input, select').attr({ disabled: toggleState });
+                    self.items.children().children(':nth-child(5n + 2)').each(function () {
+                        Component.getInstance($(this)).disable(toggleState);
                     });
-                this.clearButton = IconButton.create('bi-trash3 text-danger')
+                    self.items.children().children(':first-child, :last-child')
+                        .css({ display: toggleState ? '' : 'none' });
+                });
+                this.clearButton = new IconButton('bi-trash3 text-danger');
+                this.clearButton.$element
                     .css({ display: 'none' })
                     .click(function () {
                         const ret = window.confirm('リスト内の項目をすべて削除しますか？');
@@ -210,10 +236,10 @@
                                     .append(
                                         $('<div>')
                                             .addClass('col')
-                                            .append(this.addButton, this.clearButton),
+                                            .append(this.addButton.$element, this.clearButton.$element),
                                         $('<div>')
                                             .addClass('col text-end')
-                                            .append(this.editButton))));
+                                            .append(this.editButton.$element))));
 
             }
 
