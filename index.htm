@@ -149,10 +149,12 @@
             }
         }
 
-        class ShoppingItemView {
-            constructor() {
-                self = this
-                this.root = $('<div>')
+        class ShoppingItem extends Component {
+            constructor(shoppingList) {
+                super($('<div>'));
+                const self = this
+                this.shoppingList = shoppingList;
+                this.$element
                     .addClass('d-flex flex-row align-items-center')
                     .attr({ 'data-ui-name': 'itemPane' })
                     .append(
@@ -248,7 +250,7 @@
             }
 
             createItem() {
-                return (new ShoppingItemView).root
+                return (new ShoppingItemView).$element;
             }
         }
         $(function () {
