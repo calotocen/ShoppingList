@@ -161,37 +161,39 @@
                     .click(function () {
                         shoppingList.removeItem(self);
                     });
+                this.checkbox = new ToggleIconButton('bi-square', 'bi-check-square-fill text-success');
+                this.$nameInput = $('<input>')
+                    .addClass('form-control border-0')
+                    .attr({ type: 'text', placeholder: '品名' })
+                    .css({ marginRight: '6px' }); // prevent the border that appears when making a selection from being missing.
+                this.$amountInput = $('<input>')
+                    .addClass('form-control border-0')
+                    .attr({ type: 'number', placeholder: '量', inputmode: 'numeric' })
+                    .css({ minWidth: '3.9rem', maxWidth: '3.9rem', textAlign: 'right' });
+                this.$unitSelect = $('<select>')
+                    .addClass('form-select border-0 text-white bg-secondary')
+                    .css({ minWidth: '4.1rem', maxWidth: '4.1rem' })
+                    .append(
+                        $('<option>')
+                            .attr({ value: '個', selected: true })
+                            .text('個'),
+                        $('<option>')
+                            .attr({ value: 'g' })
+                            .text('g'),
+                    );
+                this.moveButton = new IconButton('bi-list text-secondary');
+                this.moveButton.$element.css({ marginLeft: '0.5rem', display: 'none' });
                 this.$element
                     .addClass('d-flex flex-row align-items-center')
                     .append(
                         this.removeButton.$element,
-                        (new ToggleIconButton('bi-square', 'bi-check-square-fill text-success')).$element,
-                        $('<input>')
-                            .addClass('form-control border-0')
-                            .attr({ type: 'text', placeholder: '品名' })
-                            .css({ marginRight: '6px' }), // prevent the border that appears when making a selection from being missing.
+                        this.checkbox.$element,
+                        this.$nameInput,
                         $('<div>')
                             .addClass('input-group')
                             .css({ minWidth: '8rem', maxWidth: '8rem' })
-                            .append(
-                                $('<input>')
-                                    .addClass('form-control border-0')
-                                    .attr({ type: 'number', placeholder: '量', inputmode: 'numeric' })
-                                    .css({ minWidth: '3.9rem', maxWidth: '3.9rem', textAlign: 'right' }),
-                                $('<select>')
-                                    .addClass('form-select border-0 text-white bg-secondary')
-                                    .css({ minWidth: '4.1rem', maxWidth: '4.1rem' })
-                                    .append(
-                                        $('<option>')
-                                            .attr({ value: '個', selected: true })
-                                            .text('個'),
-                                        $('<option>')
-                                            .attr({ value: 'g' })
-                                            .text('g'),
-                                    )),
-                        (new IconButton('bi-list text-secondary'))
-                            .$element
-                            .css({ marginLeft: '0.5rem', display: 'none' }));
+                            .append(this.$amountInput, this.$unitSelect),
+                        this.moveButton.$element);
             }
         }
         class ShoppingList extends Component {
