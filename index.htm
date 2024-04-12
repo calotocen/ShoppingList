@@ -13,6 +13,10 @@
             --bs-btn-padding-x: .2rem;
             --bs-btn-border-width: 0px;
         }
+
+        [disabled] {
+            filter: grayscale(100%);
+        }
     </style>
 </head>
 
@@ -139,7 +143,7 @@
                     .attr({ 'data-toggled': 'true' })
                     .append(
                         $('<i>').addClass('bi bi-square'),
-                        $('<i>').addClass('bi bi-check-square'))
+                        $('<i>').addClass('bi bi-check-square-fill text-success'))
                 this.$nameInput = $('<input>')
                     .addClass('form-control border-0 me-1')
                     .attr({ type: 'text', placeholder: '品名' })
