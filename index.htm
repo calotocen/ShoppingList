@@ -225,6 +225,7 @@
                     });
                 this.$clearButton = $('<button>')
                     .addClass('btn btn-icon')
+                    .attr({ disabled: true })
                     .append($('<i>').addClass('fs-2 bi-trash3 text-danger'))
                     .hide()
                     .click(function () {
@@ -254,6 +255,7 @@
             addItem(shoppingItem) {
                 this.items.push(shoppingItem);
                 this.$view.children(':first-child').append(shoppingItem.$view);
+                this.$clearButton.removeAttr('disabled');
             }
 
             removeItem(shoppingItem) {
@@ -263,6 +265,9 @@
                 }
                 this.items[index].removeSelf();
                 this.items.splice(index, 1);
+                if (this.items.length == 0) {
+                    this.$clearButton.attr({ disabled: true });
+                }
             }
 
             removeAllItems() {
