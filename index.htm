@@ -284,10 +284,12 @@
             change_mode(mode) {
                 switch (mode) {
                     case 'view':
+                        this.$editButton.attr({ 'data-toggle-state': false });
                         this.$addButton.show();
                         this.$clearButton.hide();
                         break;
                     case 'edit':
+                        this.$editButton.attr({ 'data-toggle-state': true });
                         this.$addButton.hide();
                         this.$clearButton.show();
                         break;
@@ -295,6 +297,7 @@
                 this.items.forEach(item => item.change_mode(mode));
             }
         }
+
         $(function () {
             enable_toggle_support();
             $('[data-ui-name="body"]').append((new ShoppingList()).$view);
