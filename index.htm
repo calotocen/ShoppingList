@@ -199,6 +199,10 @@
                         break;
                 }
             }
+
+            removeSelf() {
+                this.$view.remove();
+            }
         }
         class ShoppingList {
             constructor() {
@@ -217,7 +221,7 @@
                         $('<i>').addClass('fs-2 bi bi-pencil-square'),
                         $('<i>').addClass('fs-2 bi bi-check-lg text-success'))
                     .click(function () {
-                        self.items.forEach(item => item.change_mode($(this).attr('data-toggle-state') == 'false' ? 'view' : 'edit'));
+                        self.change_mode($(this).attr('data-toggle-state') != 'false' ? 'edit' : 'view');
                     });
                 this.$clearButton = $('<button>')
                     .addClass('btn btn-icon')
@@ -258,12 +262,27 @@
             }
 
             removeAllItems() {
-                this.items.forEach(item => item.$element.remove());
+                this.items.forEach(item => item.removeSelf());
                 this.items = [];
+                this.change_mode('view');
             }
 
             createItem() {
                 return (new ShoppingItemView).$view;
+            }
+
+            change_mode(mode) {
+                switch (mode) {
+                    case 'view':
+                        this.$addButton.show();
+                        this.$clearButton.hide();
+                        break;
+                    case 'edit':
+                        this.$addButton.hide();
+                        this.$clearButton.show();
+                        break;
+                }
+                this.items.forEach(item => item.change_mode(mode));
             }
         }
         $(function () {
