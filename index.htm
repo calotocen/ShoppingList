@@ -8,6 +8,12 @@
     <title>買い物リスト</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .btn-icon {
+            --bs-btn-padding-x: .2rem;
+            --bs-btn-border-width: 0px;
+        }
+    </style>
 </head>
 
 <body>
@@ -87,85 +93,55 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        class Component {
-            static getInstance($element) {
-                return $element.data('instance');
-            }
-
-            constructor($element) {
-                this.$element = $element.data({ instance: this });
-                this.enabled = true;
-            }
-
-            enable(enabled = true) {
-                this.$element.attr({ disabled: !enabled });
-                this.enabled = enabled;
-            }
-            disable(disabled = true) {
-                this.enable(!disabled);
-            }
+        function enable_toggle_support() {
+            togglize($('[data-toggled="true"]'));
+            (new MutationObserver(mutations => mutations
+                .map(mutation => $(mutation.addedNodes).find('[data-toggled="true"]'))
+                .forEach(node => togglize($(node)))))
+                .observe(document.getElementsByTagName('body')[0], { childList: true, subtree: true });
         }
 
-        class IconButton extends Component {
-            constructor(iconClass) {
-                super($('<button>'))
-                this.$element
-                    .attr({ type: 'button' })
-                    .addClass('btn')
-                    .css({ '--bs-btn-padding-x': '.2rem', '--bs-btn-border-width': '0px' })
-                    .append(
-                        $('<i>')
-                            .addClass(`fs-2 bi ${iconClass}`));
-                this._iconClass = iconClass;
-            }
+        function togglize($elements) {
+            $elements.each(function () {
+                (new MutationObserver(mutations => mutations
+                    .map(mutation => $(mutation.target))
+                    .forEach($target => {
+                        $target.children($target.attr('data-toggle-state') == 'false' ? ':last' : ':first').hide();
+                        $target.children($target.attr('data-toggle-state') == 'false' ? ':first' : ':last').show();
+                    })))
+                    .observe(this, { attributes: true, attributeFilter: ['data-toggle-state'] });
 
-            enable(enabled = true) {
-                if (enabled) {
-                    this.$element.children().removeClass('text-muted');
-                } else {
-                    this.$element.children().addClass('text-muted');
-                }
-                super.enable(enabled);
-            }
+                handlers = $._data(this, 'events') ? $._data(this, 'events').click.map(handler => handler.handler) : [];
+                handlers.forEach(handler => $(this).off('click', handler));
+                $(this)
+                    .attr({ 'data-toggle-state': $(this).attr('data-toggle-state') ?? 'false' })
+                    .click(function () {
+                        $(this).attr({ 'data-toggle-state': $(this).attr('data-toggle-state') == 'false' ? 'true' : 'false' })
+                    });
+                handlers.forEach(handler => $(this).on('click', handler));
+            })
         }
 
-        class ToggleIconButton extends IconButton {
-            constructor(offIconClass, onIconClass) {
-                super(offIconClass);
-                this.$element.click(function () {
-                    const toggleIconButton = $(this).data('instance');
-                    toggleIconButton.toggle();
-                });
-                this.toggleState = false;
-                this._offIconClass = offIconClass;
-                this._onIconClass = onIconClass;
-            }
-
-            toggle(toggleState = !this.toggleState) {
-                this.$element.children().removeClass(this._iconClass);
-                this._iconClass = toggleState ? this._onIconClass : this._offIconClass;
-                this.$element.children().addClass(this._iconClass);
-                this.toggleState = toggleState;
-            }
-        }
-
-        class ShoppingItem extends Component {
+        class ShoppingItem {
             constructor(shoppingList) {
-                super($('<div>'));
                 const self = this
                 this.shoppingList = shoppingList;
-                this.removeButton = new IconButton('bi-dash-circle-fill text-danger');
-                this.removeButton.$element
-                    .css({ marginRight: '0.5rem' })
+                this.$removeButton = $('<button>')
+                    .addClass('fs-2 btn btn-icon me-2')
+                    .append($('<i>').addClass('bi bi-dash-circle-fill text-danger'))
                     .hide()
                     .click(function () {
                         shoppingList.removeItem(self);
                     });
-                this.checkbox = new ToggleIconButton('bi-square', 'bi-check-square-fill text-success');
+                this.$checkbox = $('<button>')
+                    .addClass('fs-2 btn btn-icon me-1')
+                    .attr({ 'data-toggled': 'true' })
+                    .append(
+                        $('<i>').addClass('bi bi-square'),
+                        $('<i>').addClass('bi bi-check-square'))
                 this.$nameInput = $('<input>')
-                    .addClass('form-control border-0')
+                    .addClass('form-control border-0 me-1')
                     .attr({ type: 'text', placeholder: '品名' })
-                    .css({ marginRight: '6px' }); // prevent the border that appears when making a selection from being missing.
                 this.$amountInput = $('<input>')
                     .addClass('form-control border-0')
                     .attr({ type: 'number', placeholder: '量', inputmode: 'numeric' })
@@ -181,53 +157,60 @@
                             .attr({ value: 'g' })
                             .text('g'),
                     );
-                this.moveButton = new IconButton('bi-list text-secondary');
-                this.moveButton.$element.css({ marginLeft: '0.5rem', display: 'none' });
-                this.$element
+                this.$moveButton = $('<button>')
+                    .addClass('fs-2 btn btn-icon ms-2')
+                    .append($('<i>').addClass('bi-list text-secondary'))
+                    .hide()
+                this.$view = $('<div>')
                     .addClass('d-flex flex-row align-items-center')
                     .append(
-                        this.removeButton.$element,
-                        this.checkbox.$element,
+                        this.$removeButton,
+                        this.$checkbox,
                         this.$nameInput,
                         $('<div>')
                             .addClass('input-group')
                             .css({ minWidth: '8rem', maxWidth: '8rem' })
                             .append(this.$amountInput, this.$unitSelect),
-                        this.moveButton.$element);
+                        this.$moveButton);
             }
         }
-        class ShoppingList extends Component {
+        class ShoppingList {
             constructor() {
-                super($('<div>'))
                 const self = this;
                 this.items = [];
-                this.addButton = new IconButton('bi-plus-circle');
-                this.addButton.$element.click(function () {
-                    self.addItem(new ShoppingItem(self));
-                });
-                this.editButton = new ToggleIconButton('bi-pencil-square', 'bi-check-lg text-success');
-                this.editButton.$element.click(function () {
-                    const toggleState = self.editButton.toggleState;
-
-                    self.addButton.$element.toggle();
-                    self.clearButton.$element.toggle();
-                    self.items.forEach(item => {
-                        item.$element.find('input, select').attr({ disabled: toggleState });
-                        item.$element.children(':eq(1)').each(function () {
-                            Component.getInstance($(this)).disable(toggleState);
-                        });
-                        item.$element.children(':first-child, :last-child').toggle();
+                this.$addButton = $('<button>')
+                    .addClass('btn btn-icon')
+                    .append($('<i>').addClass('fs-2 bi bi-plus-circle'))
+                    .click(function () {
+                        self.addItem(new ShoppingItem(self));
                     });
-                });
-                this.clearButton = new IconButton('bi-trash3 text-danger');
-                this.clearButton.$element
-                    .css({ display: 'none' })
+                this.$editButton = $('<button>')
+                    .addClass('btn btn-icon')
+                    .attr({ 'data-toggled': 'true' })
+                    .append(
+                        $('<i>').addClass('fs-2 bi bi-pencil-square'),
+                        $('<i>').addClass('fs-2 bi bi-check-lg text-success'))
+                    .click(function () {
+                        console.log($(this).attr('data-toggle-state'));
+                        const toggleState = $(this).attr('data-toggle-state') != 'false';
+                        console.log(toggleState);
+                        self.$addButton.toggle();
+                        self.$clearButton.toggle();
+                        self.items.forEach(item => {
+                            item.$view.find('button, input, select').attr({ disabled: toggleState });
+                            item.$view.children(':first-child, :last-child').toggle();
+                        });
+                    });
+                this.$clearButton = $('<button>')
+                    .addClass('btn btn-icon')
+                    .append($('<i>').addClass('fs-2 bi-trash3 text-danger'))
+                    .hide()
                     .click(function () {
                         const ret = window.confirm('リスト内の項目をすべて削除しますか？');
                         if (!ret) return;
                         self.removeAllItems();
                     });
-                this.$element
+                this.$view = $('<div>')
                     .addClass('container-fluid')
                     .append(
                         $('<div>')
@@ -240,20 +223,20 @@
                                     .append(
                                         $('<div>')
                                             .addClass('col')
-                                            .append(this.addButton.$element, this.clearButton.$element),
+                                            .append(this.$addButton, this.$clearButton),
                                         $('<div>')
                                             .addClass('col text-end')
-                                            .append(this.editButton.$element))));
+                                            .append(this.$editButton))));
             }
 
             addItem(shoppingItem) {
                 this.items.push(shoppingItem);
-                this.$element.children(':first-child').append(shoppingItem.$element);
+                this.$view.children(':first-child').append(shoppingItem.$view);
             }
 
             removeItem(shoppingItem) {
                 this.items = this.items.filter(item => item != shoppingItem);
-                shoppingItem.$element.remove();
+                shoppingItem.$view.remove();
             }
 
             removeAllItems() {
@@ -262,11 +245,12 @@
             }
 
             createItem() {
-                return (new ShoppingItemView).$element;
+                return (new ShoppingItemView).$view;
             }
         }
         $(function () {
-            $('[data-ui-name="body"]').append((new ShoppingList()).$element);
+            enable_toggle_support();
+            $('[data-ui-name="body"]').append((new ShoppingList()).$view);
         })
     </script>
 </body>
