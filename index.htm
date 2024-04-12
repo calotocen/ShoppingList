@@ -257,13 +257,18 @@
             }
 
             removeItem(shoppingItem) {
-                this.items = this.items.filter(item => item != shoppingItem);
-                shoppingItem.$view.remove();
+                const index = this.items.indexOf(shoppingItem);
+                if (index == -1) {
+                    return;
+                }
+                this.items[index].removeSelf();
+                this.items.splice(index, 1);
             }
 
             removeAllItems() {
-                this.items.forEach(item => item.removeSelf());
-                this.items = [];
+                while (this.items.length > 0) {
+                    this.removeItem(this.items[0]);
+                }
                 this.change_mode('view');
             }
 
