@@ -11,6 +11,7 @@
     <style>
         .btn-icon {
             --bs-btn-padding-x: .2rem;
+            --bs-btn-padding-y: .2rem;
             --bs-btn-border-width: 0px;
         }
 
@@ -22,10 +23,38 @@
 
 <body>
     <div class="p-0 container">
-        <div class="p-1" data-ui-name="header" style="background-color: #d8ffd8;">
-            <p class="m-0 fw-bold text-center">リスト</p>
+        <div class="row" style="background-color: #d8ffd8;">
+            <div class="col d-flex justify-content-start align-items-center">
+                <button type="button" class="btn btn-icon ms-2" data-bs-toggle="dropdown" aria-expanded="true">
+                    <i class="fs-2 bi bi-list-ul"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal">リストの編集</a></li>
+                </ul>
+            </div>
+            <div class="col d-flex justify-content-center align-items-center">
+                <span class="fw-bold">リスト</span>
+            </div>
+            <div class="col d-flex justify-content-end align-items-center"></div>
         </div>
         <div data-ui-name="body">
+        </div>
+        <div class="modal" id="exampleModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Modal title</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Modal body text goes here.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
         </div>
         <!--
         <div id="itemListContainer" class="container-fluid">
