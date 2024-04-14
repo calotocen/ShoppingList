@@ -37,7 +37,36 @@
             </div>
             <div class="col d-flex justify-content-end align-items-center"></div>
         </div>
-        <div data-ui-name="body">
+        <div class="row">
+            <div class="col">
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button p-1" type="button" data-bs-toggle="collapse"
+                                data-bs-target="[data-id='abc']">
+                                Accordion Item #1
+                            </button>
+                        </h2>
+                        <div data-id="abc" class="accordion-collapse collapse show">
+                            <div class="accordion-body p-0" data-ui-name="body">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button p-1" type="button" data-bs-toggle="collapse"
+                                data-bs-target="[data-id='abcd']">
+                                Accordion Item #2
+                            </button>
+                        </h2>
+                        <div data-id="abcd" class="accordion-collapse collapse show">
+                            <div class="accordion-body">
+                                #2
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="modal" id="exampleModal" tabindex="-1">
             <div class="modal-dialog">
@@ -233,6 +262,7 @@
                 this.$view.remove();
             }
         }
+
         class ShoppingList {
             constructor() {
                 const self = this;
@@ -263,7 +293,7 @@
                         self.removeAllItems();
                     });
                 this.$view = $('<div>')
-                    .addClass('container-fluid')
+                    .addClass('container-fluid p-0')
                     .append(
                         $('<div>')
                             .addClass('container-fluid'),
