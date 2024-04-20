@@ -47,13 +47,22 @@
             constructor() {
                 this.recipes = [];
                 this.ingredients = [];
+                this.shoppingItems = [];
             }
         }
 
         class ShoppingListView {
-            constructor(ingredients) {
-                this.$element = $('<div>').html(
-                    Object.values(Object.groupBy(ingredients, ({ name, unit }) => [name, unit]))
+            constructor(controller, model) {
+                this.controller = controller;
+                this.model = model;
+                this.$element = $('<div>');
+                this.update();
+            }
+
+            update() {
+                this.$element.empty();
+                this.$element.html(
+                    Object.values(Object.groupBy(this.model.shoppingItems, ({ name, unit }) => [name, unit]))
                         .flatMap(grouped_ingredients => {
                             const name = grouped_ingredients[0].name;
                             const total_amount = grouped_ingredients.reduce((accumulator, ingredient) => accumulator + ingredient.amount, 0);
@@ -65,24 +74,65 @@
         }
 
         class RecipeSelectionView {
-            constructor(recipes) {
-                this.$addButton = $('<button>')
-                    .addClass('btn')
-                    .attr({ type: 'button' })
-                    .text('追加');
-                this.$element = $('<div>').append(
-                    recipes.map(recipe =>
+            constructor(controller, model) {
+                this.controller = controller;
+                this.model = model;
+                this.$element = $('<div>');
+                this.update();
+            }
+
+            update() {
+                self = this;
+                this.$element.empty();
+                this.$element.append(
+                    this.model.recipes.map(recipe =>
                         $('<div>').append(
                             $('<input>')
                                 .addClass('form-check-input')
-                                .attr({ type: 'checkbox', id: recipe.id }),
+                                .attr({ type: 'checkbox', id: recipe.id })
+                                .data({ model: recipe })
+                                .change(function () {
+                                    $(this).prop('checked')
+                                        ? self.controller.addIngreditsToShoppingList($(this).data('model'))
+                                        : self.controller.removeIngreditsToShoppingList($(this).data('model'));
+                                }),
                             $('<label>')
                                 .addClass('form-check-label')
                                 .attr({ for: recipe.id })
                                 .text(recipe.name))),
-                    this.$addButton);
+                    $('<button>')
+                        .addClass('btn')
+                        .attr({ type: 'button' })
+                        .text('追加'));
+
             }
         }
+
+        class Controller {
+            constructor(model) {
+                this.model = model;
+                this.shoppingListView = new ShoppingListView(this, model);
+                this.recipeSelectionView = new RecipeSelectionView(this, model);
+                $('[data-id="root"]').append(this.shoppingListView.$element);
+                $('[data-id="root"]').append(this.recipeSelectionView.$element);
+            }
+
+            addIngreditsToShoppingList(recipe) {
+                this.model.shoppingItems.push(
+                    ...this.model.ingredients.filter(ingredient => ingredient.belongingTo == recipe)
+                );
+                this.shoppingListView.update();
+                console.log(this.model);
+            }
+            removeIngreditsToShoppingList(recipe) {
+                this.model.shoppingItems = this.model.shoppingItems.filter(
+                    ingredient => ingredient.belongingTo != recipe
+                );
+                this.shoppingListView.update();
+                console.log(this.model);
+            }
+        }
+
         $(function () {
             if (Object.groupBy === undefined) {
                 Object.groupBy = function (items, callbackFn) {
@@ -193,11 +243,7 @@
             ));
             console.log(model);
 
-            shoppingListView = new ShoppingListView(model.ingredients);
-            $('[data-id="root"]').append(shoppingListView.$element);
-
-            recipeSelectionView = new RecipeSelectionView(model.recipes);
-            $('[data-id="root"]').append(recipeSelectionView.$element);
+            controller = new Controller(model);
         })
     </script>
 </body>
