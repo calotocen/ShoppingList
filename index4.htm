@@ -85,7 +85,7 @@
         }
         $(function () {
             if (Object.groupBy === undefined) {
-                Object.groupBy = function(items, callbackFn) {
+                Object.groupBy = function (items, callbackFn) {
                     groupedItems = {};
                     items.forEach(item => {
                         key = `${callbackFn.call(this, item)}`;
