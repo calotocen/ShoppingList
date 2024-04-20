@@ -50,7 +50,7 @@
 
         class ShoppingListView {
             constructor(ingredients) {
-                this.$element = $('div').html(
+                this.$element = $('<div>').html(
                     Object.values(Object.groupBy(ingredients, ({ name, unit }) => [name, unit]))
                         .flatMap(grouped_ingredients => {
                             const name = grouped_ingredients[0].name;
