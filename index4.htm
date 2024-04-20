@@ -63,6 +63,20 @@
         }
 
         $(function () {
+            if (Object.groupBy === undefined) {
+                Object.groupBy = function(items, callbackFn) {
+                    groupedItems = {};
+                    items.forEach(item => {
+                        key = `${callbackFn.call(this, item)}`;
+                        if (!(key in groupedItems)) {
+                            groupedItems[key] = [];
+                        }
+                        groupedItems[key].push(item);
+                    });
+                    return groupedItems;
+                }
+            }
+
             const initial_data = {
                 インドカレー: [
                     ['鶏もも肉', 250, 'g'],
