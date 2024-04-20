@@ -48,7 +48,7 @@
             }
         }
 
-        class ShoppingList {
+        class ShoppingListView {
             constructor(ingredients) {
                 this.$element = $('div').html(
                     Object.values(Object.groupBy(ingredients, ({ name, unit }) => [name, unit]))
@@ -161,8 +161,8 @@
             ));
             console.log(model);
 
-            shoppingList = new ShoppingList(model.ingredients);
-            $('[data-id="root"]').append(shoppingList.$element);
+            shoppingListView = new ShoppingListView(model.ingredients);
+            $('[data-id="root"]').append(shoppingListView.$element);
         })
     </script>
 </body>
