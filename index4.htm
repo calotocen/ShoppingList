@@ -104,15 +104,32 @@
                         .addClass('btn')
                         .attr({ type: 'button' })
                         .text('追加'));
-
             }
         }
 
         class Controller {
             constructor(model) {
+                self = this;
                 this.model = model;
                 this.shoppingListView = new ShoppingListView(this, model);
                 this.recipeSelectionView = new RecipeSelectionView(this, model);
+                $('[data-id="root"]').append(
+                    $('<button>')
+                        .addClass('btn')
+                        .attr({ type: 'button' })
+                        .text('コピー')
+                        .click(function () {
+                            const text = Object.values(Object.groupBy(self.model.shoppingItems, ({ name, unit }) => [name, unit]))
+                                .flatMap(grouped_ingredients => {
+                                    const name = grouped_ingredients[0].name;
+                                    const total_amount = grouped_ingredients.reduce((accumulator, ingredient) => accumulator + ingredient.amount, 0);
+                                    const unit = grouped_ingredients[0].unit;
+                                    return `${name} ... ${total_amount} ${unit}`;
+                                })
+                                .join("\n")
+                            console.log(text);
+                            navigator.clipboard.writeText(text);
+                        }));
                 $('[data-id="root"]').append(this.shoppingListView.$element);
                 $('[data-id="root"]').append(this.recipeSelectionView.$element);
             }
@@ -156,6 +173,21 @@
                     random_numbers[8] = 0x80 | (random_numbers[8] & 0x3f);
                     random_numbers = Array.from(random_numbers);
                     return 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'.replaceAll('xx', s => random_numbers.shift().toString(16).padStart(2, '0'));
+                }
+            }
+
+            if (navigator.clipboard === undefined) {
+                navigator.clipboard = new Object();
+            }
+            if (navigator.clipboard.writeText === undefined) {
+                navigator.clipboard.writeText = function (text) {
+                    const $textarea = $('<textarea>').val(text);
+                    const $element = $('<div>').append($textarea);
+                    $('body').append($element);
+                    const selection = window.getSelection();
+                    selection.selectAllChildren($element[0]);
+                    document.execCommand('copy');
+                    $element.remove();
                 }
             }
 
