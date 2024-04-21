@@ -120,13 +120,43 @@
             }
         }
 
+        class ItemGroupAdditionView {
+            constructor(controller, model) {
+                this.controller = controller;
+                this.model = model;
+                this.$element = $('<div>');
+                this.update();
+            }
+
+            update() {
+                const myself = this;
+                this.$nameInput = $('<input>')
+                    .addClass('form-control')
+                    .attr({ type: 'text' });
+                this.$element.append(
+                    this.$nameInput,
+                    $('<button>')
+                        .addClass('btn')
+                        .attr({ type: 'button' })
+                        .text('追加2')
+                        .click(function () {
+                            console.log(myself);
+                            console.log(myself.$nameInput);
+                            myself.controller.addItemGroup(myself.$nameInput.val());
+                            console.log(myself);
+                        }));
+            }
+        }
+
         class Controller {
             constructor(model) {
                 const myself = this;
                 this.model = model;
                 this.shoppingListView = new ShoppingListView(this, model);
                 this.recipeSelectionView = new RecipeSelectionView(this, model);
+                this.itemGroupAdditionView = new ItemGroupAdditionView(this, model);
                 $('[data-id="root"]').append(
+                    this.itemGroupAdditionView.$element,
                     $('<button>')
                         .addClass('btn')
                         .attr({ type: 'button' })
@@ -134,9 +164,9 @@
                         .click(function () {
                             const text = myself.model.shoppingItems.map(i => i.toString()).join('\n');
                             navigator.clipboard.writeText(text);
-                        }));
-                $('[data-id="root"]').append(this.shoppingListView.$element);
-                $('[data-id="root"]').append(this.recipeSelectionView.$element);
+                        }),
+                    this.shoppingListView.$element,
+                    this.recipeSelectionView.$element);
             }
 
             addIngreditsToShoppingList(itemGroup) {
@@ -156,6 +186,11 @@
                     .map(groupedItems => new AggregatedItem({ items: groupedItems }))
                 this.shoppingListView.update();
                 console.log(this.model);
+            }
+
+            addItemGroup(name, items = []) {
+                this.model.recipes.push(new Recipe({ name: name }));
+                this.recipeSelectionView.update();
             }
         }
 
