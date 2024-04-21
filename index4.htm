@@ -178,12 +178,12 @@
                 this.updateShoppingItems();
             }
             updateShoppingItems() {
-                this.model.shoppingItems = 
+                this.model.shoppingItems =
                     Object.values(
                         Object.groupBy(
                             this.model.selectedItemGroups.flatMap(g => this.model.ingredients.filter(i => i.belongingTo == g)),
                             ({ name, unit }) => [name, unit]))
-                    .map(groupedItems => new AggregatedItem({ items: groupedItems }))
+                        .map(groupedItems => new AggregatedItem({ items: groupedItems }))
                 this.shoppingListView.update();
                 console.log(this.model);
             }
