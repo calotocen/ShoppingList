@@ -37,6 +37,26 @@
                 this.belongingTo = belongingTo;
             }
         }
+        class AggregatedItem {
+            constructor({ id = `aggregated-item-${window.crypto.randomUUID()}`, items = [] }) {
+                this.id = id;
+                this.items = items;
+            }
+
+            get name() {
+                return this.items[0].name;
+            }
+            get amount() {
+                return this.items.reduce((total, item) => total + item.amount, 0);
+            }
+            get unit() {
+                return this.items[0].unit;
+            }
+
+            toString() {
+                return `${this.name} ... ${this.amount} ${this.unit}`;
+            }
+        }
         class Recipe {
             constructor({ id, name }) {
                 this.id = id ?? `recipe-${window.crypto.randomUUID()}`;
@@ -47,6 +67,7 @@
             constructor() {
                 this.recipes = [];
                 this.ingredients = [];
+                this.selectedItemGroups = [];
                 this.shoppingItems = [];
             }
         }
@@ -61,15 +82,7 @@
 
             update() {
                 this.$element.empty();
-                this.$element.html(
-                    Object.values(Object.groupBy(this.model.shoppingItems, ({ name, unit }) => [name, unit]))
-                        .flatMap(grouped_ingredients => {
-                            const name = grouped_ingredients[0].name;
-                            const total_amount = grouped_ingredients.reduce((accumulator, ingredient) => accumulator + ingredient.amount, 0);
-                            const unit = grouped_ingredients[0].unit;
-                            return `${name} ... ${total_amount} ${unit}`;
-                        })
-                        .join('<br>'));
+                this.$element.html(this.model.shoppingItems.map(i => i.toString()).join('<br>'));
             }
         }
 
@@ -119,32 +132,28 @@
                         .attr({ type: 'button' })
                         .text('コピー')
                         .click(function () {
-                            const text = Object.values(Object.groupBy(self.model.shoppingItems, ({ name, unit }) => [name, unit]))
-                                .flatMap(grouped_ingredients => {
-                                    const name = grouped_ingredients[0].name;
-                                    const total_amount = grouped_ingredients.reduce((accumulator, ingredient) => accumulator + ingredient.amount, 0);
-                                    const unit = grouped_ingredients[0].unit;
-                                    return `${name} ... ${total_amount} ${unit}`;
-                                })
-                                .join("\n")
-                            console.log(text);
+                            const text = self.model.shoppingItems.map(i => i.toString()).join('\n');
                             navigator.clipboard.writeText(text);
                         }));
                 $('[data-id="root"]').append(this.shoppingListView.$element);
                 $('[data-id="root"]').append(this.recipeSelectionView.$element);
             }
 
-            addIngreditsToShoppingList(recipe) {
-                this.model.shoppingItems.push(
-                    ...this.model.ingredients.filter(ingredient => ingredient.belongingTo == recipe)
-                );
-                this.shoppingListView.update();
-                console.log(this.model);
+            addIngreditsToShoppingList(itemGroup) {
+                this.model.selectedItemGroups.push(itemGroup);
+                this.updateShoppingItems();
             }
-            removeIngreditsToShoppingList(recipe) {
-                this.model.shoppingItems = this.model.shoppingItems.filter(
-                    ingredient => ingredient.belongingTo != recipe
-                );
+            removeIngreditsToShoppingList(itemGroup) {
+                this.model.selectedItemGroups = this.model.selectedItemGroups.filter(g => g != itemGroup)
+                this.updateShoppingItems();
+            }
+            updateShoppingItems() {
+                this.model.shoppingItems = 
+                    Object.values(
+                        Object.groupBy(
+                            this.model.selectedItemGroups.flatMap(g => this.model.ingredients.filter(i => i.belongingTo == g)),
+                            ({ name, unit }) => [name, unit]))
+                    .map(groupedItems => new AggregatedItem({ items: groupedItems }))
                 this.shoppingListView.update();
                 console.log(this.model);
             }
