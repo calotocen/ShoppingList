@@ -95,7 +95,7 @@
             }
 
             update() {
-                self = this;
+                const myself = this;
                 this.$element.empty();
                 this.$element.append(
                     this.model.recipes.map(recipe =>
@@ -106,8 +106,8 @@
                                 .data({ model: recipe })
                                 .change(function () {
                                     $(this).prop('checked')
-                                        ? self.controller.addIngreditsToShoppingList($(this).data('model'))
-                                        : self.controller.removeIngreditsToShoppingList($(this).data('model'));
+                                        ? myself.controller.addIngreditsToShoppingList($(this).data('model'))
+                                        : myself.controller.removeIngreditsToShoppingList($(this).data('model'));
                                 }),
                             $('<label>')
                                 .addClass('form-check-label')
@@ -122,7 +122,7 @@
 
         class Controller {
             constructor(model) {
-                self = this;
+                const myself = this;
                 this.model = model;
                 this.shoppingListView = new ShoppingListView(this, model);
                 this.recipeSelectionView = new RecipeSelectionView(this, model);
@@ -132,7 +132,7 @@
                         .attr({ type: 'button' })
                         .text('コピー')
                         .click(function () {
-                            const text = self.model.shoppingItems.map(i => i.toString()).join('\n');
+                            const text = myself.model.shoppingItems.map(i => i.toString()).join('\n');
                             navigator.clipboard.writeText(text);
                         }));
                 $('[data-id="root"]').append(this.shoppingListView.$element);
@@ -177,7 +177,7 @@
             if (window.crypto.randomUUID === undefined) {
                 window.crypto.randomUUID = function () {
                     random_numbers = new Uint8Array(16);
-                    self.crypto.getRandomValues(random_numbers);
+                    myself.crypto.getRandomValues(random_numbers);
                     random_numbers[6] = 0x40 | (random_numbers[6] & 0x0f);
                     random_numbers[8] = 0x80 | (random_numbers[8] & 0x3f);
                     random_numbers = Array.from(random_numbers);
