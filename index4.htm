@@ -327,8 +327,8 @@
                     ['バター', 2, '個'],
                 ],
             };
-            model.recipes.splice(model.recipes.length, 0, ...Object.keys(presetData).map(name => new Recipe({ name: name })));
-            model.ingredients.splice(model.ingredients.length, 0, ...model.recipes.flatMap(
+            model.recipes.push(...Object.keys(presetData).map(name => new Recipe({ name: name })));
+            model.ingredients.push(...model.recipes.flatMap(
                 list => presetData[list.name].map(p => new Ingredient({ name: p[0], amount: p[1], unit: p[2], belongingTo: list }))
             ));
         }
