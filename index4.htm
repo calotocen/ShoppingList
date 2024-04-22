@@ -61,17 +61,17 @@
                 return `${this.name} ... ${this.amount} ${this.unit}`;
             }
         }
-        class ItemGroup {
+        class ItemSet {
             constructor({ id, name }) {
-                this.id = id ?? `itemGroup-${window.crypto.randomUUID()}`;
+                this.id = id ?? `itemSet-${window.crypto.randomUUID()}`;
                 this.name = name;
             }
         }
         class Model {
             constructor() {
-                this.itemGroups = [];
+                this.itemSets = [];
                 this.items = [];
-                this.selectedItemGroups = [];
+                this.selectedItemSets = [];
                 this.shoppingItems = [];
             }
         }
@@ -90,7 +90,7 @@
             }
         }
 
-        class ItemGroupSelectionView {
+        class ItemSetSelectionView {
             constructor(controller, model) {
                 this.controller = controller;
                 this.model = model;
@@ -102,12 +102,12 @@
                 const myself = this;
                 this.$element.empty();
                 this.$element.append(
-                    this.model.itemGroups.map(itemGroup =>
+                    this.model.itemSets.map(itemSet =>
                         $('<div>').append(
                             $('<input>')
                                 .addClass('form-check-input')
-                                .attr({ type: 'checkbox', id: itemGroup.id })
-                                .data({ model: itemGroup })
+                                .attr({ type: 'checkbox', id: itemSet.id })
+                                .data({ model: itemSet })
                                 .change(function () {
                                     $(this).prop('checked')
                                         ? myself.controller.addIngreditsToShoppingList($(this).data('model'))
@@ -115,8 +115,8 @@
                                 }),
                             $('<label>')
                                 .addClass('form-check-label')
-                                .attr({ for: itemGroup.id })
-                                .text(itemGroup.name))),
+                                .attr({ for: itemSet.id })
+                                .text(itemSet.name))),
                     $('<button>')
                         .addClass('btn')
                         .attr({ type: 'button' })
@@ -124,7 +124,7 @@
             }
         }
 
-        class ItemGroupAdditionView {
+        class ItemSetAdditionView {
             constructor(controller, model) {
                 this.controller = controller;
                 this.model = model;
@@ -146,7 +146,7 @@
                         .click(function () {
                             console.log(myself);
                             console.log(myself.$nameInput);
-                            myself.controller.addItemGroup(myself.$nameInput.val());
+                            myself.controller.addItemSet(myself.$nameInput.val());
                             console.log(myself);
                         }));
             }
@@ -157,14 +157,14 @@
                 const myself = this;
                 this.model = model;
                 this.shoppingListView = new ShoppingListView(this, model);
-                this.itemGroupSelectionView = new ItemGroupSelectionView(this, model);
-                this.itemGroupAdditionView = new ItemGroupAdditionView(this, model);
+                this.itemSetSelectionView = new ItemSetSelectionView(this, model);
+                this.itemSetAdditionView = new ItemSetAdditionView(this, model);
                 this.$rootContainer = $('[data-id="rootContainer"]');
                 if (!RuntimeConfiguration.debugMode) {
                     this.$rootContainer
                         .addClass('container')
                         .append(
-                            this.itemGroupAdditionView.$element,
+                            this.itemSetAdditionView.$element,
                             $('<button>')
                                 .addClass('btn')
                                 .attr({ type: 'button' })
@@ -174,7 +174,7 @@
                                     navigator.clipboard.writeText(text);
                                 }),
                             this.shoppingListView.$element,
-                            this.itemGroupSelectionView.$element);
+                            this.itemSetSelectionView.$element);
                 } else {
                     const paneCss = {
                         width: '230px',
@@ -198,36 +198,36 @@
                                     $('<div>')
                                         .addClass('col')
                                         .css(paneCss)
-                                        .append(this.itemGroupSelectionView.$element),
+                                        .append(this.itemSetSelectionView.$element),
                                     $('<div>')
                                         .addClass('col')
                                         .css(paneCss)
-                                        .append(this.itemGroupAdditionView.$element)));
+                                        .append(this.itemSetAdditionView.$element)));
                 }
             }
 
-            addIngreditsToShoppingList(itemGroup) {
-                this.model.selectedItemGroups.push(itemGroup);
+            addIngreditsToShoppingList(itemSet) {
+                this.model.selectedItemSets.push(itemSet);
                 this.updateShoppingItems();
             }
-            removeIngreditsToShoppingList(itemGroup) {
-                this.model.selectedItemGroups = this.model.selectedItemGroups.filter(g => g != itemGroup)
+            removeIngreditsToShoppingList(itemSet) {
+                this.model.selectedItemSets = this.model.selectedItemSets.filter(g => g != itemSet)
                 this.updateShoppingItems();
             }
             updateShoppingItems() {
                 this.model.shoppingItems =
                     Object.values(
                         Object.groupBy(
-                            this.model.selectedItemGroups.flatMap(g => this.model.items.filter(i => i.belongingTo == g)),
+                            this.model.selectedItemSets.flatMap(g => this.model.items.filter(i => i.belongingTo == g)),
                             ({ name, unit }) => [name, unit]))
                         .map(groupedItems => new AggregatedItem({ items: groupedItems }))
                 this.shoppingListView.update();
                 console.log(this.model);
             }
 
-            addItemGroup(name, items = []) {
-                this.model.itemGroups.push(new ItemGroup({ name: name }));
-                this.itemGroupSelectionView.update();
+            addItemSet(name, items = []) {
+                this.model.itemSets.push(new ItemSet({ name: name }));
+                this.itemSetSelectionView.update();
             }
         }
 
@@ -364,8 +364,8 @@
                     ['バター', 2, '個'],
                 ],
             };
-            model.itemGroups.push(...Object.keys(presetData).map(name => new ItemGroup({ name: name })));
-            model.items.push(...model.itemGroups.flatMap(
+            model.itemSets.push(...Object.keys(presetData).map(name => new ItemSet({ name: name })));
+            model.items.push(...model.itemSets.flatMap(
                 list => presetData[list.name].map(p => new Item({ name: p[0], amount: p[1], unit: p[2], belongingTo: list }))
             ));
         }
