@@ -200,7 +200,7 @@
                 Object.groupBy = function (items, callbackFn) {
                     groupedItems = {};
                     items.forEach(item => {
-                        key = `${callbackFn.call(this, item)}`;
+                        key = callbackFn.call(this, item).toString();
                         if (!(key in groupedItems)) {
                             groupedItems[key] = [];
                         }
