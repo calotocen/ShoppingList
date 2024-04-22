@@ -78,15 +78,25 @@
 
         class ShoppingListView {
             constructor(controller, model) {
+                const myself = this;
                 this.controller = controller;
                 this.model = model;
+                this.$itemContainer = $('<div>');
+                this.$copyButton = $('<button>')
+                    .addClass('btn')
+                    .attr({ type: 'button' })
+                    .text('コピー')
+                    .click(function () {
+                        console.log(myself);
+                        myself.controller.writeCurrentShoppingListToClipboard();
+                    });
                 this.$element = $('<div>');
+                this.$element.append(this.$itemContainer, this.$copyButton);
                 this.update();
             }
 
             update() {
-                this.$element.empty();
-                this.$element.html(this.model.shoppingItems.map(i => i.toString()).join('<br>'));
+                this.$itemContainer.html(this.model.shoppingItems.map(i => i.toString()).join('<br>'));
             }
         }
 
@@ -165,14 +175,6 @@
                         .addClass('container')
                         .append(
                             this.itemSetAdditionView.$element,
-                            $('<button>')
-                                .addClass('btn')
-                                .attr({ type: 'button' })
-                                .text('コピー')
-                                .click(function () {
-                                    const text = myself.model.shoppingItems.map(i => i.toString()).join('\n');
-                                    navigator.clipboard.writeText(text);
-                                }),
                             this.shoppingListView.$element,
                             this.itemSetSelectionView.$element);
                 } else {
@@ -228,6 +230,13 @@
             addItemSet(name, items = []) {
                 this.model.itemSets.push(new ItemSet({ name: name }));
                 this.itemSetSelectionView.update();
+            }
+
+            writeCurrentShoppingListToClipboard() {
+                const text = this.model.shoppingItems.map(i => i.toString()).join('\n');
+                console.log('kita');
+                console.log(this.model.shoppingItems);
+                navigator.clipboard.writeText(text);
             }
         }
 
