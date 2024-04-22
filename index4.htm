@@ -194,7 +194,8 @@
             }
         }
 
-        $(function () {
+        function defineUnsupportedStandardMethods() {
+            // iOS Safari 16 does not support Object.groupBy yet.
             if (Object.groupBy === undefined) {
                 Object.groupBy = function (items, callbackFn) {
                     groupedItems = {};
@@ -209,6 +210,7 @@
                 }
             }
 
+            // iOS Safari 16 does not support window.crypto.randomUUID yet.
             if (window.crypto.randomUUID === undefined) {
                 window.crypto.randomUUID = function () {
                     random_numbers = new Uint8Array(16);
@@ -220,6 +222,7 @@
                 }
             }
 
+            // iOS Safari 16 does not support navigator.clipboard yet.
             if (navigator.clipboard === undefined) {
                 navigator.clipboard = new Object();
             }
@@ -234,7 +237,10 @@
                     $element.remove();
                 }
             }
+        }
 
+        $(function () {
+            defineUnsupportedStandardMethods();
             const initial_data = {
                 インドカレー: [
                     ['鶏もも肉', 300, 'g'],
