@@ -57,15 +57,15 @@
                 return `${this.name} ... ${this.amount} ${this.unit}`;
             }
         }
-        class Recipe {
+        class ItemGroup {
             constructor({ id, name }) {
-                this.id = id ?? `recipe-${window.crypto.randomUUID()}`;
+                this.id = id ?? `itemGroup-${window.crypto.randomUUID()}`;
                 this.name = name;
             }
         }
         class Model {
             constructor() {
-                this.recipes = [];
+                this.itemGroups = [];
                 this.items = [];
                 this.selectedItemGroups = [];
                 this.shoppingItems = [];
@@ -86,7 +86,7 @@
             }
         }
 
-        class RecipeSelectionView {
+        class ItemGroupSelectionView {
             constructor(controller, model) {
                 this.controller = controller;
                 this.model = model;
@@ -98,12 +98,12 @@
                 const myself = this;
                 this.$element.empty();
                 this.$element.append(
-                    this.model.recipes.map(recipe =>
+                    this.model.itemGroups.map(itemGroup =>
                         $('<div>').append(
                             $('<input>')
                                 .addClass('form-check-input')
-                                .attr({ type: 'checkbox', id: recipe.id })
-                                .data({ model: recipe })
+                                .attr({ type: 'checkbox', id: itemGroup.id })
+                                .data({ model: itemGroup })
                                 .change(function () {
                                     $(this).prop('checked')
                                         ? myself.controller.addIngreditsToShoppingList($(this).data('model'))
@@ -111,8 +111,8 @@
                                 }),
                             $('<label>')
                                 .addClass('form-check-label')
-                                .attr({ for: recipe.id })
-                                .text(recipe.name))),
+                                .attr({ for: itemGroup.id })
+                                .text(itemGroup.name))),
                     $('<button>')
                         .addClass('btn')
                         .attr({ type: 'button' })
@@ -153,7 +153,7 @@
                 const myself = this;
                 this.model = model;
                 this.shoppingListView = new ShoppingListView(this, model);
-                this.recipeSelectionView = new RecipeSelectionView(this, model);
+                this.itemGroupSelectionView = new ItemGroupSelectionView(this, model);
                 this.itemGroupAdditionView = new ItemGroupAdditionView(this, model);
                 $('[data-id="root"]').append(
                     this.itemGroupAdditionView.$element,
@@ -166,7 +166,7 @@
                             navigator.clipboard.writeText(text);
                         }),
                     this.shoppingListView.$element,
-                    this.recipeSelectionView.$element);
+                    this.itemGroupSelectionView.$element);
             }
 
             addIngreditsToShoppingList(itemGroup) {
@@ -189,8 +189,8 @@
             }
 
             addItemGroup(name, items = []) {
-                this.model.recipes.push(new Recipe({ name: name }));
-                this.recipeSelectionView.update();
+                this.model.itemGroups.push(new ItemGroup({ name: name }));
+                this.itemGroupSelectionView.update();
             }
         }
 
@@ -327,8 +327,8 @@
                     ['バター', 2, '個'],
                 ],
             };
-            model.recipes.push(...Object.keys(presetData).map(name => new Recipe({ name: name })));
-            model.items.push(...model.recipes.flatMap(
+            model.itemGroups.push(...Object.keys(presetData).map(name => new ItemGroup({ name: name })));
+            model.items.push(...model.itemGroups.flatMap(
                 list => presetData[list.name].map(p => new Item({ name: p[0], amount: p[1], unit: p[2], belongingTo: list }))
             ));
         }
