@@ -104,7 +104,6 @@
                 this.$itemContainer.html(this.model.shoppingItems.map(i => i.toString()).join('<br>'));
             }
         }
-
         class ItemSetSelectionView {
             constructor(controller, model) {
                 this.controller = controller;
@@ -138,7 +137,6 @@
                         .text('追加'));
             }
         }
-
         class ItemSetAdditionView {
             constructor(controller, model) {
                 const myself = this;
@@ -168,7 +166,6 @@
                     .append(this.model.stagedItems.map(item => $('<div>').text(item.toString())));
             }
         }
-
         class ItemAdditionView {
             constructor(controller, model) {
                 this.controller = controller;
