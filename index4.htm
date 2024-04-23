@@ -36,9 +36,13 @@
             constructor({ id, name, amount, unit, belongingTo }) {
                 this.id = id ?? `item-${window.crypto.randomUUID()}`;
                 this.name = name;
-                this.amount = amount;
+                this.amount = Number(amount);
                 this.unit = unit;
                 this.belongingTo = belongingTo;
+            }
+
+            toString() {
+                return `${this.name} ... ${this.amount} ${this.unit}`;
             }
         }
         class AggregatedItem {
@@ -73,6 +77,7 @@
                 this.items = [];
                 this.selectedItemSets = [];
                 this.shoppingItems = [];
+                this.stagedItems = [];
             }
         }
 
@@ -136,6 +141,36 @@
 
         class ItemSetAdditionView {
             constructor(controller, model) {
+                const myself = this;
+                this.controller = controller;
+                this.model = model;
+                this.$nameInput = $('<input>')
+                    .addClass('form-control')
+                    .attr({ type: 'text' });
+                this.$itemsContainer = $('<div>');
+                this.$element = $('<div>')
+                    .append(
+                        this.$nameInput,
+                        this.$itemsContainer,
+                        $('<button>')
+                            .addClass('btn')
+                            .attr({ type: 'button' })
+                            .text('追加2')
+                            .click(function () {
+                                myself.controller.addItemSet(myself.$nameInput.val(), myself.model.stagedItems);
+                            }));
+                this.update();
+            }
+
+            update() {
+                this.$itemsContainer
+                    .empty()
+                    .append(this.model.stagedItems.map(item => $('<div>').text(item.toString())));
+            }
+        }
+
+        class ItemAdditionView {
+            constructor(controller, model) {
                 this.controller = controller;
                 this.model = model;
                 this.$element = $('<div>');
@@ -147,17 +182,27 @@
                 this.$nameInput = $('<input>')
                     .addClass('form-control')
                     .attr({ type: 'text' });
+                this.$amountInput = $('<input>')
+                    .addClass('form-control')
+                    .attr({ type: 'text' });
+                this.$unitInput = $('<input>')
+                    .addClass('form-control')
+                    .attr({ type: 'text' });
                 this.$element.append(
                     this.$nameInput,
+                    this.$amountInput,
+                    this.$unitInput,
                     $('<button>')
                         .addClass('btn')
                         .attr({ type: 'button' })
-                        .text('追加2')
+                        .text('追加3')
                         .click(function () {
-                            console.log(myself);
-                            console.log(myself.$nameInput);
-                            myself.controller.addItemSet(myself.$nameInput.val());
-                            console.log(myself);
+                            myself.controller.stageItem({
+                                name: myself.$nameInput.val(),
+                                amount: myself.$amountInput.val(),
+                                unit: myself.$unitInput.val(),
+                            });
+                            console.log(myself.model);
                         }));
             }
         }
@@ -169,6 +214,7 @@
                 this.shoppingListView = new ShoppingListView(this, model);
                 this.itemSetSelectionView = new ItemSetSelectionView(this, model);
                 this.itemSetAdditionView = new ItemSetAdditionView(this, model);
+                this.itemAdditionView = new ItemAdditionView(this, model);
                 this.$rootContainer = $('[data-id="rootContainer"]');
                 if (!RuntimeConfiguration.debugMode) {
                     this.$rootContainer
@@ -176,7 +222,8 @@
                         .append(
                             this.itemSetAdditionView.$element,
                             this.shoppingListView.$element,
-                            this.itemSetSelectionView.$element);
+                            this.itemSetSelectionView.$element,
+                            this.itemAdditionView);
                 } else {
                     const paneCss = {
                         width: '230px',
@@ -204,7 +251,14 @@
                                     $('<div>')
                                         .addClass('col')
                                         .css(paneCss)
-                                        .append(this.itemSetAdditionView.$element)));
+                                        .append(this.itemSetAdditionView.$element)),
+                            $('<div>')
+                                .addClass('row')
+                                .append(
+                                    $('<div>')
+                                        .addClass('col')
+                                        .css(paneCss)
+                                        .append(this.itemAdditionView.$element)));
                 }
             }
 
@@ -228,8 +282,19 @@
             }
 
             addItemSet(name, items = []) {
-                this.model.itemSets.push(new ItemSet({ name: name }));
+                const newItemSet = new ItemSet({ name: name });
+                this.model.itemSets.push(newItemSet);
+                console.log(items);
+                this.model.items.push(...items.map(item => {
+                    item.belongingTo = newItemSet;
+                    return item;
+                }));
                 this.itemSetSelectionView.update();
+            }
+
+            stageItem(itemParameters) {
+                this.model.stagedItems.push(new Item(itemParameters));
+                this.itemSetAdditionView.update();
             }
 
             writeCurrentShoppingListToClipboard() {
