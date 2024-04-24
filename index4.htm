@@ -322,7 +322,7 @@
             if (window.crypto.randomUUID === undefined) {
                 window.crypto.randomUUID = function () {
                     random_numbers = new Uint8Array(16);
-                    myself.crypto.getRandomValues(random_numbers);
+                    window.crypto.getRandomValues(random_numbers);
                     random_numbers[6] = 0x40 | (random_numbers[6] & 0x0f);
                     random_numbers[8] = 0x80 | (random_numbers[8] & 0x3f);
                     random_numbers = Array.from(random_numbers);
