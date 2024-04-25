@@ -124,8 +124,8 @@
                                 .data({ model: itemSet })
                                 .change(function () {
                                     $(this).prop('checked')
-                                        ? myself.controller.addIngreditsToShoppingList($(this).data('model'))
-                                        : myself.controller.removeIngreditsToShoppingList($(this).data('model'));
+                                        ? myself.controller.addItemsToShoppingList($(this).data('model'))
+                                        : myself.controller.removeItemsFromShoppingList($(this).data('model'));
                                 }),
                             $('<label>')
                                 .addClass('form-check-label')
@@ -275,12 +275,12 @@
                 viewsToUpdate.forEach(v => v.update());
             }
 
-            addIngreditsToShoppingList(itemSet) {
+            addItemsToShoppingList(itemSet) {
                 this.model.selectedItemSets.push(itemSet);
                 this.updateShoppingItems();
                 this.updateView(this.model.selectedItemSets);
             }
-            removeIngreditsToShoppingList(itemSet) {
+            removeItemsFromShoppingList(itemSet) {
                 this.model.selectedItemSets = this.model.selectedItemSets.filter(g => g != itemSet)
                 this.updateShoppingItems();
                 this.updateView(this.model.selectedItemSets);
