@@ -121,6 +121,7 @@
                             $('<input>')
                                 .addClass('form-check-input')
                                 .attr({ type: 'checkbox', id: itemSet.id })
+                                .prop({ checked: this.model.selectedItemSets.includes(itemSet) })
                                 .data({ model: itemSet })
                                 .change(function () {
                                     $(this).prop('checked')
