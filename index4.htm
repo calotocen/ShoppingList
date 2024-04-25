@@ -259,13 +259,31 @@
                 }
             }
 
+            updateView(...updatedModels) {
+                const viewsToUpdate = [
+                    [this.model.itemSets, [this.itemSetSelectionView]],
+                    [this.model.items, [this.itemSetSelectionView]],
+                    [this.model.selectedItemSets, [this.shoppingListView]],
+                    [this.model.shoppingItems, [this.shoppingListView]],
+                    [this.model.stagedItems, [this.itemSetAdditionView]],
+                ]
+                    .filter(e => updatedModels.includes(e[0]))
+                    .flatMap(e => e[1])
+                    .filter((v, i, a) => a.indexOf(v) === i);   // this code uniques views.
+                console.log(this.model);
+                console.log(viewsToUpdate);
+                viewsToUpdate.forEach(v => v.update());
+            }
+
             addIngreditsToShoppingList(itemSet) {
                 this.model.selectedItemSets.push(itemSet);
                 this.updateShoppingItems();
+                this.updateView(this.model.selectedItemSets);
             }
             removeIngreditsToShoppingList(itemSet) {
                 this.model.selectedItemSets = this.model.selectedItemSets.filter(g => g != itemSet)
                 this.updateShoppingItems();
+                this.updateView(this.model.selectedItemSets);
             }
             updateShoppingItems() {
                 this.model.shoppingItems =
@@ -274,8 +292,7 @@
                             this.model.selectedItemSets.flatMap(g => this.model.items.filter(i => i.belongingTo == g)),
                             ({ name, unit }) => [name, unit]))
                         .map(groupedItems => new AggregatedItem({ items: groupedItems }))
-                this.shoppingListView.update();
-                console.log(this.model);
+                this.updateView(this.model.shoppingItems);
             }
 
             addItemSet(name, items = []) {
@@ -286,12 +303,12 @@
                     item.belongingTo = newItemSet;
                     return item;
                 }));
-                this.itemSetSelectionView.update();
+                this.updateView(this.model.itemSets, this.model.items);
             }
 
             stageItem(itemParameters) {
                 this.model.stagedItems.push(new Item(itemParameters));
-                this.itemSetAdditionView.update();
+                this.updateView(this.model.stagedItems);
             }
 
             writeCurrentShoppingListToClipboard() {
