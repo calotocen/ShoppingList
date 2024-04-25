@@ -66,8 +66,18 @@
             }
         }
         class ItemSet {
-            constructor({ id, name }) {
-                this.id = id ?? `itemSet-${window.crypto.randomUUID()}`;
+            constructor(initial_values) {
+                this.deserialize(initial_values);
+            }
+
+            serialize() {
+                return {
+                    id: this.id,
+                    name: this.name,
+                };
+            }
+            deserialize({ id = `itemSet-${window.crypto.randomUUID()}`, name }) {
+                this.id = id;
                 this.name = name;
             }
         }
@@ -78,6 +88,15 @@
                 this.selectedItemSets = [];
                 this.shoppingItems = [];
                 this.stagedItems = [];
+            }
+
+            serialize() {
+                return {
+                    itemSets: this.itemSets.map(s => s.serialize()),
+                }
+            }
+            deserialize({ itemSets = [], items = [], selectedItemSets = [], shoppingItems = [], stagedItems = [] }) {
+                this.itemSets = itemSets.map(p => new ItemSet(p));
             }
         }
 
@@ -214,6 +233,10 @@
                 this.itemSetAdditionView = new ItemSetAdditionView(this, model);
                 this.itemAdditionView = new ItemAdditionView(this, model);
                 this.$rootContainer = $('[data-id="rootContainer"]');
+                console.log(this.model);
+                saveModel(this.model);
+                loadModel(this.model);
+                console.log(this.model);
                 if (!RuntimeConfiguration.debugMode) {
                     this.$rootContainer
                         .addClass('container')
@@ -375,6 +398,13 @@
             controller = new Controller(model);
         })
 
+        function saveModel(model) {
+            console.log(JSON.stringify(model.serialize()));
+            document.cookie = `model=${JSON.stringify(model.serialize())};max-age=31536000`;
+        }
+        function loadModel(model) {
+            model.deserialize(JSON.parse(document.cookie.split("; ").find(r => r.startsWith("model")).split("=")[1]));
+        }
         function loadPresetData(model) {
             const presetData = {
                 インドカレー: [
