@@ -327,7 +327,7 @@
                 this.updateView(this.model.selectedItemSets);
             }
             removeItemsFromShoppingList(itemSet) {
-                this.model.selectedItemSets = this.model.selectedItemSets.filter(g => g != itemSet)
+                this.model.selectedItemSets = this.model.selectedItemSets.filter(g => g !== itemSet)
                 this.updateShoppingItems();
                 this.updateView(this.model.selectedItemSets);
             }
