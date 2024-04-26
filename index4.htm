@@ -41,6 +41,23 @@
                 this.belongingTo = belongingTo;
             }
 
+            serialize() {
+                return {
+                    id: this.id,
+                    name: this.name,
+                    amount: this.amount,
+                    unit: this.unit,
+                    belongingTo: this.belongingTo.id,
+                };
+            }
+            deserialize({ id = `item-${window.crypto.randomUUID()}`, name, amount, unit, belongingTo }) {
+                this.id = id;
+                this.name = name;
+                this.amount = amount;
+                this.unit = unit;
+                this.belongingTo = belongingTo;
+            }
+
             toString() {
                 return `${this.name} ... ${this.amount} ${this.unit}`;
             }
@@ -93,10 +110,15 @@
             serialize() {
                 return {
                     itemSets: this.itemSets.map(s => s.serialize()),
+                    items: this.items.map(i => i.serialize()),
                 }
             }
             deserialize({ itemSets = [], items = [], selectedItemSets = [], shoppingItems = [], stagedItems = [] }) {
                 this.itemSets = itemSets.map(p => new ItemSet(p));
+                this.items = items.map(p => {
+                    p.belongingTo = this.itemSets.find(s => s.id == p.belongingTo);
+                    return new Item(p);
+                });
             }
         }
 
@@ -228,15 +250,15 @@
             constructor(model) {
                 const myself = this;
                 this.model = model;
+                console.log(this.model);
+                saveModel(this.model);
+                loadModel(this.model);
+                console.log(this.model);
                 this.shoppingListView = new ShoppingListView(this, model);
                 this.itemSetSelectionView = new ItemSetSelectionView(this, model);
                 this.itemSetAdditionView = new ItemSetAdditionView(this, model);
                 this.itemAdditionView = new ItemAdditionView(this, model);
                 this.$rootContainer = $('[data-id="rootContainer"]');
-                console.log(this.model);
-                saveModel(this.model);
-                loadModel(this.model);
-                console.log(this.model);
                 if (!RuntimeConfiguration.debugMode) {
                     this.$rootContainer
                         .addClass('container')
