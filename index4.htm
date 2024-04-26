@@ -421,11 +421,26 @@
         })
 
         function saveModel(model) {
-            console.log(JSON.stringify(model.serialize()));
-            document.cookie = `model=${JSON.stringify(model.serialize())};max-age=31536000`;
+            json = JSON.stringify(model.serialize());
+            splittedJson = json.split('').reduce((ss, c) => {
+                ss[0] += c;
+                if ((new TextEncoder()).encode(ss[0]).length > 4000) {  // the upper limit size of one cookie is almost 4000 bytes.
+                    ss.unshift('');
+                }
+                return ss;
+            }, ['']).reverse();
+            splittedJson.forEach((s, i) => {
+                document.cookie = `model(${i})=${s};max-age=31536000`;
+            });
         }
         function loadModel(model) {
-            model.deserialize(JSON.parse(document.cookie.split("; ").find(r => r.startsWith("model")).split("=")[1]));
+            json = document.cookie
+                .split('; ')
+                .filter(row => row.startsWith('model('))
+                .sort()
+                .map(row => row.split('=')[1])
+                .join('');
+            model.deserialize(JSON.parse(json));
         }
         function loadPresetData(model) {
             const presetData = {
