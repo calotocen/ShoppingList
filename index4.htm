@@ -354,7 +354,9 @@
             }
 
             writeCurrentShoppingListToClipboard() {
-                const text = this.model.shoppingItems.map(i => i.toString()).join('\n');
+                const text = this.model.selectedItemSets.map(s => s.name).join('\n')
+                    + '\n'
+                    + this.model.shoppingItems.map(i => i.toString()).join('\n');
                 console.log('kita');
                 console.log(this.model.shoppingItems);
                 navigator.clipboard.writeText(text);
