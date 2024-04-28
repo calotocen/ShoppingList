@@ -33,12 +33,8 @@
         };
 
         class Item {
-            constructor({ id, name, amount, unit, belongingTo }) {
-                this.id = id ?? `item-${window.crypto.randomUUID()}`;
-                this.name = name;
-                this.amount = Number(amount);
-                this.unit = unit;
-                this.belongingTo = belongingTo;
+            constructor(parameter) {
+                this.deserialize(parameter);
             }
 
             serialize() {
