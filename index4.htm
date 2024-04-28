@@ -361,9 +361,11 @@
             }
         }
 
-        function defineUnsupportedStandardMethods() {
-            // iOS Safari 16 does not support Object.groupBy yet.
-            if (Object.groupBy === undefined) {
+        class BuiltinObjectsExtension {
+            // Safari bundled in iOS 16 does not support Object.groupBy function yet.
+            static defineObjectGroupBy(force = false) {
+                if (Object.groupBy !== undefined && !force) return;
+
                 Object.groupBy = function (items, callbackFn) {
                     groupedItems = {};
                     items.forEach(item => {
@@ -377,8 +379,16 @@
                 }
             }
 
-            // iOS Safari 16 does not support window.crypto.randomUUID yet.
-            if (window.crypto.randomUUID === undefined) {
+            // Safari bundled in iOS 16 does not support window.crypto.randomUUID function yet,
+            // or the browser only allows calling the function in https.
+            static defineWindowCryptoRandomUUID(force = false) {
+                if (window.crypto !== undefined && window.crypto.randomUUID !== undefined && !force) return;
+
+                if (window.crypto === undefined) {
+                    window.crypto = new Object();
+                }
+
+                // The following function will generate a UUID with variant 10x and version 4 defined in RFC-4122.
                 window.crypto.randomUUID = function () {
                     random_numbers = new Uint8Array(16);
                     window.crypto.getRandomValues(random_numbers);
@@ -389,17 +399,20 @@
                 }
             }
 
-            // iOS Safari 16 does not support navigator.clipboard yet.
-            if (navigator.clipboard === undefined) {
-                navigator.clipboard = new Object();
-            }
-            if (navigator.clipboard.writeText === undefined) {
+            // Safari bundled in iOS 16 does not support navigator.clipboard.writeText function yet.
+            static defineNavigatorClipboardWriteText(force = false) {
+                if (navigator.clipboard !== undefined && navigator.clipboard.writeText != undefined && !force) return;
+
+                if (navigator.clipboard === undefined) {
+                    navigator.clipboard = new Object();
+                }
+
                 navigator.clipboard.writeText = function (text) {
                     const $textarea = $('<textarea>').val(text);
                     const $element = $('<div>').append($textarea);
                     $('body').append($element);
                     const selection = window.getSelection();
-                    selection.selectAllChildren($element[0]);
+                    selection.selectAllChildren($element[0]);   // Safari bundled iOS requires selection in this way.
                     document.execCommand('copy');
                     $element.remove();
                 }
@@ -407,7 +420,9 @@
         }
 
         $(function () {
-            defineUnsupportedStandardMethods();
+            BuiltinObjectsExtension.defineObjectGroupBy();
+            BuiltinObjectsExtension.defineWindowCryptoRandomUUID();
+            BuiltinObjectsExtension.defineNavigatorClipboardWriteText();
 
             model = new Model();
             loadPresetData(model);
