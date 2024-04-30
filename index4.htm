@@ -103,7 +103,7 @@
                 return this.map(s => s.serialize());
             }
             deserialize(serializedData) {
-                this.splice(0);
+                this.empty();
                 this.push(...serializedData.map(sis => new ItemSet(sis)));
                 return this;
             }
@@ -433,12 +433,21 @@
                     $element.remove();
                 }
             }
+
+            static defineArrayPrototypeEmpty(force = false) {
+                if (Array.prototype.empty !== undefined) return;
+
+                Array.prototype.empty = function() {
+                    this.splice(0);
+                }
+            }
         }
 
         $(function () {
             BuiltinObjectsExtension.defineObjectGroupBy();
             BuiltinObjectsExtension.defineWindowCryptoRandomUUID();
             BuiltinObjectsExtension.defineNavigatorClipboardWriteText();
+            BuiltinObjectsExtension.defineArrayPrototypeEmpty();
 
             model = new Model();
             loadPresetData(model);
