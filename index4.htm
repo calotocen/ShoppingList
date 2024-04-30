@@ -33,7 +33,7 @@
         };
 
         class Item {
-            constructor(parameter) {
+            constructor(parameter = {}) {
                 this.deserialize(parameter);
             }
 
@@ -46,12 +46,16 @@
                     belongingTo: this.belongingTo.id,
                 };
             }
-            deserialize({ id = `item-${window.crypto.randomUUID()}`, name, amount, unit, belongingTo }) {
+            deserialize({ id = `item-${window.crypto.randomUUID()}`, name, amount, unit, belongingTo }, model = undefined) {
                 this.id = id;
                 this.name = name;
                 this.amount = amount;
                 this.unit = unit;
+                if (belongingTo && belongingTo.constructor && belongingTo.constructor.name != 'ItemSet') {
+                    belongingTo = (model !== undefined) ? model.itemSets.find(s => s.id == belongingTo) : undefined;
+                }
                 this.belongingTo = belongingTo;
+                return this;
             }
 
             toString() {
@@ -76,6 +80,20 @@
 
             toString() {
                 return `${this.name} ... ${this.amount} ${this.unit}`;
+            }
+        }
+        class Items extends Array {
+            constructor(...args) {
+                super(...args);
+            }
+
+            serialize() {
+                return this.map(i => i.serialize());
+            }
+            deserialize(serializedData, model = undefined) {
+                this.empty();
+                this.push(...serializedData.map(si => (new Item()).deserialize(si, model)));
+                return this;
             }
         }
         class ItemSet {
@@ -110,8 +128,8 @@
         }
         class Model {
             constructor() {
+                this.items = new Items();
                 this.itemSets = new ItemSets();
-                this.items = [];
                 this.selectedItemSets = [];
                 this.shoppingItems = [];
                 this.stagedItems = [];
@@ -125,10 +143,7 @@
             }
             deserialize({ itemSets = [], items = [], selectedItemSets = [], shoppingItems = [], stagedItems = [] }) {
                 this.itemSets = (new ItemSets()).deserialize(itemSets);
-                this.items = items.map(p => {
-                    p.belongingTo = this.itemSets.find(s => s.id == p.belongingTo);
-                    return new Item(p);
-                });
+                this.items.deserialize(items, model);
             }
         }
 
