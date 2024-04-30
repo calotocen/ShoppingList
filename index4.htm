@@ -452,7 +452,7 @@
             static defineArrayPrototypeEmpty(force = false) {
                 if (Array.prototype.empty !== undefined) return;
 
-                Array.prototype.empty = function() {
+                Array.prototype.empty = function () {
                     this.splice(0);
                 }
             }
