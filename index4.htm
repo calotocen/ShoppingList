@@ -97,7 +97,7 @@
             }
         }
         class ItemSet {
-            constructor(parameters) {
+            constructor(parameters = {}) {
                 this.deserialize(parameters);
             }
 
@@ -107,9 +107,10 @@
                     name: this.name,
                 };
             }
-            deserialize({ id = `itemSet-${window.crypto.randomUUID()}`, name }) {
+            deserialize({ id = `itemSet-${window.crypto.randomUUID()}`, name }, model = undefined) {
                 this.id = id;
                 this.name = name;
+                return this;
             }
         }
         class ItemSets extends Array {
@@ -120,9 +121,9 @@
             serialize() {
                 return this.map(s => s.serialize());
             }
-            deserialize(serializedData) {
+            deserialize(serializedData, model = undefined) {
                 this.empty();
-                this.push(...serializedData.map(sis => new ItemSet(sis)));
+                this.push(...serializedData.map(sis => new ItemSet(sis, model)));
                 return this;
             }
         }
@@ -142,7 +143,7 @@
                 }
             }
             deserialize({ itemSets = [], items = [], selectedItemSets = [], shoppingItems = [], stagedItems = [] }) {
-                this.itemSets = (new ItemSets()).deserialize(itemSets);
+                this.itemSets.deserialize(itemSets, model);
                 this.items.deserialize(items, model);
             }
         }
