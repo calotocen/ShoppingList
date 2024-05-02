@@ -151,8 +151,8 @@
                 }
             }
             deserialize({ itemSets = [], items = [], selectedItemSets = [], shoppingItems = [], stagedItems = [] }) {
-                this.itemSets.deserialize(itemSets, model);
-                this.items.deserialize(items, model);
+                this.itemSets.deserialize(itemSets);
+                this.items.deserialize(items);
             }
         }
 
