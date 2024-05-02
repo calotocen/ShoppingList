@@ -33,7 +33,8 @@
         };
 
         class Item {
-            constructor(parameter = {}) {
+            constructor(model, parameter = {}) {
+                this.model = model;
                 this.deserialize(parameter);
             }
 
@@ -46,13 +47,13 @@
                     belongingTo: this.belongingTo.id,
                 };
             }
-            deserialize({ id = `item-${window.crypto.randomUUID()}`, name, amount, unit, belongingTo }, model = undefined) {
+            deserialize({ id = `item-${window.crypto.randomUUID()}`, name, amount, unit, belongingTo }) {
                 this.id = id;
                 this.name = name;
                 this.amount = amount;
                 this.unit = unit;
                 if (!(belongingTo instanceof ItemSet)) {
-                    belongingTo = (model !== undefined) ? model.itemSets.get(belongingTo) : undefined;
+                    belongingTo = this.model.itemSets.get(belongingTo);
                 }
                 this.belongingTo = belongingTo;
                 return this;
@@ -83,21 +84,23 @@
             }
         }
         class Items extends Array {
-            constructor(...args) {
+            constructor(model, ...args) {
                 super(...args);
+                this.model = model;
             }
 
             serialize() {
                 return this.map(i => i.serialize());
             }
-            deserialize(serializedData, model = undefined) {
+            deserialize(serializedData) {
                 this.empty();
-                this.push(...serializedData.map(si => (new Item()).deserialize(si, model)));
+                this.push(...serializedData.map(si => (new Item(this.model)).deserialize(si)));
                 return this;
             }
         }
         class ItemSet {
-            constructor(parameters = {}) {
+            constructor(model, parameters = {}) {
+                this.model = model;
                 this.deserialize(parameters);
             }
 
@@ -107,33 +110,35 @@
                     name: this.name,
                 };
             }
-            deserialize({ id = `itemSet-${window.crypto.randomUUID()}`, name }, model = undefined) {
+            deserialize({ id = `itemSet-${window.crypto.randomUUID()}`, name }) {
                 this.id = id;
                 this.name = name;
                 return this;
             }
         }
         class ItemSets extends Array {
-            constructor(...args) {
+            constructor(model, ...args) {
                 super(...args);
+                this.model = model;
             }
 
             get(id) {
                 return this.find(s => s.id == id);
             }
+
             serialize() {
                 return this.map(is => is.serialize());
             }
-            deserialize(serializedData, model = undefined) {
+            deserialize(serializedData) {
                 this.empty();
-                this.push(...serializedData.map(sis => new ItemSet(sis, model)));
+                this.push(...serializedData.map(sis => new ItemSet(this.model).deserialize(sis)));
                 return this;
             }
         }
         class Model {
             constructor() {
-                this.items = new Items();
-                this.itemSets = new ItemSets();
+                this.items = new Items(this);
+                this.itemSets = new ItemSets(this);
                 this.selectedItemSets = [];
                 this.shoppingItems = [];
                 this.stagedItems = [];
@@ -580,9 +585,9 @@
                     ['きつねあげ', 1, 'パック'],
                 ],
             };
-            model.itemSets.push(...Object.keys(presetData).map(name => new ItemSet({ name: name })));
+            model.itemSets.push(...Object.keys(presetData).map(name => new ItemSet(model, { name: name })));
             model.items.push(...model.itemSets.flatMap(
-                list => presetData[list.name].map(p => new Item({ name: p[0], amount: p[1], unit: p[2], belongingTo: list }))
+                list => presetData[list.name].map(p => new Item(model, { name: p[0], amount: p[1], unit: p[2], belongingTo: list }))
             ));
         }
     </script>
