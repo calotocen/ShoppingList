@@ -135,11 +135,26 @@
                 return this;
             }
         }
+        class SelectedItemSets extends Array {
+            constructor(model, ...args) {
+                super(...args);
+                this.model = model;
+            }
+
+            serialize() {
+                return this.map(is => is.id);
+            }
+            deserialize(serializedData) {
+                this.empty();
+                this.push(...serializedData.map(id => this.model.itemSets.get(id)));
+                return this;
+            }
+        }
         class Model {
             constructor() {
                 this.items = new Items(this);
                 this.itemSets = new ItemSets(this);
-                this.selectedItemSets = [];
+                this.selectedItemSets = new SelectedItemSets(this);
                 this.shoppingItems = [];
                 this.stagedItems = [];
             }
@@ -148,11 +163,13 @@
                 return {
                     itemSets: this.itemSets.map(s => s.serialize()),
                     items: this.items.map(i => i.serialize()),
+                    selectedItemSets: this.selectedItemSets.serialize(),
                 }
             }
             deserialize({ itemSets = [], items = [], selectedItemSets = [], shoppingItems = [], stagedItems = [] }) {
                 this.itemSets.deserialize(itemSets);
                 this.items.deserialize(items);
+                this.selectedItemSets.deserialize(selectedItemSets);
             }
         }
 
