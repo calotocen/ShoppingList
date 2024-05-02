@@ -51,7 +51,7 @@
                 this.name = name;
                 this.amount = amount;
                 this.unit = unit;
-                if (belongingTo && belongingTo.constructor && belongingTo.constructor.name != 'ItemSet') {
+                if (!(belongingTo instanceof ItemSet)) {
                     belongingTo = (model !== undefined) ? model.itemSets.find(s => s.id == belongingTo) : undefined;
                 }
                 this.belongingTo = belongingTo;
