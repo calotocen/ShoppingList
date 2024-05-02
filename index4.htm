@@ -122,7 +122,7 @@
                 return this.find(s => s.id == id);
             }
             serialize() {
-                return this.map(s => s.serialize());
+                return this.map(is => is.serialize());
             }
             deserialize(serializedData, model = undefined) {
                 this.empty();
