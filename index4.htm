@@ -173,6 +173,19 @@
             }
         }
 
+        class NonVolatileModelStore {
+            constructor(model) {
+                this.model = model;
+            }
+
+            save() {
+                localStorage['model'] = JSON.stringify(this.model.serialize());
+            }
+            load() {
+                this.model.deserialize(JSON.parse(localStorage['model']));
+            }
+        }
+
         class ShoppingListView {
             constructor(controller, model) {
                 const myself = this;
@@ -299,12 +312,11 @@
 
         class Controller {
             constructor(model) {
-                const myself = this;
                 this.model = model;
-                console.log(this.model);
-                saveModel(this.model);
-                loadModel(this.model);
-                console.log(this.model);
+                this.modelStore = new NonVolatileModelStore(model);
+                this.modelStore.load();
+
+                const myself = this;
                 this.shoppingListView = new ShoppingListView(this, model);
                 this.itemSetSelectionView = new ItemSetSelectionView(this, model);
                 this.itemSetAdditionView = new ItemSetAdditionView(this, model);
@@ -358,6 +370,7 @@
 
             updateView(...updatedModels) {
                 const viewsToUpdate = [
+                    [this.model, [this.itemSetAdditionView, this.shoppingListView, this.ItemSetSelectionView, this.itemAdditionView]],
                     [this.model.itemSets, [this.itemSetSelectionView]],
                     [this.model.items, [this.itemSetSelectionView]],
                     [this.model.selectedItemSets, [this.shoppingListView]],
@@ -370,6 +383,7 @@
                 console.log(this.model);
                 console.log(viewsToUpdate);
                 viewsToUpdate.forEach(v => v.update());
+                this.modelStore.save();
             }
 
             addItemsToShoppingList(itemSet) {
@@ -415,6 +429,14 @@
                 console.log('kita');
                 console.log(this.model.shoppingItems);
                 navigator.clipboard.writeText(text);
+            }
+
+            saveModel() {
+                this.modelStore.save();
+            }
+            loadModel() {
+                this.modelStore.load();
+                updateView(this.model);
             }
         }
 
@@ -491,18 +513,11 @@
             BuiltinObjectsExtension.defineArrayPrototypeEmpty();
 
             model = new Model();
-            loadPresetData(model);
-            console.log(model);
+            //loadPresetData(model);
 
             controller = new Controller(model);
         })
 
-        function saveModel(model) {
-            localStorage['model'] = JSON.stringify(model.serialize());
-        }
-        function loadModel(model) {
-            model.deserialize(JSON.parse(localStorage['model']));
-        }
         function loadPresetData(model) {
             const presetData = {
                 インドカレー: [
