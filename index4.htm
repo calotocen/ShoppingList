@@ -52,7 +52,7 @@
                 this.amount = amount;
                 this.unit = unit;
                 if (!(belongingTo instanceof ItemSet)) {
-                    belongingTo = (model !== undefined) ? model.itemSets.find(s => s.id == belongingTo) : undefined;
+                    belongingTo = (model !== undefined) ? model.itemSets.get(belongingTo) : undefined;
                 }
                 this.belongingTo = belongingTo;
                 return this;
@@ -118,6 +118,9 @@
                 super(...args);
             }
 
+            get(id) {
+                return this.find(s => s.id == id);
+            }
             serialize() {
                 return this.map(s => s.serialize());
             }
