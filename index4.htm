@@ -64,9 +64,10 @@
             }
         }
         class Items extends Array {
-            constructor(model, ...args) {
-                super(...args);
+            constructor(model, parameters = []) {
+                super();
                 this.model = model;
+                this.deserialize(parameters);
             }
 
             get(id) {
@@ -115,9 +116,10 @@
             }
         }
         class AggregatedItems extends Array {
-            constructor(model, ...args) {
-                super(...args);
+            constructor(model, parameters = []) {
+                super();
                 this.model = model;
+                this.deserialize(parameters);
             }
 
             get(id) {
@@ -152,9 +154,10 @@
             }
         }
         class ItemSets extends Array {
-            constructor(model, ...args) {
-                super(...args);
+            constructor(model, parameters = []) {
+                super();
                 this.model = model;
+                this.deserialize(parameters);
             }
 
             get(id) {
@@ -171,9 +174,10 @@
             }
         }
         class SelectedItemSets extends Array {
-            constructor(model, ...args) {
-                super(...args);
+            constructor(model, parameters = []) {
+                super();
                 this.model = model;
+                this.deserialize(parameters);
             }
 
             serialize() {
@@ -531,6 +535,11 @@
                 if (Array.prototype.empty !== undefined) return;
 
                 Array.prototype.empty = function () {
+                    // splice() will call constructor().
+                    // constructor() of models that inherit Array class calls this method via deserialize().
+                    // This is why this guard is required.
+                    // It prevents infinite loop when models that inherit Array class are created.
+                    if (this.length == 0) return;
                     this.splice(0);
                 }
             }
