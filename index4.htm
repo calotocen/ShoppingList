@@ -53,7 +53,11 @@
                 this.amount = amount;
                 this.unit = unit;
                 if (!(belongingTo instanceof ItemSet)) {
-                    belongingTo = this.model.itemSets.get(belongingTo);
+                    if (this.model.stagedItemSet !== undefined && belongingTo == this.model.stagedItemSet.id) {
+                        belongingTo = this.model.stagedItemSet;
+                    } else {
+                        belongingTo = this.model.itemSets.get(belongingTo);
+                    }
                 }
                 this.belongingTo = belongingTo;
                 return this;
@@ -195,7 +199,8 @@
                 this.itemSets = new ItemSets(this);
                 this.selectedItemSets = new SelectedItemSets(this);
                 this.shoppingItems = new AggregatedItems(this);
-                this.stagedItems = [];
+                this.stagedItemSet = undefined;
+                this.stagedItems = undefined;
             }
 
             serialize() {
@@ -204,13 +209,21 @@
                     items: this.items.map(i => i.serialize()),
                     selectedItemSets: this.selectedItemSets.serialize(),
                     shoppingItems: this.shoppingItems.serialize(),
+                    stagedItemSet: this.stagedItemSet !== undefined ? this.stagedItemSet.serialize() : undefined,
+                    stagedItems: this.stagedItems !== undefined ? this.stagedItems.serialize() : undefined,
                 }
             }
-            deserialize({ itemSets = [], items = [], selectedItemSets = [], shoppingItems = [], stagedItems = [] }) {
+            deserialize({ itemSets = [], items = [], selectedItemSets = [], shoppingItems = [], stagedItemSet, stagedItems }) {
                 this.itemSets.deserialize(itemSets);
                 this.items.deserialize(items);
                 this.selectedItemSets.deserialize(selectedItemSets);
                 this.shoppingItems.deserialize(shoppingItems);
+                if (stagedItemSet !== undefined) {
+                    this.stagedItemSet = new ItemSet(this, stagedItemSet);
+                }
+                if (stagedItems !== undefined) {
+                    this.stagedItems = new Items(this, stagedItems);
+                }
             }
         }
 
@@ -280,7 +293,10 @@
                     $('<button>')
                         .addClass('btn')
                         .attr({ type: 'button' })
-                        .text('追加'));
+                        .text('追加'))
+                        .click(function () {
+                            myself.controller.stageItemSet();
+                        });
             }
         }
         class ItemSetAdditionView {
@@ -309,7 +325,7 @@
             update() {
                 this.$itemsContainer
                     .empty()
-                    .append(this.model.stagedItems.map(item => $('<div>').text(item.toString())));
+                    .append((this.model.stagedItems ?? []).map(item => $('<div>').text(item.toString())));
             }
         }
         class ItemAdditionView {
@@ -453,9 +469,15 @@
                 this.updateView(this.model.itemSets, this.model.items);
             }
 
-            stageItem(itemParameters) {
-                this.model.stagedItems.push(new Item(itemParameters));
+            stageItemSet(parameters) {
+                this.model.stagedItemSet = new ItemSet(this.model, parameters);
+                this.saveModel();
+            }
+            stageItem(parameters) {
+                this.model.stagedItems ??= new Items(this.model);
+                this.model.stagedItems.push(new Item(this.model, { belongingTo: this.model.stagedItemSet, ...parameters }));
                 this.updateView(this.model.stagedItems);
+                this.saveModel();
             }
 
             writeCurrentShoppingListToClipboard() {
