@@ -655,6 +655,17 @@
                     ['メンチカツ', 2, '個'],
                     ['きつねあげ', 1, 'パック'],
                 ],
+                ミートパスタ: [
+                    ['ミートソース', 1, '袋'],
+                    ['合挽肉', 300, 'g'],
+                    ['エリンギ', 1, 'パック'],
+                ],
+                ロコモコ丼: [
+                    ['合挽肉', 300, 'g'],
+                    ['エリンギ', 1, 'パック'],
+                    ['卵', 2, '個'],
+                    ['千切りキャベツ', 1, '袋'],
+                ],
             };
             model.itemSets.push(...Object.keys(presetData).map(name => new ItemSet(model, { name: name })));
             model.items.push(...model.itemSets.flatMap(
