@@ -485,9 +485,9 @@
                 if (Object.groupBy !== undefined && !force) return;
 
                 Object.groupBy = function (items, callbackFn) {
-                    groupedItems = {};
+                    let groupedItems = {};
                     items.forEach(item => {
-                        key = callbackFn.call(this, item).toString();
+                        const key = callbackFn.call(this, item).toString();
                         if (!(key in groupedItems)) {
                             groupedItems[key] = [];
                         }
@@ -508,7 +508,7 @@
 
                 // The following function will generate a UUID with variant 10x and version 4 defined in RFC-4122.
                 window.crypto.randomUUID = function () {
-                    random_numbers = new Uint8Array(16);
+                    let random_numbers = new Uint8Array(16);
                     window.crypto.getRandomValues(random_numbers);
                     random_numbers[6] = 0x40 | (random_numbers[6] & 0x0f);
                     random_numbers[8] = 0x80 | (random_numbers[8] & 0x3f);
