@@ -235,7 +235,6 @@
                     .attr({ type: 'button' })
                     .text('コピー')
                     .click(function () {
-                        console.log(myself);
                         myself.controller.writeCurrentShoppingListToClipboard();
                     });
                 this.$element = $('<div>');
@@ -343,7 +342,6 @@
                                 amount: myself.$amountInput.val(),
                                 unit: myself.$unitInput.val(),
                             });
-                            console.log(myself.model);
                         }));
             }
         }
@@ -417,8 +415,6 @@
                     .filter(e => updatedModels.includes(e[0]))
                     .flatMap(e => e[1])
                     .filter((v, i, a) => a.indexOf(v) === i);   // this code uniques views.
-                console.log(this.model);
-                console.log(viewsToUpdate);
                 viewsToUpdate.forEach(v => v.update());
                 this.modelStore.save();
             }
@@ -447,7 +443,6 @@
             addItemSet(name, items = []) {
                 const newItemSet = new ItemSet({ name: name });
                 this.model.itemSets.push(newItemSet);
-                console.log(items);
                 this.model.items.push(...items.map(item => {
                     item.belongingTo = newItemSet;
                     return item;
@@ -464,8 +459,6 @@
                 const text = this.model.selectedItemSets.map(s => s.name).join('\n')
                     + '\n'
                     + this.model.shoppingItems.map(i => i.toString()).join('\n');
-                console.log('kita');
-                console.log(this.model.shoppingItems);
                 navigator.clipboard.writeText(text);
             }
 
