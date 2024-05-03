@@ -332,12 +332,9 @@
             constructor(controller, model) {
                 this.controller = controller;
                 this.model = model;
-                this.$element = $('<div>');
-                this.update();
-            }
 
-            update() {
                 const myself = this;
+                this.$element = $('<div>');
                 this.$nameInput = $('<input>')
                     .addClass('form-control')
                     .attr({ type: 'text' });
@@ -362,6 +359,10 @@
                                 unit: myself.$unitInput.val(),
                             });
                         }));
+                this.update();
+            }
+
+            update() {
             }
         }
 
