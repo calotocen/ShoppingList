@@ -83,10 +83,9 @@
             }
         }
         class AggregatedItem {
-            constructor(model, parameters = { id: `aggregated-item-${window.crypto.randomUUID()}`, items: [] }) {
+            constructor(model, parameters = {}) {
                 this.model = model;
-                this.id = parameters.id;
-                this.items = parameters.items;
+                this.deserialize(parameters);
             }
 
             get name() {
@@ -107,7 +106,7 @@
             }
             deserialize({ id = `aggregated-item-${window.crypto.randomUUID()}`, items = [] }) {
                 this.id = id;
-                this.items = items.map(i => this.model.items.get(i));
+                this.items = items.map(i => i instanceof Item ? i : this.model.items.get(i));
                 return this;
             }
 
