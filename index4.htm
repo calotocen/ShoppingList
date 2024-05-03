@@ -79,7 +79,7 @@
             }
             deserialize(serializedData) {
                 this.empty();
-                this.push(...serializedData.map(si => (new Item(this.model)).deserialize(si)));
+                this.push(...serializedData.map(si => new Item(this.model, si)));
                 return this;
             }
         }
@@ -131,7 +131,7 @@
             }
             deserialize(serializedData) {
                 this.empty();
-                this.push(...serializedData.map(si => (new AggregatedItem(this.model)).deserialize(si)));
+                this.push(...serializedData.map(si => new AggregatedItem(this.model, si)));
                 return this;
             }
         }
@@ -169,7 +169,7 @@
             }
             deserialize(serializedData) {
                 this.empty();
-                this.push(...serializedData.map(sis => new ItemSet(this.model).deserialize(sis)));
+                this.push(...serializedData.map(sis => new ItemSet(this.model, sis)));
                 return this;
             }
         }
