@@ -63,10 +63,30 @@
                 return `${this.name} ... ${this.amount} ${this.unit}`;
             }
         }
+        class Items extends Array {
+            constructor(model, ...args) {
+                super(...args);
+                this.model = model;
+            }
+
+            get(id) {
+                return this.find(i => i.id == id);
+            }
+
+            serialize() {
+                return this.map(i => i.serialize());
+            }
+            deserialize(serializedData) {
+                this.empty();
+                this.push(...serializedData.map(si => (new Item(this.model)).deserialize(si)));
+                return this;
+            }
+        }
         class AggregatedItem {
-            constructor({ id = `aggregated-item-${window.crypto.randomUUID()}`, items = [] }) {
-                this.id = id;
-                this.items = items;
+            constructor(model, parameters = { id: `aggregated-item-${window.crypto.randomUUID()}`, items: [] }) {
+                this.model = model;
+                this.id = parameters.id;
+                this.items = parameters.items;
             }
 
             get name() {
@@ -79,14 +99,30 @@
                 return this.items[0].unit;
             }
 
+            serialize() {
+                return {
+                    id: this.id,
+                    items: this.items.map(i => i.id),
+                };
+            }
+            deserialize({ id = `aggregated-item-${window.crypto.randomUUID()}`, items = [] }) {
+                this.id = id;
+                this.items = items.map(i => this.model.items.get(i));
+                return this;
+            }
+
             toString() {
                 return `${this.name} ... ${this.amount} ${this.unit}`;
             }
         }
-        class Items extends Array {
+        class AggregatedItems extends Array {
             constructor(model, ...args) {
                 super(...args);
                 this.model = model;
+            }
+
+            get(id) {
+                return this.find(i => i.id == id);
             }
 
             serialize() {
@@ -94,7 +130,7 @@
             }
             deserialize(serializedData) {
                 this.empty();
-                this.push(...serializedData.map(si => (new Item(this.model)).deserialize(si)));
+                this.push(...serializedData.map(si => (new AggregatedItem(this.model)).deserialize(si)));
                 return this;
             }
         }
@@ -155,7 +191,7 @@
                 this.items = new Items(this);
                 this.itemSets = new ItemSets(this);
                 this.selectedItemSets = new SelectedItemSets(this);
-                this.shoppingItems = [];
+                this.shoppingItems = new AggregatedItems(this);
                 this.stagedItems = [];
             }
 
@@ -164,12 +200,14 @@
                     itemSets: this.itemSets.map(s => s.serialize()),
                     items: this.items.map(i => i.serialize()),
                     selectedItemSets: this.selectedItemSets.serialize(),
+                    shoppingItems: this.shoppingItems.serialize(),
                 }
             }
             deserialize({ itemSets = [], items = [], selectedItemSets = [], shoppingItems = [], stagedItems = [] }) {
                 this.itemSets.deserialize(itemSets);
                 this.items.deserialize(items);
                 this.selectedItemSets.deserialize(selectedItemSets);
+                this.shoppingItems.deserialize(shoppingItems);
             }
         }
 
@@ -398,11 +436,12 @@
             }
             updateShoppingItems() {
                 this.model.shoppingItems =
-                    Object.values(
-                        Object.groupBy(
-                            this.model.selectedItemSets.flatMap(g => this.model.items.filter(i => i.belongingTo == g)),
-                            ({ name, unit }) => [name, unit]))
-                        .map(groupedItems => new AggregatedItem({ items: groupedItems }))
+                    AggregatedItems.from(
+                        Object.values(
+                            Object.groupBy(
+                                this.model.selectedItemSets.flatMap(g => this.model.items.filter(i => i.belongingTo == g)),
+                                ({ name, unit }) => [name, unit]))
+                            .map(groupedItems => new AggregatedItem(this.model, { items: groupedItems })))
                 this.updateView(this.model.shoppingItems);
             }
 
