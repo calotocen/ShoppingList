@@ -352,7 +352,6 @@
             constructor(model) {
                 this.model = model;
                 this.modelStore = new NonVolatileModelStore(model);
-                this.modelStore.load();
 
                 const myself = this;
                 this.shoppingListView = new ShoppingListView(this, model);
@@ -551,10 +550,11 @@
             BuiltinObjectsExtension.defineNavigatorClipboardWriteText();
             BuiltinObjectsExtension.defineArrayPrototypeEmpty();
 
-            model = new Model();
+            const model = new Model();
+            const controller = new Controller(model);
             //loadPresetData(model);
-
-            controller = new Controller(model);
+            //controller.saveModel();
+            controller.loadModel();
         })
 
         function loadPresetData(model) {
