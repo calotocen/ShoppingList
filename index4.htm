@@ -488,13 +488,19 @@
 
             changeItemSetSelectionState(itemSet, selected) {
                 selected ? this.model.selectedItemSets.push(itemSet) : this.model.selectedItemSets.remove(itemSet);
-                this.model.shoppingItems =
-                    AggregatedItemArray.from(
-                        Object.values(
-                            Object.groupBy(
-                                this.model.selectedItemSets.flatMap(g => this.model.items.filter(i => i.belongingTo == g)),
-                                ({ name, unit }) => [name, unit]))
-                            .map(groupedItems => new AggregatedItem(this.model, { items: groupedItems })))
+                if (selected) {
+                    this.model.items.filter(i => i.belongingTo == itemSet).forEach(i => {
+                        let aggregatedItem = this.model.shoppingItems.find(ai => i.name == ai.name && i.unit == ai.unit);
+                        if (aggregatedItem === undefined) {
+                            aggregatedItem = new AggregatedItem(this.model);
+                            this.model.shoppingItems.push(aggregatedItem);
+                        }
+                        aggregatedItem.items.push(i);
+                    });
+                } else {
+                    this.model.shoppingItems.forEach(ai => ai.items.removeIf(i => i.belongingTo == itemSet));
+                    this.model.shoppingItems.removeIf(ai => ai.items.length == 0);
+                }
                 return [this.model.shoppingItems, this.model.selectedItemSets];
             }
 
@@ -610,8 +616,24 @@
 
                 Array.prototype.remove = function (value) {
                     let lastRemovedElement = undefined;
-                    for (;;) {
-                        const i = this.findIndex(value);
+                    for (; ;) {
+                        const i = this.indexOf(value);
+                        if (i == -1) break;
+
+                        lastRemovedElement = this[i];
+                        this.splice(i, 1);
+                    }
+                    return lastRemovedElement;
+                }
+            }
+
+            static defineArrayPrototypeRemoveIf(force = false) {
+                if (Array.prototype.removeIf !== undefined) return;
+
+                Array.prototype.removeIf = function (callbackFn, thisArg) {
+                    let lastRemovedElement = undefined;
+                    for (; ;) {
+                        const i = this.findIndex(callbackFn, thisArg);
                         if (i == -1) break;
 
                         lastRemovedElement = this[i];
@@ -628,6 +650,7 @@
             BuiltinObjectsExtension.defineNavigatorClipboardWriteText();
             BuiltinObjectsExtension.defineArrayPrototypeEmpty();
             BuiltinObjectsExtension.defineArrayPrototypeRemove();
+            BuiltinObjectsExtension.defineArrayPrototypeRemoveIf();
 
             const model = new Model();
             const controller = new Controller(model);
