@@ -470,8 +470,9 @@
                     [this.model, [this.itemSetAdditionView, this.shoppingListView, this.itemSetSelectionView, this.itemAdditionView]],
                     [this.model.itemSets, [this.itemSetSelectionView]],
                     [this.model.items, [this.itemSetSelectionView]],
-                    [this.model.selectedItemSets, [this.shoppingListView]],
+                    [this.model.selectedItemSets, [this.itemSetSelectionView, this.shoppingListView]],
                     [this.model.shoppingItems, [this.shoppingListView]],
+                    [this.model.selectedShoppingItems, [this.shoppingListView]],
                     [this.model.stagedItems, [this.itemSetAdditionView]],
                 ]
                     .filter(e => updatedModels.includes(e[0]))
