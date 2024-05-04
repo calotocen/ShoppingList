@@ -139,6 +139,22 @@
                 return this;
             }
         }
+        class AggregatedItemReferenceArray extends Array {
+            constructor(model, parameters = []) {
+                super();
+                this.model = model;
+                this.deserialize(parameters);
+            }
+
+            serialize() {
+                return this.map(i => i.id);
+            }
+            deserialize(serializedData) {
+                this.empty();
+                this.push(...serializedData.map(id => this.model.shoppingItems.get(id)));
+                return this;
+            }
+        }
         class ItemSet {
             constructor(model, parameters = {}) {
                 this.model = model;
@@ -199,6 +215,7 @@
                 this.itemSets = new ItemSetArray(this);
                 this.selectedItemSets = new ItemSetReferenceArray(this);
                 this.shoppingItems = new AggregatedItemArray(this);
+                this.selectedShoppingItems = new AggregatedItemReferenceArray(this);
                 this.stagedItemSet = undefined;
                 this.stagedItems = undefined;
             }
@@ -209,15 +226,17 @@
                     items: this.items.map(i => i.serialize()),
                     selectedItemSets: this.selectedItemSets.serialize(),
                     shoppingItems: this.shoppingItems.serialize(),
+                    selectedShoppingItems: this.selectedShoppingItems.serialize(),
                     stagedItemSet: this.stagedItemSet !== undefined ? this.stagedItemSet.serialize() : undefined,
                     stagedItems: this.stagedItems !== undefined ? this.stagedItems.serialize() : undefined,
                 }
             }
-            deserialize({ itemSets = [], items = [], selectedItemSets = [], shoppingItems = [], stagedItemSet, stagedItems }) {
+            deserialize({ itemSets = [], items = [], selectedItemSets = [], shoppingItems = [], selectedShoppingItems = [], stagedItemSet, stagedItems }) {
                 this.itemSets.deserialize(itemSets);
                 this.items.deserialize(items);
                 this.selectedItemSets.deserialize(selectedItemSets);
                 this.shoppingItems.deserialize(shoppingItems);
+                this.selectedShoppingItems.deserialize(selectedShoppingItems);
                 if (stagedItemSet !== undefined) {
                     this.stagedItemSet = new ItemSet(this, stagedItemSet);
                 }
@@ -259,7 +278,23 @@
             }
 
             update() {
-                this.$itemContainer.html(this.model.shoppingItems.map(i => i.toString()).join('<br>'));
+                const myself = this;
+                this.$itemContainer.empty();
+                this.$itemContainer.append(
+                    this.model.shoppingItems.map(i =>
+                        $('<div>').append(
+                            $('<input>')
+                                .addClass('form-check-input')
+                                .attr({ type: 'checkbox', id: i.id })
+                                .prop({ checked: this.model.selectedShoppingItems.includes(i) })
+                                .data({ model: i })
+                                .change(function () {
+                                    myself.controller.do('changeShoppingItemSelectionState', $(this).data('model'), $(this).prop('checked'));
+                                }),
+                            $('<label>')
+                                .addClass('form-check-label')
+                                .attr({ for: i.id })
+                                .text(i.name))));
             }
         }
         class ItemSetSelectionView {
@@ -423,6 +458,14 @@
                 }
             }
 
+            do(command, ...args) {
+                const changedModels = {
+                    changeShoppingItemSelectionState: (...args) => this.changeShoppingItemSelectionState(...args),
+                }[command](...args);
+                this.updateView(...changedModels);
+                this.modelStore.save();
+            }
+
             updateView(...updatedModels) {
                 const viewsToUpdate = [
                     [this.model, [this.itemSetAdditionView, this.shoppingListView, this.itemSetSelectionView, this.itemAdditionView]],
@@ -437,6 +480,11 @@
                     .filter((v, i, a) => a.indexOf(v) === i);   // this code uniques views.
                 viewsToUpdate.forEach(v => v.update());
                 this.modelStore.save();
+            }
+
+            changeShoppingItemSelectionState(item, selected) {
+                selected ? this.model.selectedShoppingItems.push(item) : this.mode.selectedShoppingItems.remove(item);
+                return [this.model.selectedShoppingItems];
             }
 
             addItemsToShoppingList(itemSet) {
@@ -566,6 +614,22 @@
                     this.splice(0);
                 }
             }
+
+            static defineArrayPrototypeRemove(force = false) {
+                if (Array.prototype.remove !== undefined) return;
+
+                Array.prototype.remove = function (value) {
+                    let lastRemovedElement = undefined;
+                    for (;;) {
+                        const i = this.findIndex(value);
+                        if (i == -1) break;
+
+                        lastRemovedElement = this[i];
+                        this.splice(i, 1);
+                    }
+                    return lastRemovedElement;
+                }
+            }
         }
 
         $(function () {
@@ -573,6 +637,7 @@
             BuiltinObjectsExtension.defineWindowCryptoRandomUUID();
             BuiltinObjectsExtension.defineNavigatorClipboardWriteText();
             BuiltinObjectsExtension.defineArrayPrototypeEmpty();
+            BuiltinObjectsExtension.defineArrayPrototypeRemove();
 
             const model = new Model();
             const controller = new Controller(model);
