@@ -317,9 +317,7 @@
                                 .prop({ checked: this.model.selectedItemSets.includes(itemSet) })
                                 .data({ model: itemSet })
                                 .change(function () {
-                                    $(this).prop('checked')
-                                        ? myself.controller.addItemsToShoppingList($(this).data('model'))
-                                        : myself.controller.removeItemsFromShoppingList($(this).data('model'));
+                                    myself.controller.do('changeItemSetSelectionState', $(this).data('model'), $(this).prop('checked'));
                                 }),
                             $('<label>')
                                 .addClass('form-check-label')
@@ -460,6 +458,7 @@
 
             do(command, ...args) {
                 const changedModels = {
+                    changeItemSetSelectionState: (...args) => this.changeItemSetSelectionState(...args),
                     changeShoppingItemSelectionState: (...args) => this.changeShoppingItemSelectionState(...args),
                 }[command](...args);
                 this.updateView(...changedModels);
@@ -487,17 +486,8 @@
                 return [this.model.selectedShoppingItems];
             }
 
-            addItemsToShoppingList(itemSet) {
-                this.model.selectedItemSets.push(itemSet);
-                this.updateShoppingItems();
-                this.updateView(this.model.selectedItemSets);
-            }
-            removeItemsFromShoppingList(itemSet) {
-                this.model.selectedItemSets = this.model.selectedItemSets.filter(g => g !== itemSet)
-                this.updateShoppingItems();
-                this.updateView(this.model.selectedItemSets);
-            }
-            updateShoppingItems() {
+            changeItemSetSelectionState(itemSet, selected) {
+                selected ? this.model.selectedItemSets.push(itemSet) : this.model.selectedItemSets.remove(itemSet);
                 this.model.shoppingItems =
                     AggregatedItemArray.from(
                         Object.values(
@@ -505,7 +495,7 @@
                                 this.model.selectedItemSets.flatMap(g => this.model.items.filter(i => i.belongingTo == g)),
                                 ({ name, unit }) => [name, unit]))
                             .map(groupedItems => new AggregatedItem(this.model, { items: groupedItems })))
-                this.updateView(this.model.shoppingItems);
+                return [this.model.shoppingItems, this.model.selectedItemSets];
             }
 
             addItemSet(name, items = []) {
