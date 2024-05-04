@@ -487,8 +487,8 @@
             }
 
             changeItemSetSelectionState(itemSet, selected) {
-                selected ? this.model.selectedItemSets.push(itemSet) : this.model.selectedItemSets.remove(itemSet);
                 if (selected) {
+                    this.model.selectedItemSets.push(itemSet);
                     this.model.items.filter(i => i.belongingTo == itemSet).forEach(i => {
                         let aggregatedItem = this.model.shoppingItems.find(ai => i.name == ai.name && i.unit == ai.unit);
                         if (aggregatedItem === undefined) {
@@ -498,10 +498,12 @@
                         aggregatedItem.items.push(i);
                     });
                 } else {
+                    this.model.selectedItemSets.remove(itemSet);
                     this.model.shoppingItems.forEach(ai => ai.items.removeIf(i => i.belongingTo == itemSet));
                     this.model.shoppingItems.removeIf(ai => ai.items.length == 0);
                 }
-                return [this.model.shoppingItems, this.model.selectedItemSets];
+                this.model.selectedShoppingItems.removeIf(ai => !this.model.shoppingItems.includes(ai));
+                return [this.model.shoppingItems, this.model.selectedShoppingItems, this.model.selectedItemSets];
             }
 
             addItemSet(name, items = []) {
