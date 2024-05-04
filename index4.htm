@@ -67,7 +67,7 @@
                 return `${this.name} ... ${this.amount} ${this.unit}`;
             }
         }
-        class Items extends Array {
+        class ItemArray extends Array {
             constructor(model, parameters = []) {
                 super();
                 this.model = model;
@@ -119,7 +119,7 @@
                 return `${this.name} ... ${this.amount} ${this.unit}`;
             }
         }
-        class AggregatedItems extends Array {
+        class AggregatedItemArray extends Array {
             constructor(model, parameters = []) {
                 super();
                 this.model = model;
@@ -157,7 +157,7 @@
                 return this;
             }
         }
-        class ItemSets extends Array {
+        class ItemSetArray extends Array {
             constructor(model, parameters = []) {
                 super();
                 this.model = model;
@@ -177,7 +177,7 @@
                 return this;
             }
         }
-        class SelectedItemSets extends Array {
+        class ItemSetReferenceArray extends Array {
             constructor(model, parameters = []) {
                 super();
                 this.model = model;
@@ -195,10 +195,10 @@
         }
         class Model {
             constructor() {
-                this.items = new Items(this);
-                this.itemSets = new ItemSets(this);
-                this.selectedItemSets = new SelectedItemSets(this);
-                this.shoppingItems = new AggregatedItems(this);
+                this.items = new ItemArray(this);
+                this.itemSets = new ItemSetArray(this);
+                this.selectedItemSets = new ItemSetReferenceArray(this);
+                this.shoppingItems = new AggregatedItemArray(this);
                 this.stagedItemSet = undefined;
                 this.stagedItems = undefined;
             }
@@ -222,7 +222,7 @@
                     this.stagedItemSet = new ItemSet(this, stagedItemSet);
                 }
                 if (stagedItems !== undefined) {
-                    this.stagedItems = new Items(this, stagedItems);
+                    this.stagedItems = new ItemArray(this, stagedItems);
                 }
             }
         }
@@ -451,7 +451,7 @@
             }
             updateShoppingItems() {
                 this.model.shoppingItems =
-                    AggregatedItems.from(
+                    AggregatedItemArray.from(
                         Object.values(
                             Object.groupBy(
                                 this.model.selectedItemSets.flatMap(g => this.model.items.filter(i => i.belongingTo == g)),
@@ -475,7 +475,7 @@
                 this.saveModel();
             }
             stageItem(parameters) {
-                this.model.stagedItems ??= new Items(this.model);
+                this.model.stagedItems ??= new ItemArray(this.model);
                 this.model.stagedItems.push(new Item(this.model, { belongingTo: this.model.stagedItemSet, ...parameters }));
                 this.updateView(this.model.stagedItems);
                 this.saveModel();
