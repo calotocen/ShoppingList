@@ -483,7 +483,7 @@
             }
 
             changeShoppingItemSelectionState(item, selected) {
-                selected ? this.model.selectedShoppingItems.push(item) : this.mode.selectedShoppingItems.remove(item);
+                selected ? this.model.selectedShoppingItems.push(item) : this.model.selectedShoppingItems.remove(item);
                 return [this.model.selectedShoppingItems];
             }
 
