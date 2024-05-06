@@ -429,30 +429,23 @@
                         border: '1px solid red',
                     };
                     this.$rootContainer
-                        .addClass('container-fluid')
+                        .addClass('container-fluid p-0')
                         .append(
                             $('<div>')
-                                .addClass('row')
+                                .addClass('container-fluid p-0 d-flex flex-wrap')
                                 .append(
                                     $('<div>')
-                                        .addClass('col')
                                         .css(paneCss)
                                         .append(this.shoppingListView.$element),
                                     $('<div>')
-                                        .addClass('col')
                                         .css(paneCss)
                                         .append(this.itemSetSelectionView.$element),
                                     $('<div>')
-                                        .addClass('col')
                                         .css(paneCss)
-                                        .append(this.itemSetAdditionView.$element)),
-                            $('<div>')
-                                .addClass('row')
-                                .append(
+                                        .append(this.itemAdditionView.$element),
                                     $('<div>')
-                                        .addClass('col')
                                         .css(paneCss)
-                                        .append(this.itemAdditionView.$element)));
+                                        .append(this.itemSetAdditionView.$element)));
                 }
             }
 
