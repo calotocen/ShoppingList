@@ -261,10 +261,10 @@
 
         class ShoppingListView {
             constructor(controller, model) {
-                const myself = this;
                 this.controller = controller;
                 this.model = model;
-                this.$itemContainer = $('<div>');
+
+                const myself = this;
                 this.$copyButton = $('<button>')
                     .addClass('btn')
                     .attr({ type: 'button' })
@@ -272,8 +272,17 @@
                     .click(function () {
                         myself.controller.writeCurrentShoppingListToClipboard();
                     });
-                this.$element = $('<div>');
-                this.$element.append(this.$copyButton, this.$itemContainer);
+                this.$operationPane = $('<div>')
+                    .addClass('fixed-bottom')
+                    .css({ 'background-color': 'white' })
+                    .append(this.$copyButton);
+                this.$itemContainer = $('<div>')
+                    .addClass('container-fluid p-0 overflow-y-auto')
+                    .data({ previousScrollTop: 0 });
+                this.$element = $('<div>')
+                    .addClass('container-fluid p-0 d-flex flex-column')
+                    .css({ height: '100%' })
+                    .append(this.$itemContainer, this.$operationPane);
                 this.update();
             }
 
