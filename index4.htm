@@ -290,20 +290,25 @@
                 const myself = this;
                 this.$itemContainer.empty();
                 this.$itemContainer.append(
-                    this.model.shoppingItems.map(i =>
-                        $('<div>').append(
-                            $('<input>')
-                                .addClass('form-check-input')
-                                .attr({ type: 'checkbox', id: i.id })
-                                .prop({ checked: this.model.selectedShoppingItems.includes(i) })
-                                .data({ model: i })
-                                .change(function () {
-                                    myself.controller.do('changeShoppingItemSelectionState', $(this).data('model'), $(this).prop('checked'));
-                                }),
-                            $('<label>')
-                                .addClass('form-check-label')
-                                .attr({ for: i.id })
-                                .text(i.toString()))));
+                    this.model.shoppingItems.map(item =>
+                        $('<div>')
+                            .addClass('containter-fluid px-3 d-flex align-items-center')
+                            .append(
+                                $('<button>')
+                                    .addClass('btn btn-icon')
+                                    .attr({ 'data-toggled': true, 'data-toggle-state': this.model.selectedShoppingItems.includes(item) })
+                                    .append(
+                                        $('<i>').addClass('fs-4 bi bi-circle'),
+                                        $('<i>').addClass('fs-4 bi bi-check-circle-fill text-success'))
+                                    .click(function () {
+                                        myself.controller.do('changeShoppingItemSelectionState', item, $(this).data('toggle-state'));
+                                    }),
+                                $('<div>')
+                                    .addClass('ps-3')
+                                    .text(item.toString())
+                                    .click(function () {
+                                        $(this).prev().click();
+                                    }))));
             }
         }
         class ItemSetSelectionView {
