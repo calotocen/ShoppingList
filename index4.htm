@@ -265,6 +265,10 @@
                 this.model = model;
 
                 const myself = this;
+                this.$headerPane = $('<div>')
+                    .addClass('container-fluid p-0 text-center')
+                    .append($('<i>')
+                        .addClass('fs-2 bi bi-bag'));
                 this.$copyButton = $('<button>')
                     .addClass('btn')
                     .attr({ type: 'button' })
@@ -288,7 +292,7 @@
                 this.$element = $('<div>')
                     .addClass('container-fluid p-0 d-flex flex-column')
                     .css({ height: '100%' })
-                    .append(this.$itemContainer, this.$operationPane);
+                    .append(this.$headerPane, this.$itemContainer, this.$operationPane);
                 this.update();
             }
 
