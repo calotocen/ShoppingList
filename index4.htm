@@ -649,6 +649,48 @@
             }
         }
 
+        class Togglizer {
+            static enable_auto_togglize() {
+                this.togglize($('[data-toggled="true"]'));
+                (new MutationObserver(mutations => mutations
+                    .map(mutation => $(mutation.addedNodes).find('[data-toggled="true"]'))
+                    .forEach(node => this.togglize($(node)))))
+                    .observe(document.getElementsByTagName('body')[0], { childList: true, subtree: true });
+            }
+
+            static togglize($elements) {
+                $elements.each(function () {
+                    const $element = $(this);
+                    if ($element.data('toggle-initialized')) return;
+
+                    // This observing should start before adding data-toggle-state attribute to $element
+                    // in order to match its state and its display.
+                    (new MutationObserver(mutations => mutations
+                        .map(mutation => $(mutation.target))
+                        .forEach($target => {
+                            const toggleState = JSON.parse($target.attr('data-toggle-state'));
+                            $target.children(toggleState ? ':first' : ':last').hide();
+                            $target.children(toggleState ? ':last' : ':first').show();
+                            $target.data({ 'toggle-state': toggleState });
+                        })))
+                        .observe(this, { attributes: true, attributeFilter: ['data-toggle-state'] });
+
+                    let handlers = $._data(this, 'events') ? $._data(this, 'events').click.map(handler => handler.handler) : [];
+                    handlers.forEach(handler => $element.off('click', handler));
+                    $element
+                        .attr({ 'data-toggle-state': $element.attr('data-toggle-state') ?? 'false' })
+                        .click(function () {
+                            const newToggleState = !JSON.parse($element.attr('data-toggle-state'));
+                            $element.attr({ 'data-toggle-state': newToggleState });
+                            $element.data({ 'toggle-state': newToggleState });
+                        });
+                    handlers.forEach(handler => $element.on('click', handler));
+
+                    $element.data({ 'toggle-initialized': true });
+                })
+            }
+        }
+
         $(function () {
             BuiltinObjectsExtension.defineObjectGroupBy();
             BuiltinObjectsExtension.defineWindowCryptoRandomUUID();
@@ -656,6 +698,8 @@
             BuiltinObjectsExtension.defineArrayPrototypeEmpty();
             BuiltinObjectsExtension.defineArrayPrototypeRemove();
             BuiltinObjectsExtension.defineArrayPrototypeRemoveIf();
+
+            Togglizer.enable_auto_togglize();
 
             const model = new Model();
             const controller = new Controller(model);
