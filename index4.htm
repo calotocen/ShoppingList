@@ -278,7 +278,13 @@
                     .append(this.$copyButton);
                 this.$itemContainer = $('<div>')
                     .addClass('container-fluid p-0 overflow-y-auto')
-                    .data({ previousScrollTop: 0 });
+                    .data({ previousScrollTop: 0 })
+                    .scroll(function () {
+                        const currentScrollTop = $(this).scrollTop();
+                        const previousScrollTop = $(this).data('previousScrollTop');
+                        myself.$operationPane.toggle(previousScrollTop > currentScrollTop || currentScrollTop <= 0);
+                        $(this).data('previousScrollTop', currentScrollTop);
+                    });
                 this.$element = $('<div>')
                     .addClass('container-fluid p-0 d-flex flex-column')
                     .css({ height: '100%' })
