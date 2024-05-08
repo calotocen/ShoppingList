@@ -15,6 +15,10 @@
             --bs-btn-border-width: 0px;
         }
 
+        .text-main {
+            color: #20c997;
+        }
+
         [disabled] {
             filter: grayscale(100%);
         }
@@ -267,8 +271,7 @@
                 const myself = this;
                 this.$headerPane = $('<div>')
                     .addClass('container-fluid p-0 text-center')
-                    .append($('<i>')
-                        .addClass('fs-2 bi bi-bag'));
+                    .append($('<i>').addClass('fs-2 bi bi-bag text-main'));
                 this.$copyButton = $('<button>')
                     .addClass('btn')
                     .attr({ type: 'button' })
@@ -309,7 +312,7 @@
                                     .attr({ 'data-toggled': true, 'data-toggle-state': this.model.selectedShoppingItems.includes(item) })
                                     .append(
                                         $('<i>').addClass('fs-4 bi bi-circle'),
-                                        $('<i>').addClass('fs-4 bi bi-check-circle-fill text-success'))
+                                        $('<i>').addClass('fs-4 bi bi-check-circle-fill text-main'))
                                     .click(function () {
                                         myself.controller.do('changeShoppingItemSelectionState', item, $(this).data('toggle-state'));
                                     }),
