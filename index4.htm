@@ -18,6 +18,9 @@
         .text-main {
             color: #20c997;
         }
+        .bg-main-subtle {
+            background-color: #ffffff;
+        }
 
         [disabled] {
             filter: grayscale(100%);
@@ -28,7 +31,7 @@
 <body>
     <div data-id="rootContainer">
     </div>
-    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -270,19 +273,28 @@
 
                 const myself = this;
                 this.$headerPane = $('<div>')
-                    .addClass('container-fluid p-0 text-center')
+                    .addClass('container-fluid p-0 text-center bg-main-subtle')
                     .append($('<i>').addClass('fs-2 bi bi-bag text-main'));
-                this.$copyButton = $('<button>')
-                    .addClass('btn')
-                    .attr({ type: 'button' })
-                    .text('コピー')
+                this.$copyButton = $('<div>')
+                    .addClass('position-relative')
+                    .append(
+                        $('<button>')
+                            .addClass('btn btn-icon')
+                            .append($('<i>').addClass('fs-1 bi bi-clipboard text-main')),
+                        $('<button>')
+                            .addClass('btn btn-icon position-absolute top-0 start-0')
+                            .append($('<i>').addClass('fs-1 bi bi-clipboard-check-fill text-main'))
+                            .hide())
                     .click(function () {
                         myself.controller.writeCurrentShoppingListToClipboard();
+                        $(this).children().eq(1).show().fadeOut(1000);
                     });
                 this.$operationPane = $('<div>')
-                    .addClass('fixed-bottom')
-                    .css({ 'background-color': 'white' })
-                    .append(this.$copyButton);
+                    // d-flex needs to wrap by a div because hide() does not work for d-flex.
+                    .addClass('container-fluid')
+                    .append($('<div>')
+                        .addClass('d-flex justify-content-around fixed-bottom bg-main-subtle')
+                        .append(this.$copyButton));
                 this.$itemContainer = $('<div>')
                     .addClass('container-fluid p-0 overflow-y-auto')
                     .data({ previousScrollTop: 0 })
