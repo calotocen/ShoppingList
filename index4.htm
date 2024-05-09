@@ -266,10 +266,19 @@
             }
         }
 
-        class ShoppingListView {
-            constructor(controller, model) {
+        class AbstractView {
+            constructor(controller, model, $element = $('<div>')) {
                 this.controller = controller;
                 this.model = model;
+                this.$element = $element;
+            }
+
+            update(...args) {
+            }
+        }
+        class ShoppingListView extends AbstractView {
+            constructor(controller, model) {
+                super(controller, model);
 
                 const myself = this;
                 this.$headerPane = $('<div>')
@@ -305,13 +314,16 @@
                         $(this).data('previousScrollTop', currentScrollTop);
                     });
                 this.$element = $('<div>')
+                this.$element
                     .addClass('container-fluid p-0 d-flex flex-column')
                     .css({ height: '100%' })
                     .append(this.$headerPane, this.$itemContainer, this.$operationPane);
                 this.update();
             }
 
-            update() {
+            update(...updatedModels) {
+                if (updatedModels.length > 0 && !updatedModels.flat().some(m => [this.model, this.model.shoppingItems].includes(m))) return;
+
                 const myself = this;
                 this.$itemContainer.empty();
                 this.$itemContainer.append(
@@ -336,15 +348,15 @@
                                     }))));
             }
         }
-        class ItemSetSelectionView {
+        class ItemSetSelectionView extends AbstractView {
             constructor(controller, model) {
-                this.controller = controller;
-                this.model = model;
-                this.$element = $('<div>');
+                super(controller, model);
                 this.update();
             }
 
-            update() {
+            update(...updatedModels) {
+                if (updatedModels.length > 0 && !updatedModels.flat().some(m => [this.model, this.model.itemSets].includes(m))) return;
+
                 const myself = this;
                 this.$element.empty();
                 this.$element.append(
@@ -371,11 +383,11 @@
                         }));
             }
         }
-        class ItemSetAdditionView {
+        class ItemSetAdditionView extends AbstractView {
             constructor(controller, model) {
+                super(controller, model);
+
                 const myself = this;
-                this.controller = controller;
-                this.model = model;
                 this.$nameInput = $('<input>')
                     .addClass('form-control')
                     .attr({ type: 'text' });
@@ -394,16 +406,17 @@
                 this.update();
             }
 
-            update() {
+            update(...updatedModels) {
+                if (updatedModels.length > 0 && !updatedModels.flat().some(m => [this.model, this.model.stagedItems].includes(m))) return;
+
                 this.$itemsContainer
                     .empty()
                     .append((this.model.stagedItems ?? []).map(item => $('<div>').text(item.toString())));
             }
         }
-        class ItemAdditionView {
+        class ItemAdditionView extends AbstractView {
             constructor(controller, model) {
-                this.controller = controller;
-                this.model = model;
+                super(controller, model);
 
                 const myself = this;
                 this.$element = $('<div>');
@@ -432,9 +445,6 @@
                             });
                         }));
                 this.update();
-            }
-
-            update() {
             }
         }
 
@@ -498,19 +508,10 @@
             }
 
             updateView(...updatedModels) {
-                const viewsToUpdate = [
-                    [this.model, [this.itemSetAdditionView, this.shoppingListView, this.itemSetSelectionView, this.itemAdditionView]],
-                    [this.model.itemSets, [this.itemSetSelectionView]],
-                    [this.model.items, [this.itemSetSelectionView]],
-                    [this.model.selectedItemSets, [this.itemSetSelectionView, this.shoppingListView]],
-                    [this.model.shoppingItems, [this.shoppingListView]],
-                    [this.model.selectedShoppingItems, [this.shoppingListView]],
-                    [this.model.stagedItems, [this.itemSetAdditionView]],
-                ]
-                    .filter(e => updatedModels.includes(e[0]))
-                    .flatMap(e => e[1])
-                    .filter((v, i, a) => a.indexOf(v) === i);   // this code uniques views.
-                viewsToUpdate.forEach(v => v.update());
+                this.shoppingListView.update(updatedModels);
+                this.itemSetSelectionView.update(updatedModels);
+                this.itemSetAdditionView.update(updatedModels);
+                this.itemAdditionView.update(updatedModels);
                 this.modelStore.save();
             }
 
