@@ -324,7 +324,7 @@
             }
 
             update(...updatedModels) {
-                if (updatedModels.length > 0 && !updatedModels.flat().some(m => [this.model, this.model.shoppingItems].includes(m))) return;
+                if (updatedModels.length > 0 && !updatedModels.some(m => [this.model, this.model.shoppingItems].includes(m))) return;
 
                 const myself = this;
                 this.$itemContainer.empty();
@@ -357,7 +357,7 @@
             }
 
             update(...updatedModels) {
-                if (updatedModels.length > 0 && !updatedModels.flat().some(m => [this.model, this.model.itemSets].includes(m))) return;
+                if (updatedModels.length > 0 && !updatedModels.some(m => [this.model, this.model.itemSets].includes(m))) return;
 
                 const myself = this;
                 this.$element.empty();
@@ -409,7 +409,7 @@
             }
 
             update(...updatedModels) {
-                if (updatedModels.length > 0 && !updatedModels.flat().some(m => [this.model, this.model.stagedItems].includes(m))) return;
+                if (updatedModels.length > 0 && !updatedModels.some(m => [this.model, this.model.stagedItems].includes(m))) return;
 
                 this.$itemsContainer
                     .empty()
