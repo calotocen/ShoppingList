@@ -449,55 +449,49 @@
                 this.update();
             }
         }
+        class FlexView extends AbstractView {
+            constructor(controller, model) {
+                super(controller, model);
+
+                this.shoppingList = new ShoppingListView(controller, model);
+                this.itemSetSelection = new ItemSetSelectionView(controller, model);
+                this.itemSetAddition = new ItemSetAdditionView(controller, model);
+                this.itemAddition = new ItemAdditionView(controller, model);
+
+                const $template = $('<div>').css({
+                    width: '372px',
+                    'min-width': '372px',
+                    'max-width': '372px',
+                    height: '625px',
+                    'min-height': '625px',
+                    'max-height': '625px',
+                    border: '1px solid red',
+                });
+                this.$element = $('[data-id="rootContainer"]')
+                    .addClass('container-fluid p-0')
+                    .append(
+                        $('<div>')
+                            .addClass('container-fluid p-0 d-flex flex-wrap')
+                            .append(
+                                $template.clone().append(this.shoppingList.$element),
+                                $template.clone().append(this.itemSetSelection.$element),
+                                $template.clone().append(this.itemAddition.$element),
+                                $template.clone().append(this.itemSetAddition.$element)));
+            }
+
+            update(...updatedModels) {
+                this.shoppingList.update(...updatedModels);
+                this.itemSetSelection.update(...updatedModels);
+                this.itemSetAddition.update(...updatedModels);
+                this.itemAddition.update(...updatedModels);
+            }
+        }
 
         class Controller {
             constructor(model) {
                 this.model = model;
+                this.view = new FlexView(this, model);
                 this.modelStore = new NonVolatileModelStore(model);
-
-                const myself = this;
-                this.shoppingListView = new ShoppingListView(this, model);
-                this.itemSetSelectionView = new ItemSetSelectionView(this, model);
-                this.itemSetAdditionView = new ItemSetAdditionView(this, model);
-                this.itemAdditionView = new ItemAdditionView(this, model);
-                this.$rootContainer = $('[data-id="rootContainer"]');
-                if (!RuntimeConfiguration.debugMode) {
-                    this.$rootContainer
-                        .addClass('container')
-                        .append(
-                            this.itemSetAdditionView.$element,
-                            this.shoppingListView.$element,
-                            this.itemSetSelectionView.$element,
-                            this.itemAdditionView);
-                } else {
-                    const paneCss = {
-                        width: '372px',
-                        'min-width': '372px',
-                        'max-width': '372px',
-                        height: '625px',
-                        'min-height': '625px',
-                        'max-height': '625px',
-                        border: '1px solid red',
-                    };
-                    this.$rootContainer
-                        .addClass('container-fluid p-0')
-                        .append(
-                            $('<div>')
-                                .addClass('container-fluid p-0 d-flex flex-wrap')
-                                .append(
-                                    $('<div>')
-                                        .css(paneCss)
-                                        .append(this.shoppingListView.$element),
-                                    $('<div>')
-                                        .css(paneCss)
-                                        .append(this.itemSetSelectionView.$element),
-                                    $('<div>')
-                                        .css(paneCss)
-                                        .append(this.itemAdditionView.$element),
-                                    $('<div>')
-                                        .css(paneCss)
-                                        .append(this.itemSetAdditionView.$element)));
-                }
             }
 
             do(command, ...args) {
@@ -510,10 +504,7 @@
             }
 
             updateView(...updatedModels) {
-                this.shoppingListView.update(updatedModels);
-                this.itemSetSelectionView.update(updatedModels);
-                this.itemSetAdditionView.update(updatedModels);
-                this.itemAdditionView.update(updatedModels);
+                this.view.update(...updatedModels);
                 this.modelStore.save();
             }
 
