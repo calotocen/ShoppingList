@@ -280,6 +280,18 @@
                     .append(this.$headerPanel);
             }
 
+            createIconButton(iconClasses, additionalButtonClasses = '') {
+                return $('<button>')
+                    .addClass(`btn btn-icon ${additionalButtonClasses}`)
+                    .append($('<i>').addClass(iconClasses));
+            }
+            createToggleIconButton(iconClassForOff, iconClassForOn, initialState = false, additionalButtonClasses = '') {
+                return $('<button>')
+                    .addClass(`btn btn-icon ${additionalButtonClasses}`)
+                    .attr({ 'data-toggled': true, 'data-toggle-state': initialState })
+                    .append(
+                        $('<i>').addClass(iconClassForOff),
+                        $('<i>').addClass(iconClassForOn));
             }
 
             update(...args) {
@@ -294,13 +306,8 @@
                 this.$copyButton = $('<div>')
                     .addClass('position-relative')
                     .append(
-                        $('<button>')
-                            .addClass('btn btn-icon')
-                            .append($('<i>').addClass('fs-1 bi bi-clipboard text-main')),
-                        $('<button>')
-                            .addClass('btn btn-icon position-absolute top-0 start-0')
-                            .append($('<i>').addClass('fs-1 bi bi-clipboard-check-fill text-main'))
-                            .hide())
+                        this.createIconButton('fs-1 bi bi-clipboard text-main'),
+                        this.createIconButton('fs-1 bi bi-clipboard-check-fill text-main', 'position-absolute top-0 start-0').hide())
                     .click(function () {
                         myself.controller.writeCurrentShoppingListToClipboard();
                         $(this).children().eq(1).show().fadeOut(1000);
@@ -338,12 +345,10 @@
                         $('<div>')
                             .addClass('containter-fluid px-3 d-flex align-items-center')
                             .append(
-                                $('<button>')
-                                    .addClass('btn btn-icon')
-                                    .attr({ 'data-toggled': true, 'data-toggle-state': this.model.selectedShoppingItems.includes(item) })
-                                    .append(
-                                        $('<i>').addClass('fs-4 bi bi-circle'),
-                                        $('<i>').addClass('fs-4 bi bi-check-circle-fill text-main'))
+                                this.createToggleIconButton(
+                                    'fs-4 bi bi-circle',
+                                    'fs-4 bi bi-check-circle-fill text-main',
+                                    this.model.selectedShoppingItems.includes(item))
                                     .click(function () {
                                         myself.controller.do('changeShoppingItemSelectionState', item, $(this).data('toggle-state'));
                                     }),
