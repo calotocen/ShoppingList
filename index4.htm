@@ -273,6 +273,13 @@
                 this.controller = controller;
                 this.model = model;
                 this.$element = $element;
+                this.$headerPanel = $('<div>')
+                    .addClass('d-flex justify-content-around bg-main-subtle');
+                this.$headerContainer = $('<div>')
+                    .addClass('container-fluid p-0')
+                    .append(this.$headerPanel);
+            }
+
             }
 
             update(...args) {
@@ -283,9 +290,7 @@
                 super(controller, model);
 
                 const myself = this;
-                this.$headerPane = $('<div>')
-                    .addClass('container-fluid p-0 text-center bg-main-subtle')
-                    .append($('<i>').addClass('fs-2 bi bi-bag text-main'));
+                this.$headerPanel.append($('<i>').addClass('fs-2 bi bi-bag text-main'))
                 this.$copyButton = $('<div>')
                     .addClass('position-relative')
                     .append(
@@ -319,7 +324,7 @@
                 this.$element
                     .addClass('container-fluid p-0 d-flex flex-column')
                     .css({ height: '100%' })
-                    .append(this.$headerPane, this.$itemContainer, this.$operationPane);
+                    .append(this.$headerContainer, this.$itemContainer, this.$operationPane);
                 this.update();
             }
 
