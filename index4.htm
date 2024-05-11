@@ -484,7 +484,7 @@
                 this.update();
             }
         }
-        class FlexViewPane extends AbstractView {
+        class AbstractViewPane extends AbstractView {
             constructor(controller) {
                 super(controller);
 
@@ -492,6 +492,22 @@
                 this.itemSetSelection = new ItemSetSelectionView(controller);
                 this.itemSetAddition = new ItemSetAdditionView(controller);
                 this.itemAddition = new ItemAdditionView(controller);
+                this.$element = $('[data-id="rootContainer"]');
+            }
+
+            switchOver(view) {
+            }
+
+            update(...updatedModels) {
+                this.shoppingList.update(...updatedModels);
+                this.itemSetSelection.update(...updatedModels);
+                this.itemSetAddition.update(...updatedModels);
+                this.itemAddition.update(...updatedModels);
+            }
+        }
+        class FlexViewPane extends AbstractViewPane {
+            constructor(controller) {
+                super(controller);
 
                 const $template = $('<div>').css({
                     width: '372px',
@@ -502,7 +518,7 @@
                     'max-height': '625px',
                     border: '1px solid red',
                 });
-                this.$element = $('[data-id="rootContainer"]')
+                this.$element
                     .addClass('container-fluid p-0')
                     .append(
                         $('<div>')
@@ -512,13 +528,6 @@
                                 $template.clone().append(this.itemSetSelection.$element),
                                 $template.clone().append(this.itemAddition.$element),
                                 $template.clone().append(this.itemSetAddition.$element)));
-            }
-
-            update(...updatedModels) {
-                this.shoppingList.update(...updatedModels);
-                this.itemSetSelection.update(...updatedModels);
-                this.itemSetAddition.update(...updatedModels);
-                this.itemAddition.update(...updatedModels);
             }
         }
 
