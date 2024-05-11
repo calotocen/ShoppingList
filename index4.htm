@@ -463,7 +463,7 @@
                 this.update();
             }
         }
-        class FlexView extends AbstractView {
+        class FlexViewPane extends AbstractView {
             constructor(controller, model) {
                 super(controller, model);
 
@@ -504,7 +504,7 @@
         class Controller {
             constructor(model) {
                 this.model = model;
-                this.view = new FlexView(this, model);
+                this.view = new FlexViewPane(this, model);
                 this.modelStore = new NonVolatileModelStore(model);
             }
 
