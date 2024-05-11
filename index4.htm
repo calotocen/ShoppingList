@@ -283,18 +283,30 @@
                 return this.controller.model;
             }
 
-            createIconButton(iconClasses, additionalButtonClasses = '') {
+            createIconButton({ type = 'push', size = 'normal', icon, off, on, toggleState = false }) {
                 return $('<button>')
-                    .addClass(`btn btn-icon ${additionalButtonClasses}`)
-                    .append($('<i>').addClass(iconClasses));
-            }
-            createToggleIconButton(iconClassForOff, iconClassForOn, initialState = false, additionalButtonClasses = '') {
-                return $('<button>')
-                    .addClass(`btn btn-icon ${additionalButtonClasses}`)
-                    .attr({ 'data-toggled': true, 'data-toggle-state': initialState })
+                    .addClass('btn')
+                    .css({
+                        normal: {
+                            '--bs-btn-border-width': '0px',
+                        },
+                        fit: {
+                            '--bs-btn-padding-x': '0px',
+                            '--bs-btn-padding-y': '0px',
+                            '--bs-btn-border-width': '0px',
+                        },
+                    }[size])
+                    .attr({
+                        push: {},
+                        toggle: {
+                            'data-toggled': true,
+                            'data-toggle-state': toggleState,
+                        },
+                    }[type])
                     .append(
-                        $('<i>').addClass(iconClassForOff),
-                        $('<i>').addClass(iconClassForOn));
+                        [icon, off, on]
+                            .filter(c => c !== undefined)
+                            .map(c => $('<i>').addClass(c)));
             }
 
             update(...args) {
@@ -309,15 +321,17 @@
                 this.$copyButton = $('<div>')
                     .addClass('position-relative')
                     .append(
-                        this.createIconButton('fs-1 bi bi-clipboard text-main'),
-                        this.createIconButton('fs-1 bi bi-clipboard-check-fill text-main', 'position-absolute top-0 start-0').hide())
+                        this.createIconButton({ icon: 'fs-1 bi bi-clipboard text-main' }),
+                        this.createIconButton({ icon: 'fs-1 bi bi-clipboard-check-fill text-main' })
+                            .addClass('position-absolute top-0 start-0')
+                            .hide())
                     .click(function () {
                         myself.controller.writeCurrentShoppingListToClipboard();
                         $(this).children().eq(1).show().fadeOut(1000);
                     });
                 this.$operationPane = $('<div>')
                     // d-flex needs to wrap by a div because hide() does not work for d-flex.
-                    .addClass('container-fluid')
+                    .addClass('container-fluid p-0')
                     .append($('<div>')
                         .addClass('d-flex justify-content-around fixed-bottom bg-main-subtle')
                         .append(this.$copyButton));
@@ -348,10 +362,13 @@
                         $('<div>')
                             .addClass('containter-fluid px-3 d-flex align-items-center')
                             .append(
-                                this.createToggleIconButton(
-                                    'fs-4 bi bi-circle',
-                                    'fs-4 bi bi-check-circle-fill text-main',
-                                    this.model.selectedShoppingItems.includes(item))
+                                this.createIconButton({
+                                    type: 'toggle',
+                                    size: 'fit',
+                                    off: 'fs-4 bi bi-circle',
+                                    on: 'fs-4 bi bi-check-circle-fill text-main',
+                                    toggleState: this.model.selectedShoppingItems.includes(item),
+                                })
                                     .click(function () {
                                         myself.controller.do('changeShoppingItemSelectionState', item, $(this).data('toggle-state'));
                                     }),
