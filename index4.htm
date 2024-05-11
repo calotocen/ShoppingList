@@ -363,6 +363,10 @@
         class ItemSetSelectionView extends AbstractView {
             constructor(controller, model) {
                 super(controller, model);
+                this.$headerPanel.append($('<i>').addClass('fs-2 bi bi-journals text-main'));
+                this.$bodyPanel = $('<div>')
+                    .addClass('container-fluid p-0 overflow-y-auto');
+                this.$element.append(this.$headerPanel, this.$bodyPanel);
                 this.update();
             }
 
@@ -370,8 +374,8 @@
                 if (updatedModels.length > 0 && !updatedModels.some(m => [this.model, this.model.itemSets].includes(m))) return;
 
                 const myself = this;
-                this.$element.empty();
-                this.$element.append(
+                this.$bodyPanel.empty();
+                this.$bodyPanel.append(
                     this.model.itemSets.map(itemSet =>
                         $('<div>').append(
                             $('<input>')
