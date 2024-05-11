@@ -495,14 +495,30 @@
                 this.$element = $('[data-id="rootContainer"]');
             }
 
+            get views() {
+                return [
+                    this.shoppingList,
+                    this.itemSetSelection,
+                    this.itemAddition,
+                    this.itemSetAddition,
+                ];
+            }
+
             switchOver(view) {
             }
 
             update(...updatedModels) {
-                this.shoppingList.update(...updatedModels);
-                this.itemSetSelection.update(...updatedModels);
-                this.itemSetAddition.update(...updatedModels);
-                this.itemAddition.update(...updatedModels);
+                this.views.forEach(v => v.update(...updatedModels));
+            }
+        }
+        class SingleViewPane extends AbstractViewPane {
+            constructor(controller) {
+                super(controller);
+
+                this.$element
+                    .addClass('container-fluid p-0')
+                    .append(this.views.map(v => v.$element));
+                this.views.forEach(v => v === this.shoppingList ? v.show() : v.hide());
             }
         }
         class FlexViewPane extends AbstractViewPane {
@@ -523,11 +539,7 @@
                     .append(
                         $('<div>')
                             .addClass('container-fluid p-0 d-flex flex-wrap')
-                            .append(
-                                $template.clone().append(this.shoppingList.$element),
-                                $template.clone().append(this.itemSetSelection.$element),
-                                $template.clone().append(this.itemAddition.$element),
-                                $template.clone().append(this.itemSetAddition.$element)));
+                            .append(this.views.map(v => $template.clone().append(v.$element))));
             }
         }
 
