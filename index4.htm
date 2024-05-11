@@ -269,15 +269,18 @@
         }
 
         class AbstractView {
-            constructor(controller, model, $element = $('<div>')) {
+            constructor(controller, $element = $('<div>')) {
                 this.controller = controller;
-                this.model = model;
                 this.$element = $element;
                 this.$headerPanel = $('<div>')
                     .addClass('d-flex justify-content-around bg-main-subtle');
                 this.$headerContainer = $('<div>')
                     .addClass('container-fluid p-0')
                     .append(this.$headerPanel);
+            }
+
+            get model() {
+                return this.controller.model;
             }
 
             createIconButton(iconClasses, additionalButtonClasses = '') {
@@ -298,8 +301,8 @@
             }
         }
         class ShoppingListView extends AbstractView {
-            constructor(controller, model) {
-                super(controller, model);
+            constructor(controller) {
+                super(controller);
 
                 const myself = this;
                 this.$headerPanel.append($('<i>').addClass('fs-2 bi bi-bag text-main'))
@@ -361,8 +364,9 @@
             }
         }
         class ItemSetSelectionView extends AbstractView {
-            constructor(controller, model) {
-                super(controller, model);
+            constructor(controller) {
+                super(controller);
+
                 this.$headerPanel.append($('<i>').addClass('fs-2 bi bi-journals text-main'));
                 this.$bodyPanel = $('<div>')
                     .addClass('container-fluid p-0 overflow-y-auto');
@@ -400,8 +404,8 @@
             }
         }
         class ItemSetAdditionView extends AbstractView {
-            constructor(controller, model) {
-                super(controller, model);
+            constructor(controller) {
+                super(controller);
 
                 const myself = this;
                 this.$nameInput = $('<input>')
@@ -431,8 +435,8 @@
             }
         }
         class ItemAdditionView extends AbstractView {
-            constructor(controller, model) {
-                super(controller, model);
+            constructor(controller) {
+                super(controller);
 
                 const myself = this;
                 this.$element = $('<div>');
@@ -464,13 +468,13 @@
             }
         }
         class FlexViewPane extends AbstractView {
-            constructor(controller, model) {
-                super(controller, model);
+            constructor(controller) {
+                super(controller);
 
-                this.shoppingList = new ShoppingListView(controller, model);
-                this.itemSetSelection = new ItemSetSelectionView(controller, model);
-                this.itemSetAddition = new ItemSetAdditionView(controller, model);
-                this.itemAddition = new ItemAdditionView(controller, model);
+                this.shoppingList = new ShoppingListView(controller);
+                this.itemSetSelection = new ItemSetSelectionView(controller);
+                this.itemSetAddition = new ItemSetAdditionView(controller);
+                this.itemAddition = new ItemAdditionView(controller);
 
                 const $template = $('<div>').css({
                     width: '372px',
@@ -504,7 +508,7 @@
         class Controller {
             constructor(model) {
                 this.model = model;
-                this.view = new FlexViewPane(this, model);
+                this.view = new FlexViewPane(this);
                 this.modelStore = new NonVolatileModelStore(model);
             }
 
