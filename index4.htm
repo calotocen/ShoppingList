@@ -317,7 +317,20 @@
                 super(controller);
 
                 const myself = this;
-                this.$headerPanel.append($('<i>').addClass('fs-2 bi bi-bag text-main'))
+                this.$headerPanel.append($('<i>').addClass('fs-2 bi bi-bag text-main'));
+                this.$itemContainer = $('<div>')
+                    .addClass('container-fluid p-0 overflow-y-auto')
+                    .data({ previousScrollTop: 0 })
+                    .scroll(function () {
+                        const currentScrollTop = $(this).scrollTop();
+                        const previousScrollTop = $(this).data('previousScrollTop');
+                        myself.$operationPane.toggle(previousScrollTop > currentScrollTop || currentScrollTop <= 0);
+                        $(this).data('previousScrollTop', currentScrollTop);
+                    });
+                this.$setSelectionButton = this.createIconButton({ icon: 'fs-1 bi bi-journals text-main' })
+                    .click(function () {
+                        myself.controller.do('showSetSelectionView');
+                    });
                 this.$copyButton = $('<div>')
                     .addClass('position-relative')
                     .append(
@@ -334,17 +347,12 @@
                     .addClass('container-fluid p-0')
                     .append($('<div>')
                         .addClass('d-flex justify-content-around fixed-bottom bg-main-subtle')
-                        .append(this.$copyButton));
-                this.$itemContainer = $('<div>')
-                    .addClass('container-fluid p-0 overflow-y-auto')
-                    .data({ previousScrollTop: 0 })
-                    .scroll(function () {
-                        const currentScrollTop = $(this).scrollTop();
-                        const previousScrollTop = $(this).data('previousScrollTop');
-                        myself.$operationPane.toggle(previousScrollTop > currentScrollTop || currentScrollTop <= 0);
-                        $(this).data('previousScrollTop', currentScrollTop);
-                    });
-                this.$element = $('<div>')
+                        .append(
+                            this.$setSelectionButton,
+                            $('<div>'),
+                            $('<div>'),
+                            $('<div>'),
+                            this.$copyButton));
                 this.$element
                     .addClass('container-fluid p-0 d-flex flex-column')
                     .css({ height: '100%' })
