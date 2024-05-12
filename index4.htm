@@ -269,18 +269,15 @@
         }
 
         class AbstractView {
-            constructor(controller, $element = $('<div>')) {
-                this.controller = controller;
-                this.$element = $element;
-                this.$headerPanel = $('<div>')
-                    .addClass('d-flex justify-content-around bg-main-subtle');
-                this.$headerContainer = $('<div>')
-                    .addClass('container-fluid p-0')
-                    .append(this.$headerPanel);
+            get controller() {
+                return this._controller;
+            }
+            set controller(controller) {
+                this._controller = controller;
             }
 
             get model() {
-                return this.controller.model;
+                return this._controller.model;
             }
 
             createIconButton({ type = 'push', size = 'normal', icon, off, on, toggleState = false }) {
@@ -309,13 +306,35 @@
                             .map(c => $('<i>').addClass(c)));
             }
 
-            update(...args) {
+            _updateOnce() {
+            }
+
+            _update(...updatedModels) {
+            }
+
+            _isUpdateNeeded(...updatedModels) {
+                return true;
+            }
+
+            update(...updatedModels) {
+                if (!this._isUpdateNeeded()) return;
+
+                if (!this._initialized) {
+                    this.$element = $('<div>');
+                    this.$headerPanel = $('<div>')
+                        .addClass('d-flex justify-content-around bg-main-subtle');
+                    this.$headerContainer = $('<div>')
+                        .addClass('container-fluid p-0')
+                        .append(this.$headerPanel);
+                    this._updateOnce();
+                    this._initialized = true;
+                }
+
+                this._update(...updatedModels);
             }
         }
         class ShoppingListView extends AbstractView {
-            constructor(controller) {
-                super(controller);
-
+            _updateOnce() {
                 const myself = this;
                 this.$headerPanel.append($('<i>').addClass('fs-2 bi bi-bag text-main'));
                 this.$itemContainer = $('<div>')
@@ -357,12 +376,9 @@
                     .addClass('container-fluid p-0 d-flex flex-column')
                     .css({ height: '100%' })
                     .append(this.$headerContainer, this.$itemContainer, this.$operationPane);
-                this.update();
             }
 
-            update(...updatedModels) {
-                if (updatedModels.length > 0 && !updatedModels.some(m => [this.model, this.model.shoppingItems].includes(m))) return;
-
+            _update(...updatedModels) {
                 const myself = this;
                 this.$itemContainer.empty();
                 this.$itemContainer.append(
@@ -387,21 +403,20 @@
                                         $(this).prev().click();
                                     }))));
             }
+
+            _isUpdateNeeded(...updatedModels) {
+                return updatedModels.length == 0 || updatedModels.some(m => [this.model, this.model.shoppingItems].includes(m));
+            }
         }
         class ItemSetSelectionView extends AbstractView {
-            constructor(controller) {
-                super(controller);
-
+            _updateOnce() {
                 this.$headerPanel.append($('<i>').addClass('fs-2 bi bi-journals text-main'));
                 this.$bodyPanel = $('<div>')
                     .addClass('container-fluid p-0 overflow-y-auto');
                 this.$element.append(this.$headerPanel, this.$bodyPanel);
-                this.update();
             }
 
-            update(...updatedModels) {
-                if (updatedModels.length > 0 && !updatedModels.some(m => [this.model, this.model.itemSets].includes(m))) return;
-
+            _update(...updatedModels) {
                 const myself = this;
                 this.$bodyPanel.empty();
                 this.$bodyPanel.append(
@@ -427,17 +442,19 @@
                             myself.controller.stageItemSet();
                         }));
             }
+
+            _isUpdateNeeded(...updatedModels) {
+                return updatedModels.length == 0 || updatedModels.some(m => [this.model, this.model.itemSets].includes(m));
+            }
         }
         class ItemSetAdditionView extends AbstractView {
-            constructor(controller) {
-                super(controller);
-
+            _updateOnce() {
                 const myself = this;
                 this.$nameInput = $('<input>')
                     .addClass('form-control')
                     .attr({ type: 'text' });
                 this.$itemsContainer = $('<div>');
-                this.$element = $('<div>')
+                this.$element
                     .append(
                         this.$nameInput,
                         this.$itemsContainer,
@@ -448,21 +465,20 @@
                             .click(function () {
                                 myself.controller.addItemSet(myself.$nameInput.val(), myself.model.stagedItems);
                             }));
-                this.update();
             }
 
-            update(...updatedModels) {
-                if (updatedModels.length > 0 && !updatedModels.some(m => [this.model, this.model.stagedItems].includes(m))) return;
-
+            _update(...updatedModels) {
                 this.$itemsContainer
                     .empty()
                     .append((this.model.stagedItems ?? []).map(item => $('<div>').text(item.toString())));
             }
+
+            _isUpdateNeeded(...updatedModels) {
+                return updatedModels.length == 0 || updatedModels.some(m => [this.model, this.model.stagedItems].includes(m));
+            }
         }
         class ItemAdditionView extends AbstractView {
-            constructor(controller) {
-                super(controller);
-
+            _updateOnce() {
                 const myself = this;
                 this.$element = $('<div>');
                 this.$nameInput = $('<input>')
@@ -489,18 +505,20 @@
                                 unit: myself.$unitInput.val(),
                             });
                         }));
-                this.update();
             }
         }
         class AbstractViewPane extends AbstractView {
-            constructor(controller) {
-                super(controller);
+            constructor() {
+                super();
+                this.shoppingList = new ShoppingListView();
+                this.itemSetSelection = new ItemSetSelectionView();
+                this.itemSetAddition = new ItemSetAdditionView();
+                this.itemAddition = new ItemAdditionView();
+            }
 
-                this.shoppingList = new ShoppingListView(controller);
-                this.itemSetSelection = new ItemSetSelectionView(controller);
-                this.itemSetAddition = new ItemSetAdditionView(controller);
-                this.itemAddition = new ItemAdditionView(controller);
-                this.$element = $('[data-id="rootContainer"]');
+            set controller(controller) {
+                super.controller = controller;
+                this.views.forEach(v => v.controller = controller);
             }
 
             get views() {
@@ -516,13 +534,21 @@
             }
 
             update(...updatedModels) {
+                if (!this._isUpdateNeeded()) return;
+
                 this.views.forEach(v => v.update(...updatedModels));
+
+                if (!this._initialized) {
+                    this.$element = $('[data-id="rootContainer"]');
+                    this._updateOnce();
+                    this._initialized = true;
+                }
+
+                this._update(...updatedModels);
             }
         }
         class SingleViewPane extends AbstractViewPane {
-            constructor(controller) {
-                super(controller);
-
+            _updateOnce() {
                 this.$element
                     .addClass('container-fluid p-0')
                     .append(this.views.map(v => v.$element));
@@ -530,9 +556,7 @@
             }
         }
         class FlexViewPane extends AbstractViewPane {
-            constructor(controller) {
-                super(controller);
-
+            _updateOnce() {
                 const $template = $('<div>').css({
                     width: '372px',
                     'min-width': '372px',
@@ -552,10 +576,13 @@
         }
 
         class Controller {
-            constructor(model) {
+            constructor(model, view) {
                 this.model = model;
-                this.view = new FlexViewPane(this);
+                this.view = view;
                 this.modelStore = new NonVolatileModelStore(model);
+
+                this.view.controller = this;
+                this.view.update();
             }
 
             do(command, ...args) {
@@ -796,7 +823,8 @@
             Togglizer.enable_auto_togglize();
 
             const model = new Model();
-            const controller = new Controller(model);
+            const view = new FlexViewPane();
+            const controller = new Controller(model, view);
             //loadPresetData(model);
             //controller.saveModel();
             controller.loadModel();
