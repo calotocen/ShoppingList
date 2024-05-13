@@ -307,6 +307,12 @@
             }
 
             _updateOnce() {
+                this.$element = $('<div>');
+                this.$headerPanel = $('<div>')
+                    .addClass('d-flex justify-content-around bg-main-subtle');
+                this.$headerContainer = $('<div>')
+                    .addClass('container-fluid p-0')
+                    .append(this.$headerPanel);
             }
 
             _update(...updatedModels) {
@@ -320,12 +326,6 @@
                 if (!this._isUpdateNeeded()) return;
 
                 if (!this._initialized) {
-                    this.$element = $('<div>');
-                    this.$headerPanel = $('<div>')
-                        .addClass('d-flex justify-content-around bg-main-subtle');
-                    this.$headerContainer = $('<div>')
-                        .addClass('container-fluid p-0')
-                        .append(this.$headerPanel);
                     this._updateOnce();
                     this._initialized = true;
                 }
@@ -335,6 +335,8 @@
         }
         class ShoppingListView extends AbstractView {
             _updateOnce() {
+                super._updateOnce();
+
                 const myself = this;
                 this.$headerPanel.append($('<i>').addClass('fs-2 bi bi-bag text-main'));
                 this.$itemContainer = $('<div>')
@@ -379,6 +381,8 @@
             }
 
             _update(...updatedModels) {
+                super._update(...updatedModels);
+
                 const myself = this;
                 this.$itemContainer.empty();
                 this.$itemContainer.append(
@@ -410,6 +414,8 @@
         }
         class ItemSetSelectionView extends AbstractView {
             _updateOnce() {
+                super._updateOnce();
+
                 this.$headerPanel.append($('<i>').addClass('fs-2 bi bi-journals text-main'));
                 this.$bodyPanel = $('<div>')
                     .addClass('container-fluid p-0 overflow-y-auto');
@@ -417,6 +423,8 @@
             }
 
             _update(...updatedModels) {
+                super._update(...updatedModels);
+
                 const myself = this;
                 this.$bodyPanel.empty();
                 this.$bodyPanel.append(
@@ -449,6 +457,8 @@
         }
         class ItemSetAdditionView extends AbstractView {
             _updateOnce() {
+                super._updateOnce();
+
                 const myself = this;
                 this.$nameInput = $('<input>')
                     .addClass('form-control')
@@ -468,6 +478,8 @@
             }
 
             _update(...updatedModels) {
+                super._update(...updatedModels);
+
                 this.$itemsContainer
                     .empty()
                     .append((this.model.stagedItems ?? []).map(item => $('<div>').text(item.toString())));
@@ -479,6 +491,8 @@
         }
         class ItemAdditionView extends AbstractView {
             _updateOnce() {
+                super._updateOnce();
+
                 const myself = this;
                 this.$element = $('<div>');
                 this.$nameInput = $('<input>')
@@ -533,22 +547,19 @@
             switchOver(view) {
             }
 
-            update(...updatedModels) {
-                if (!this._isUpdateNeeded()) return;
+            _updateOnce() {
+                this.views.forEach(v => v.update());
+                this.$element = $('[data-id="rootContainer"]');
+            }
 
+            _update(...updatedModels) {
                 this.views.forEach(v => v.update(...updatedModels));
-
-                if (!this._initialized) {
-                    this.$element = $('[data-id="rootContainer"]');
-                    this._updateOnce();
-                    this._initialized = true;
-                }
-
-                this._update(...updatedModels);
             }
         }
         class SingleViewPane extends AbstractViewPane {
             _updateOnce() {
+                super._updateOnce();
+
                 this.$element
                     .addClass('container-fluid p-0')
                     .append(this.views.map(v => v.$element));
@@ -557,6 +568,8 @@
         }
         class FlexViewPane extends AbstractViewPane {
             _updateOnce() {
+                super._updateOnce();
+
                 const $template = $('<div>').css({
                     width: '372px',
                     'min-width': '372px',
