@@ -350,7 +350,7 @@
                     });
                 this.$setSelectionButton = this.createIconButton({ icon: 'fs-1 bi bi-journals text-main' })
                     .click(function () {
-                        myself.controller.do('showSetSelectionView');
+                        myself.controller.run('showSetSelectionView');
                     });
                 this.$copyButton = $('<div>')
                     .addClass('position-relative')
@@ -398,7 +398,7 @@
                                     toggleState: this.model.selectedShoppingItems.includes(item),
                                 })
                                     .click(function () {
-                                        myself.controller.do('changeShoppingItemSelectionState', item, $(this).data('toggle-state'));
+                                        myself.controller.run('changeShoppingItemSelectionState', item, $(this).data('toggle-state'));
                                     }),
                                 $('<div>')
                                     .addClass('ps-3')
@@ -436,7 +436,7 @@
                                 .prop({ checked: this.model.selectedItemSets.includes(itemSet) })
                                 .data({ model: itemSet })
                                 .change(function () {
-                                    myself.controller.do('changeItemSetSelectionState', $(this).data('model'), $(this).prop('checked'));
+                                    myself.controller.run('changeItemSetSelectionState', $(this).data('model'), $(this).prop('checked'));
                                 }),
                             $('<label>')
                                 .addClass('form-check-label')
@@ -598,7 +598,7 @@
                 this.view.update();
             }
 
-            do(command, ...args) {
+            run(command, ...args) {
                 const changedModels = {
                     changeItemSetSelectionState: (...args) => this.changeItemSetSelectionState(...args),
                     changeShoppingItemSelectionState: (...args) => this.changeShoppingItemSelectionState(...args),
