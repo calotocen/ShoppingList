@@ -447,7 +447,7 @@
                         .attr({ type: 'button' })
                         .text('追加')
                         .click(function () {
-                            myself.controller.stageItemSet();
+                            myself.controller.run('stageItemSet');
                         }));
             }
 
@@ -473,7 +473,7 @@
                             .attr({ type: 'button' })
                             .text('追加2')
                             .click(function () {
-                                myself.controller.addItemSet(myself.$nameInput.val(), myself.model.stagedItems);
+                                myself.controller.run('addItemSet', myself.$nameInput.val(), myself.model.stagedItems);
                             }));
             }
 
@@ -513,7 +513,7 @@
                         .attr({ type: 'button' })
                         .text('追加3')
                         .click(function () {
-                            myself.controller.stageItem({
+                            myself.controller.run('stageItem', {
                                 name: myself.$nameInput.val(),
                                 amount: myself.$amountInput.val(),
                                 unit: myself.$unitInput.val(),
@@ -602,13 +602,12 @@
                 const changedModels = {
                     changeItemSetSelectionState: (...args) => this.changeItemSetSelectionState(...args),
                     changeShoppingItemSelectionState: (...args) => this.changeShoppingItemSelectionState(...args),
+                    addItemSet: (...args) => this.addItemSet(...args),
+                    stageItemSet: (...args) => this.stageItemSet(...args),
+                    stageItem: (...args) => this.stageItem(...args),
+                    loadModel: (...args) => this.loadModel(...args),
                 }[command](...args);
-                this.updateView(...changedModels);
-                this.modelStore.save();
-            }
-
-            updateView(...updatedModels) {
-                this.view.update(...updatedModels);
+                this.view.update(...changedModels);
                 this.modelStore.save();
             }
 
@@ -644,18 +643,17 @@
                     item.belongingTo = newItemSet;
                     return item;
                 }));
-                this.updateView(this.model.itemSets, this.model.items);
+                return [this.model.itemSets, this.model.items];
             }
 
             stageItemSet(parameters) {
                 this.model.stagedItemSet = new ItemSet(this.model, parameters);
-                this.saveModel();
+                return [this.model.stagedItemSet];
             }
             stageItem(parameters) {
                 this.model.stagedItems ??= new ItemArray(this.model);
                 this.model.stagedItems.push(new Item(this.model, { belongingTo: this.model.stagedItemSet, ...parameters }));
-                this.updateView(this.model.stagedItems);
-                this.saveModel();
+                return [this.model.stagedItems]
             }
 
             writeCurrentShoppingListToClipboard() {
@@ -670,7 +668,7 @@
             }
             loadModel() {
                 this.modelStore.load();
-                this.updateView(this.model);
+                return [this.model];
             }
         }
 
@@ -840,7 +838,7 @@
             const controller = new Controller(model, view);
             //loadPresetData(model);
             //controller.saveModel();
-            controller.loadModel();
+            controller.run('loadModel');
         })
 
         function loadPresetData(model) {
