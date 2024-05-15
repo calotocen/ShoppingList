@@ -308,11 +308,6 @@
 
             _updateOnce() {
                 this.$element = $('<div>');
-                this.$headerPanel = $('<div>')
-                    .addClass('d-flex justify-content-around bg-main-subtle');
-                this.$headerContainer = $('<div>')
-                    .addClass('container-fluid p-0')
-                    .append(this.$headerPanel);
             }
 
             _update(...updatedModels) {
@@ -333,21 +328,45 @@
                 this._update(...updatedModels);
             }
         }
-        class ShoppingListView extends AbstractView {
+        class BaseView extends AbstractView {
             _updateOnce() {
                 super._updateOnce();
 
-                const myself = this;
-                this.$headerPanel.append($('<i>').addClass('fs-2 bi bi-bag text-main'));
-                this.$itemContainer = $('<div>')
+                this.$headerPanel = $('<div>')
+                    .addClass('d-flex justify-content-around bg-main-subtle');
+                this.$headerContainer = $('<div>')
+                    .addClass('container-fluid p-0')
+                    .append(this.$headerPanel);
+
+                this.$bodyPanel = $('<div>')
                     .addClass('container-fluid p-0 overflow-y-auto')
                     .data({ previousScrollTop: 0 })
                     .scroll(function () {
                         const currentScrollTop = $(this).scrollTop();
                         const previousScrollTop = $(this).data('previousScrollTop');
-                        myself.$operationPane.toggle(previousScrollTop > currentScrollTop || currentScrollTop <= 0);
+                        myself.$footerContainer.toggle(previousScrollTop > currentScrollTop || currentScrollTop <= 0);
                         $(this).data('previousScrollTop', currentScrollTop);
                     });
+
+                this.$footerPanel = $('<div>')
+                    .addClass('d-flex justify-content-around fixed-bottom bg-main-subtle');
+                this.$footerContainer = $('<div>')
+                    // d-flex needs to wrap by a div because hide() does not work for d-flex.
+                    .addClass('container-fluid p-0')
+                    .append(this.$footerPanel);
+
+                this.$element
+                    .addClass('container-fluid p-0 d-flex flex-column')
+                    .css({ height: '100%' })
+                    .append(this.$headerContainer, this.$bodyPanel, this.$footerContainer);
+            }
+        }
+        class ShoppingListView extends BaseView {
+            _updateOnce() {
+                super._updateOnce();
+
+                const myself = this;
+                this.$headerPanel.append($('<i>').addClass('fs-2 bi bi-bag text-main'));
                 this.$setSelectionButton = this.createIconButton({ icon: 'fs-1 bi bi-journals text-main' })
                     .click(function () {
                         myself.controller.run('showSetSelectionView');
@@ -363,29 +382,20 @@
                         myself.controller.writeCurrentShoppingListToClipboard();
                         $(this).children().eq(1).show().fadeOut(1000);
                     });
-                this.$operationPane = $('<div>')
-                    // d-flex needs to wrap by a div because hide() does not work for d-flex.
-                    .addClass('container-fluid p-0')
-                    .append($('<div>')
-                        .addClass('d-flex justify-content-around fixed-bottom bg-main-subtle')
-                        .append(
-                            this.$setSelectionButton,
-                            $('<div>'),
-                            $('<div>'),
-                            $('<div>'),
-                            this.$copyButton));
-                this.$element
-                    .addClass('container-fluid p-0 d-flex flex-column')
-                    .css({ height: '100%' })
-                    .append(this.$headerContainer, this.$itemContainer, this.$operationPane);
+                this.$footerPanel.append(
+                    this.$setSelectionButton,
+                    $('<div>'),
+                    $('<div>'),
+                    $('<div>'),
+                    this.$copyButton);
             }
 
             _update(...updatedModels) {
                 super._update(...updatedModels);
 
                 const myself = this;
-                this.$itemContainer.empty();
-                this.$itemContainer.append(
+                this.$bodyPanel.empty();
+                this.$bodyPanel.append(
                     this.model.shoppingItems.map(item =>
                         $('<div>')
                             .addClass('containter-fluid px-3 d-flex align-items-center')
@@ -412,7 +422,7 @@
                 return updatedModels.length == 0 || updatedModels.some(m => [this.model, this.model.shoppingItems].includes(m));
             }
         }
-        class ItemSetSelectionView extends AbstractView {
+        class ItemSetSelectionView extends BaseView {
             _updateOnce() {
                 super._updateOnce();
 
