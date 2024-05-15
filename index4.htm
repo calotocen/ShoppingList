@@ -306,6 +306,16 @@
                             .map(c => $('<i>').addClass(c)));
             }
 
+            createCheckButton({ off = 'fs-4 bi bi-circle', on = 'fs-4 bi bi-check-circle-fill text-main', state = false }) {
+                return this.createIconButton({
+                    type: 'toggle',
+                    size: 'fit',
+                    off: off,
+                    on: on,
+                    toggleState: state,
+                });
+            }
+
             _updateOnce() {
                 this.$element = $('<div>');
             }
@@ -400,13 +410,7 @@
                         $('<div>')
                             .addClass('containter-fluid px-3 d-flex align-items-center')
                             .append(
-                                this.createIconButton({
-                                    type: 'toggle',
-                                    size: 'fit',
-                                    off: 'fs-4 bi bi-circle',
-                                    on: 'fs-4 bi bi-check-circle-fill text-main',
-                                    toggleState: this.model.selectedShoppingItems.includes(item),
-                                })
+                                this.createCheckButton({ state: this.model.selectedShoppingItems.includes(item) })
                                     .click(function () {
                                         myself.controller.run('changeShoppingItemSelectionState', item, $(this).data('toggle-state'));
                                     }),
