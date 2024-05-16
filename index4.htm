@@ -357,17 +357,34 @@
                     .append(this.$headerPanel);
 
                 this.$bodyPanel = $('<div>')
-                    .addClass('container-fluid p-0 overflow-y-auto')
-                    .data({ previousScrollTop: 0 })
+                    .addClass('container-fluid px-0 overflow-y-auto')
+                    .data({
+                        adjusted: false,
+                        previousScrollTop: 0,
+                    })
                     .scroll(function () {
+                        if (!$(this).data('adjusted')) {
+                            myself.$headerContainer.addClass('fixed-top');
+                            myself.$footerContainer.addClass('fixed-bottom');
+                            myself.$bodyPanel.css({ 'padding-top': `${myself.$headerContainer.innerHeight()}px` });
+                            $(this).data({ adjusted: true });
+                        }
+
                         const currentScrollTop = $(this).scrollTop();
                         const previousScrollTop = $(this).data('previousScrollTop');
-                        myself.$footerContainer.toggle(previousScrollTop > currentScrollTop || currentScrollTop <= 0);
+                        if (previousScrollTop > currentScrollTop || currentScrollTop <= 0) {
+                            myself.$headerContainer.fadeIn(0);
+                            myself.$footerContainer.show();
+                        } else {
+                            myself.$headerContainer.fadeOut();
+                            myself.$footerContainer.hide();
+                        }
+
                         $(this).data('previousScrollTop', currentScrollTop);
                     });
 
                 this.$footerPanel = $('<div>')
-                    .addClass('d-flex justify-content-around fixed-bottom bg-main-subtle');
+                    .addClass('d-flex justify-content-around bg-main-subtle');
                 this.$footerContainer = $('<div>')
                     // d-flex needs to wrap by a div because hide() does not work for d-flex.
                     .addClass('container-fluid p-0')
