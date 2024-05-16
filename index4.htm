@@ -283,6 +283,9 @@
             get model() {
                 return this._controller.model;
             }
+            get view() {
+                return this._controller.view;
+            }
 
             createIconButton({ type = 'push', size = 'normal', icon, off, on, toggleState = false }) {
                 return $('<button>')
@@ -371,9 +374,12 @@
                     .append(this.$footerPanel);
 
                 this.$element
-                    .addClass('container-fluid p-0 d-flex flex-column')
-                    .css({ height: '100%' })
-                    .append(this.$headerContainer, this.$bodyPanel, this.$footerContainer);
+                    // d-flex needs to wrap by a div because hide() does not work for d-flex.
+                    .addClass('container-fluid p-0 h-100')
+                    .append(
+                        $('<div>')
+                            .addClass('d-flex flex-column h-100')
+                            .append(this.$headerContainer, this.$bodyPanel, this.$footerContainer));
             }
         }
         class ShoppingListView extends BaseView {
@@ -384,7 +390,7 @@
                 this.$headerPanel.append($('<i>').addClass('fs-2 bi bi-bag text-main'));
                 this.$setSelectionButton = this.createIconButton({ icon: 'fs-1 bi bi-journals text-main' })
                     .click(function () {
-                        myself.controller.run('showSetSelectionView');
+                        myself.view.switchOver(myself.view.itemSetSelectionView);
                     });
                 this.$copyButton = $('<div>')
                     .addClass('position-relative')
@@ -543,10 +549,10 @@
         class AbstractViewPane extends AbstractView {
             constructor() {
                 super();
-                this.shoppingList = new ShoppingListView();
-                this.itemSetSelection = new ItemSetSelectionView();
-                this.itemSetAddition = new ItemSetAdditionView();
-                this.itemAddition = new ItemAdditionView();
+                this.shoppingListView = new ShoppingListView();
+                this.itemSetSelectionView = new ItemSetSelectionView();
+                this.itemSetAdditionView = new ItemSetAdditionView();
+                this.itemAdditionView = new ItemAdditionView();
             }
 
             set controller(controller) {
@@ -556,10 +562,10 @@
 
             get views() {
                 return [
-                    this.shoppingList,
-                    this.itemSetSelection,
-                    this.itemAddition,
-                    this.itemSetAddition,
+                    this.shoppingListView,
+                    this.itemSetSelectionView,
+                    this.itemAdditionView,
+                    this.itemSetAdditionView,
                 ];
             }
 
@@ -581,8 +587,13 @@
 
                 this.$element
                     .addClass('container-fluid p-0')
+                    .css({ 'max-height': '100vh', 'min-height': '100vh', height: '100vh' })
                     .append(this.views.map(v => v.$element));
-                this.views.forEach(v => v === this.shoppingList ? v.show() : v.hide());
+                this.switchOver(this.shoppingListView);
+            }
+
+            switchOver(view) {
+                this.views.forEach(v => v === view ? v.$element.show() : v.$element.hide());
             }
         }
         class FlexViewPane extends AbstractViewPane {
@@ -853,7 +864,7 @@
             Togglizer.enable_auto_togglize();
 
             const model = new Model();
-            const view = new FlexViewPane();
+            const view = Platform.isSmartPhone() ? new SingleViewPane() : new FlexViewPane();
             const controller = new Controller(model, view);
             //loadPresetData(model);
             //controller.saveModel();
