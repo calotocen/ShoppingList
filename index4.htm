@@ -170,6 +170,10 @@
                 this.deserialize(parameters);
             }
 
+            toString() {
+                return this.name;
+            }
+
             serialize() {
                 return {
                     id: this.id,
@@ -210,6 +214,7 @@
             }
 
             serialize() {
+                console.log(this);
                 return this.map(is => is.id);
             }
             deserialize(serializedData) {
@@ -443,19 +448,19 @@
                 this.$bodyPanel.empty();
                 this.$bodyPanel.append(
                     this.model.itemSets.map(itemSet =>
-                        $('<div>').append(
-                            $('<input>')
-                                .addClass('form-check-input')
-                                .attr({ type: 'checkbox', id: itemSet.id })
-                                .prop({ checked: this.model.selectedItemSets.includes(itemSet) })
-                                .data({ model: itemSet })
-                                .change(function () {
-                                    myself.controller.run('changeItemSetSelectionState', $(this).data('model'), $(this).prop('checked'));
-                                }),
-                            $('<label>')
-                                .addClass('form-check-label')
-                                .attr({ for: itemSet.id })
-                                .text(itemSet.name))),
+                        $('<div>')
+                            .addClass('containter-fluid px-3 d-flex align-items-center')
+                            .append(
+                                this.createCheckButton({ state: this.model.selectedItemSets.includes(itemSet) })
+                                    .click(function () {
+                                        myself.controller.run('changeItemSetSelectionState', itemSet, $(this).data('toggle-state'));
+                                    }),
+                                $('<div>')
+                                    .addClass('ps-3')
+                                    .text(itemSet.toString())
+                                    .click(function () {
+                                        $(this).prev().click();
+                                    }))),
                     $('<button>')
                         .addClass('btn')
                         .attr({ type: 'button' })
