@@ -365,7 +365,6 @@
                     .scroll(function () {
                         if (!$(this).data('adjusted')) {
                             myself.$headerContainer.addClass('fixed-top');
-                            myself.$footerContainer.addClass('fixed-bottom');
                             myself.$bodyPanel.css({ 'padding-top': `${myself.$headerContainer.innerHeight()}px` });
                             $(this).data({ adjusted: true });
                         }
@@ -391,7 +390,7 @@
                     .addClass('d-flex justify-content-around bg-main-subtle');
                 this.$footerContainer = $('<div>')
                     // d-flex needs to wrap by a div because hide() does not work for d-flex.
-                    .addClass('container-fluid p-0')
+                    .addClass('container-fluid p-0 fixed-bottom')
                     .append(this.$footerPanel);
 
                 this.$element
