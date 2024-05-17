@@ -409,7 +409,7 @@
 
                 const myself = this;
                 this.$headerPanel.append($('<i>').addClass('fs-2 bi bi-bag text-main'));
-                this.$setSelectionButton = this.createIconButton({ icon: 'fs-1 bi bi-journals text-main' })
+                this.$showItemSetSelectionViewButton = this.createIconButton({ icon: 'fs-1 bi bi-journals text-main' })
                     .click(function () {
                         myself.view.switchOver(myself.view.itemSetSelectionView);
                     });
@@ -425,7 +425,7 @@
                         $(this).children().eq(1).show().fadeOut(1000);
                     });
                 this.$footerPanel.append(
-                    this.$setSelectionButton,
+                    this.$showItemSetSelectionViewButton,
                     $('<div>'),
                     $('<div>'),
                     $('<div>'),
@@ -463,9 +463,6 @@
                 super._updateOnce();
 
                 this.$headerPanel.append($('<i>').addClass('fs-2 bi bi-journals text-main'));
-                this.$bodyPanel = $('<div>')
-                    .addClass('container-fluid p-0 overflow-y-auto');
-                this.$element.append(this.$headerPanel, this.$bodyPanel);
             }
 
             _update(...updatedModels) {
