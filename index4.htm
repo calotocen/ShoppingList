@@ -372,7 +372,11 @@
 
                         const currentScrollTop = $(this).scrollTop();
                         const previousScrollTop = $(this).data('previousScrollTop');
-                        if (previousScrollTop > currentScrollTop || currentScrollTop <= 0) {
+                        // The scroll top should be compared with '<= 0' because iOS-Safari can scroll to out of screen.
+                        const scrolledToTop = currentScrollTop <= 0;
+                        const scrolledToBottom = $(this).prop('scrollHeight') - $(this).prop('clientHeight') - currentScrollTop <= 0;
+                        const scrolledToDown = previousScrollTop > currentScrollTop;
+                        if (scrolledToTop || (scrolledToDown && !scrolledToBottom)) {
                             myself.$headerContainer.fadeIn(0);
                             myself.$footerContainer.show();
                         } else {
