@@ -351,7 +351,7 @@
 
                 const myself = this;
                 this.$headerPanel = $('<div>')
-                    .addClass('d-flex justify-content-around bg-main-subtle');
+                    .addClass('row bg-main-subtle');
                 this.$headerContainer = $('<div>')
                     .addClass('container-fluid p-0')
                     .append(this.$headerPanel);
@@ -407,7 +407,11 @@
                 super._updateOnce();
 
                 const myself = this;
-                this.$headerPanel.append($('<i>').addClass('fs-1 bi bi-bag text-main'));
+                this.$headerPanel
+                    .append(
+                        $('<div>')
+                            .addClass('col text-center')
+                            .append($('<i>').addClass('fs-1 bi bi-bag text-main')));
                 this.$showItemSetSelectionViewButton = this.createIconButton({ icon: 'fs-1 bi bi-journals text-main' })
                     .click(function () {
                         myself.view.switchOver(myself.view.itemSetSelectionView);
@@ -461,7 +465,20 @@
             _updateOnce() {
                 super._updateOnce();
 
-                this.$headerPanel.append($('<i>').addClass('fs-2 bi bi-journals text-main'));
+                const myself = this;
+                this.$backButton = this.createIconButton({ icon: 'fs-2 bi bi-arrow-left-circle text-secondary' })
+                    .click(function () {
+                        myself.view.switchOver(myself.view.shoppingListView);
+                    })
+                this.$headerPanel.append(
+                    $('<div>')
+                        .addClass('col text-left')
+                        .append(this.$backButton),
+                    $('<div>')
+                        .addClass('col text-center')
+                        .append($('<i>').addClass('fs-1 bi bi-journals text-main')),
+                    $('<div>')
+                        .addClass('col text-right'));
             }
 
             _update(...updatedModels) {
