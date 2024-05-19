@@ -407,7 +407,7 @@
                     const scrolledToBottom = Math.abs(scrollHeight - clientHeight - scrollTop) <= 10;
                     const scrolledDown = myself.previousScrollTop > scrollTop;
                     if (scrolledToTop || (scrolledDown && !scrolledToBottom)) {
-                        myself.$headerContainer.fadeIn(0);
+                        myself.$headerContainer.show();
                         myself.$footerContainer.show();
                     } else {
                         myself.$headerContainer.fadeOut();
