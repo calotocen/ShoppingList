@@ -402,9 +402,9 @@
                     const clientHeight = window.innerHeight;
                     const scrollTop = window.pageYOffset;
 
-                    // Scroll can be bounced in iOS-Safari, so the following check has margin.
+                    // Scroll can be bounced in iOS-Safari. This is why the margin is required at the following check.
                     const scrolledToTop = scrollTop <= 0;
-                    const scrolledToBottom = Math.abs(scrollHeight - clientHeight - scrollTop) <= 10;
+                    const scrolledToBottom = Math.abs(scrollHeight - clientHeight - scrollTop) <= (Platform.isIOS() ? 80 : 1);
                     const scrolledDown = myself.previousScrollTop > scrollTop;
                     if (scrolledToTop || (scrolledDown && !scrolledToBottom)) {
                         myself.$headerContainer.show();
@@ -908,6 +908,10 @@
         class Platform {
             static isSmartPhone() {
                 return navigator.userAgent.match(/iPhone|Android.+Mobile/);
+            }
+
+            static isIOS() {
+                return navigator.userAgent.match(/iPhone|iPad/);
             }
         }
 
