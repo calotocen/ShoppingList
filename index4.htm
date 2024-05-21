@@ -504,6 +504,18 @@
                         .append($('<i>').addClass('fs-1 bi bi-journals text-main')),
                     $('<div>')
                         .addClass('col text-right'));
+
+                this.$addButton = this.createIconButton({ icon: 'fs-1 bi bi-journal-plus text-main' })
+                    .click(function () {
+                        myself.controller.run('stageItemSet');
+                    });
+                this.$footerPanel.append(
+                    this.$addButton,
+                    $('<div>'),
+                    $('<div>'),
+                    $('<div>'),
+                    $('<div>'),
+                );
             }
 
             _update(...updatedModels) {
@@ -525,14 +537,7 @@
                                     .text(itemSet.toString())
                                     .click(function () {
                                         $(this).prev().click();
-                                    }))),
-                    $('<button>')
-                        .addClass('btn')
-                        .attr({ type: 'button' })
-                        .text('追加')
-                        .click(function () {
-                            myself.controller.run('stageItemSet');
-                        }));
+                                    }),
             }
 
             _isUpdateNeeded(...updatedModels) {
