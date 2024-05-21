@@ -528,7 +528,10 @@
                         $('<div>')
                             .addClass('containter-fluid px-3 d-flex align-items-center')
                             .append(
-                                this.createCheckButton({ state: this.model.selectedItemSets.includes(itemSet) })
+                                this.createCheckButton({
+                                    on: 'fs-4 bi bi-plus-circle-fill text-main',
+                                    state: this.model.selectedItemSets.includes(itemSet),
+                                })
                                     .click(function () {
                                         myself.controller.run('changeItemSetSelectionState', itemSet, $(this).data('toggle-state'));
                                     }),
