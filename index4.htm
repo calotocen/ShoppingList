@@ -41,6 +41,11 @@
             debugMode: true,
         };
 
+        class StringsInEnglish {
+            static newItemSetName = 'New set';
+        }
+        let L10n = StringsInEnglish;
+
         class Item {
             constructor(model, parameter = {}) {
                 this.model = model;
@@ -521,7 +526,9 @@
 
                 this.$addButton = this.createIconButton({ icon: 'fs-1 bi bi-journal-plus text-main' })
                     .click(function () {
-                        myself.controller.run('stageItemSet');
+                        myself.controller.run('addItemSet', { name: L10n.newItemSetName });
+                        myself.controller.run('stageItemSet', myself.model.itemSets.at(-1));
+                        myself.view.switchOver(myself.view.itemSetAdditionView);
                     });
                 this.$footerPanel.append(
                     this.$addButton,
@@ -561,31 +568,65 @@
                 return updatedModels.length == 0 || updatedModels.some(m => [this.model, this.model.itemSets].includes(m));
             }
         }
-        class ItemSetAdditionView extends AbstractView {
+        class ItemSetAdditionView extends BaseView {
             _updateOnce() {
                 super._updateOnce();
 
                 const myself = this;
+                this.$backButton = this.createIconButton({ icon: 'fs-2 bi bi-arrow-left-circle text-secondary' })
+                    .click(function () {
+                        myself.view.switchOver(myself.view.itemSetSelectionView);
+                    })
+                this.$headerPanel.append(
+                    $('<div>')
+                        .addClass('col text-left')
+                        .append(this.$backButton),
+                    $('<div>'));
                 this.$nameInput = $('<input>')
                     .addClass('form-control')
                     .attr({ type: 'text' });
                 this.$itemsContainer = $('<div>');
-                this.$element
+                this.$bodyPanel
                     .append(
-                        this.$nameInput,
-                        this.$itemsContainer,
-                        $('<button>')
-                            .addClass('btn')
-                            .attr({ type: 'button' })
-                            .text('追加2')
-                            .click(function () {
-                                myself.controller.run('addItemSet', myself.$nameInput.val(), myself.model.stagedItems);
-                            }));
+                        $('<div>')
+                            .addClass('container-fluid')
+                            .append(
+                                $('<div>')
+                                    .addClass('row')
+                                    .append(
+                                        $('<div>').addClass('col-auto'),
+                                        $('<div>')
+                                            .addClass('col')
+                                            .append(this.$nameInput)),
+                                $('<div>')
+                                    .addClass('row')
+                                    .append(
+                                        $('<div>')
+                                            .addClass('col-auto')
+                                            .append($('<i>').addClass('bi bi-basket3 text-main')),
+                                        $('<div>')
+                                            .addClass('col')
+                                            .append(this.$itemsContainer)),
+                                $('<div>')
+                                    .addClass('row')
+                                    .append(
+                                        $('<div>').addClass('col-auto'),
+                                        $('<div>')
+                                            .addClass('col')
+                                            .append($('<button>')
+                                                .addClass('btn')
+                                                .attr({ type: 'button' })
+                                                .text('追加2')
+                                                .click(function () {
+                                                    myself.controller.run('addItemSet', myself.$nameInput.val(), myself.model.stagedItems);
+                                                })))));
             }
 
             _update(...updatedModels) {
                 super._update(...updatedModels);
 
+                console.log(this.model.stagedItemSet);
+                this.$nameInput.val(this.model.stagedItemSet ? this.model.stagedItemSet.name : '');
                 this.$itemsContainer
                     .empty()
                     .append((this.model.stagedItems ?? []).map(item => $('<div>').text(item.toString())));
@@ -746,20 +787,22 @@
                 return [this.model.shoppingItems, this.model.selectedShoppingItems, this.model.selectedItemSets];
             }
 
-            addItemSet(name, items = []) {
-                const newItemSet = new ItemSet({ name: name });
-                this.model.itemSets.push(newItemSet);
-                this.model.items.push(...items.map(item => {
-                    item.belongingTo = newItemSet;
-                    return item;
-                }));
-                return [this.model.itemSets, this.model.items];
+            addItemSet(parameters) {
+                this.model.itemSets.push(new ItemSet(this.model, parameters));
+                return [this.model.itemSets];
             }
 
-            stageItemSet(parameters) {
-                this.model.stagedItemSet = new ItemSet(this.model, parameters);
+            addItemToItemSet(item, itemSet) {
+                item.belongingTo = itemSet;
+                this.model.items.push(item);
+                return [this.model.items];
+            }
+
+            stageItemSet(itemSet) {
+                this.model.stagedItemSet = itemSet;
                 return [this.model.stagedItemSet];
             }
+
             stageItem(parameters) {
                 this.model.stagedItems ??= new ItemArray(this.model);
                 this.model.stagedItems.push(new Item(this.model, { belongingTo: this.model.stagedItemSet, ...parameters }));
