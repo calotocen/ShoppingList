@@ -714,7 +714,14 @@
             }
 
             switchOver(view) {
-                this.views.forEach(v => v === view ? v.show() : v.hide());
+                this.views.forEach(v => {
+                    if (v === view) {
+                        v.show();
+                        v.update();
+                    } else {
+                        v.hide();
+                    }
+                });
             }
         }
         class FlexViewPane extends AbstractViewPane {
