@@ -523,7 +523,8 @@
                         .append($('<i>').addClass('fs-1 bi bi-journals text-main')),
                     $('<div>')
                         .addClass('col text-right'));
-
+                this.$itemsContainer = $('<div>').addClass('containter-fluid px-3');
+                this.$bodyPanel.append(this.$itemsContainer);
                 this.$addButton = this.createIconButton({ icon: 'fs-1 bi bi-journal-plus text-main' })
                     .click(function () {
                         myself.controller.run('addItemSet', { name: L10n.newItemSetName });
@@ -543,25 +544,38 @@
                 super._update(...updatedModels);
 
                 const myself = this;
-                this.$bodyPanel.empty();
-                this.$bodyPanel.append(
+                this.$itemsContainer.empty();
+                this.$itemsContainer.append(
                     this.model.itemSets.map(itemSet =>
                         $('<div>')
-                            .addClass('containter-fluid px-3 d-flex align-items-center')
+                            .addClass('row')
                             .append(
-                                this.createCheckButton({
-                                    on: 'fs-4 bi bi-plus-circle-fill text-main',
-                                    state: this.model.selectedItemSets.includes(itemSet),
-                                })
-                                    .click(function () {
-                                        myself.controller.run('changeItemSetSelectionState', itemSet, $(this).data('toggle-state'));
-                                    }),
                                 $('<div>')
-                                    .addClass('ps-3')
+                                    .addClass('col-auto d-flex align-items-center')
+                                    .append(this.createCheckButton({
+                                        on: 'fs-4 bi bi-plus-circle-fill text-main',
+                                        state: this.model.selectedItemSets.includes(itemSet)
+                                    })
+                                        .click(function () {
+                                            myself.controller.run('changeItemSetSelectionState', itemSet, $(this).data('toggle-state'));
+                                        })),
+                                $('<div>')
+                                    .addClass('col d-flex align-items-center')
                                     .text(itemSet.toString())
                                     .click(function () {
                                         $(this).prev().click();
-                                    }))));
+                                    }),
+                                $('<div>')
+                                    .addClass('col-auto p-0 d-flex align-items-center')
+                                    .append(this.createIconButton({ icon: 'fs-4 bi bi-pencil-square', size: 'fit' })),
+                                $('<div>')
+                                    .addClass('col-auto d-flex align-items-center')
+                                    .append(
+                                        this.createIconButton({ icon: 'fs-4 bi bi-dash-circle-fill text-danger', size: 'fit' })
+                                            .click(function () {
+                                                myself.controller.run('removeItemSet', itemSet);
+                                            })
+                                    ))));
             }
 
             _isUpdateNeeded(...updatedModels) {
@@ -761,6 +775,7 @@
                     changeItemSetSelectionState: (...args) => this.changeItemSetSelectionState(...args),
                     changeShoppingItemSelectionState: (...args) => this.changeShoppingItemSelectionState(...args),
                     addItemSet: (...args) => this.addItemSet(...args),
+                    removeItemSet: (...args) => this.removeItemSet(...args),
                     stageItemSet: (...args) => this.stageItemSet(...args),
                     stageItem: (...args) => this.stageItem(...args),
                     loadModel: (...args) => this.loadModel(...args),
@@ -796,6 +811,12 @@
 
             addItemSet(parameters) {
                 this.model.itemSets.push(new ItemSet(this.model, parameters));
+                return [this.model.itemSets];
+            }
+            removeItemSet(itemSet) {
+                this.changeItemSetSelectionState(itemSet, false);
+                this.model.items.removeIf(i => i.belongingTo == itemSet.id);
+                this.model.itemSets.remove(itemSet);
                 return [this.model.itemSets];
             }
 
