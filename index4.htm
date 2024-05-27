@@ -639,7 +639,6 @@
             _update(...updatedModels) {
                 super._update(...updatedModels);
 
-                console.log(this.model.stagedItemSet);
                 this.$nameInput.val(this.model.stagedItemSet ? this.model.stagedItemSet.name : '');
                 this.$itemsContainer
                     .empty()
