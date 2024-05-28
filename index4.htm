@@ -531,12 +531,20 @@
                         myself.controller.run('stageItemSet', myself.model.itemSets.at(-1));
                         myself.view.switchOver(myself.view.itemSetAdditionView);
                     });
+                this.$changeModeButton = this.createIconButton({
+                    type: 'toggle',
+                    off: 'fs-1 bi bi-pencil-square text-main',
+                    on: 'fs-1 bi bi-list-ul text-main'
+                })
+                    .click(function () {
+                        myself.update();
+                    });
                 this.$footerPanel.append(
                     this.$addButton,
                     $('<div>'),
                     $('<div>'),
                     $('<div>'),
-                    $('<div>'),
+                    this.$changeModeButton,
                 );
             }
 
@@ -567,15 +575,17 @@
                                     }),
                                 $('<div>')
                                     .addClass('col-auto p-0 d-flex align-items-center')
-                                    .append(this.createIconButton({ icon: 'fs-4 bi bi-pencil-square', size: 'fit' })),
+                                    .append(
+                                        this.createIconButton({ icon: 'fs-4 bi bi-pencil-fill text-main', size: 'fit' })
+                                            .toggle(this.$changeModeButton.data('toggle-state'))),
                                 $('<div>')
                                     .addClass('col-auto d-flex align-items-center')
                                     .append(
                                         this.createIconButton({ icon: 'fs-4 bi bi-dash-circle-fill text-danger', size: 'fit' })
+                                            .toggle(this.$changeModeButton.data('toggle-state'))
                                             .click(function () {
                                                 myself.controller.run('removeItemSet', itemSet);
-                                            })
-                                    ))));
+                                            })))));
             }
 
             _isUpdateNeeded(...updatedModels) {
