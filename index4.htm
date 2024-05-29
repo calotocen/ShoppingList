@@ -421,11 +421,12 @@
                     const clientHeight = window.innerHeight;
                     const scrollTop = window.pageYOffset;
 
-                    // Scroll can be bounced in iOS-Safari. This is why the margin is required at the following check.
+                    // Scroll can be bounced in iOS-Safari.
+                    // This is why the following code checks if the scroll position is at the bottom when scrolling up.
                     const scrolledToTop = scrollTop <= 0;
-                    const scrolledToBottom = Math.abs(scrollHeight - clientHeight - scrollTop) <= (Platform.isIOS() ? 80 : 1);
-                    const scrolledDown = myself.previousScrollTop > scrollTop;
-                    if (scrolledToTop || (scrolledDown && !scrolledToBottom)) {
+                    const scrolledToBottom = scrollHeight - clientHeight - scrollTop <= 1;
+                    const scrolledUp = myself.previousScrollTop > scrollTop;
+                    if (scrolledToTop || (scrolledUp && !scrolledToBottom)) {
                         myself.$headerContainer.show();
                         myself.$footerContainer.show();
                     } else {
