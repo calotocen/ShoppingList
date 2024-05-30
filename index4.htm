@@ -1029,7 +1029,7 @@
             Togglizer.enable_auto_togglize();
 
             const model = new Model();
-            const view = Platform.isSmartPhone() ? new SingleViewPane() : new FlexViewPane();
+            const view = new SingleViewPane();
             const controller = new Controller(model, view);
             //loadPresetData(model);
             //controller.saveModel();
