@@ -528,8 +528,7 @@
                 this.$bodyPanel.append(this.$itemsContainer);
                 this.$addButton = this.createIconButton({ icon: 'fs-1 bi bi-journal-plus text-main' })
                     .click(function () {
-                        myself.controller.run('addItemSet', { name: L10n.newItemSetName });
-                        myself.controller.run('stageItemSet', myself.model.itemSets.at(-1));
+                        myself.view.itemAdditionView.editedItemSet = new ItemSet();
                         myself.view.switchOver(myself.view.itemSetAdditionView);
                     });
                 this.$changeModeButton = this.createIconButton({
@@ -598,7 +597,8 @@
                 super._updateOnce();
 
                 const myself = this;
-                this.$backButton = this.createIconButton({ icon: 'fs-2 bi bi-arrow-left-circle text-secondary' })
+                this.editedItemSet = undefined;
+                this.$backButton = this.createIconButton({ icon: 'fs-2 bi bi-x-circle text-secondary' })
                     .click(function () {
                         myself.view.switchOver(myself.view.itemSetSelectionView);
                     })
