@@ -571,7 +571,7 @@
                                     .addClass('col d-flex align-items-center')
                                     .text(itemSet.toString())
                                     .click(function () {
-                                        $(this).prev().click();
+                                        $(this).prev().children(':first').click();
                                     }),
                                 $('<div>')
                                     .addClass('col-auto p-0 d-flex align-items-center')
