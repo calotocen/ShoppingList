@@ -528,7 +528,7 @@
                 this.$bodyPanel.append(this.$itemsContainer);
                 this.$addButton = this.createIconButton({ icon: 'fs-1 bi bi-journal-plus text-main' })
                     .click(function () {
-                        myself.view.itemAdditionView.editedItemSet = new ItemSet();
+                        myself.controller.run('stageItemSet', new ItemSet());
                         myself.view.switchOver(myself.view.itemSetAdditionView);
                     });
                 this.$changeModeButton = this.createIconButton({
@@ -597,7 +597,6 @@
                 super._updateOnce();
 
                 const myself = this;
-                this.editedItemSet = undefined;
                 this.$backButton = this.createIconButton({ icon: 'fs-2 bi bi-x-circle text-secondary' })
                     .click(function () {
                         myself.view.switchOver(myself.view.itemSetSelectionView);
@@ -838,13 +837,19 @@
             }
 
             stageItemSet(itemSet) {
-                this.model.stagedItemSet = itemSet;
-                return [this.model.stagedItemSet];
+                this.model.stagedItemSet = Object.assign(new ItemSet(), itemSet);
+                this.model.stagedItems = undefined;
+                const changedModels = this.model.items
+                    .filter(i => i.belongingTo === itemSet)
+                    .map(i => this.stageItem(i));
+                return changedModels.concat([this.model.stageItemSet, this.model.stagedItems]);
             }
-
-            stageItem(parameters) {
+            stageItem(item) {
                 this.model.stagedItems ??= new ItemArray(this.model);
-                this.model.stagedItems.push(new Item(this.model, { belongingTo: this.model.stagedItemSet, ...parameters }));
+
+                let serialized_item = item.serialize();
+                serialized_item.belongingTo = this.model.stagedItemSet.id;
+                this.model.stagedItems.push(new Item(this.model, serialized_item));
                 return [this.model.stagedItems]
             }
 
