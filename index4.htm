@@ -826,10 +826,10 @@
                 return [this.model.itemSets];
             }
             removeItemSet(itemSet) {
-                this.changeItemSetSelectionState(itemSet, false);
+                const changedModels = this.changeItemSetSelectionState(itemSet, false);
                 this.model.items.removeIf(i => i.belongingTo == itemSet.id);
                 this.model.itemSets.remove(itemSet);
-                return [this.model.itemSets];
+                return changedModels.concat([this.model.itemSets]);
             }
 
             addItemToItemSet(item, itemSet) {
