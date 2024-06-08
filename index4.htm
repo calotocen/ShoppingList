@@ -599,6 +599,7 @@
                 const myself = this;
                 this.$backButton = this.createIconButton({ icon: 'fs-2 bi bi-x-circle text-secondary' })
                     .click(function () {
+                        myself.controller.run('unstageItemSet');
                         myself.view.switchOver(myself.view.itemSetSelectionView);
                     })
                 this.$headerPanel.append(
@@ -787,6 +788,7 @@
                     addItemSet: (...args) => this.addItemSet(...args),
                     removeItemSet: (...args) => this.removeItemSet(...args),
                     stageItemSet: (...args) => this.stageItemSet(...args),
+                    unstageItemSet: (...args) => this.unstageItemSet(...args),
                     stageItem: (...args) => this.stageItem(...args),
                     loadModel: (...args) => this.loadModel(...args),
                 }[command](...args);
@@ -843,6 +845,11 @@
                     .filter(i => i.belongingTo === itemSet)
                     .map(i => this.stageItem(i));
                 return changedModels.concat([this.model.stageItemSet, this.model.stagedItems]);
+            }
+            unstageItemSet() {
+                this.model.stagedItemSet = undefined;
+                this.model.stagedItems = undefined;
+                return [this.model.stageItemSet, this.model.stagedItems];
             }
             stageItem(item) {
                 this.model.stagedItems ??= new ItemArray(this.model);
