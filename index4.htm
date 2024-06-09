@@ -577,7 +577,11 @@
                                     .addClass('col-auto p-0 d-flex align-items-center')
                                     .append(
                                         this.createIconButton({ icon: 'fs-4 bi bi-pencil-fill text-main', size: 'fit' })
-                                            .toggle(this.$changeModeButton.data('toggle-state'))),
+                                            .toggle(this.$changeModeButton.data('toggle-state'))
+                                            .click(function () {
+                                                myself.controller.run('stageItemSet', itemSet);
+                                                myself.view.switchOver(myself.view.itemSetAdditionView);
+                                            })),
                                 $('<div>')
                                     .addClass('col-auto d-flex align-items-center')
                                     .append(
