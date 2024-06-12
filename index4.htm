@@ -33,10 +33,6 @@
     <div data-id="rootContainer">
     </div>
     <div class="offcanvas offcanvas-start" tabindex="-1" id="leftMenuBar">
-        <div class="offcanvas-body">
-            <div>
-            </div>
-        </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
@@ -49,6 +45,7 @@
 
         class StringsInEnglish {
             static newItemSetName = 'New set';
+            static loadPresetLabel = 'Load the preset'
         }
         let L10n = StringsInEnglish;
 
@@ -458,6 +455,29 @@
                 super._updateOnce();
 
                 const myself = this;
+                // it seems that bootstrap.Offcanvs.hide() dows not work
+                // when the boostrap.Offcanvas instance was created in the click event handler.
+                // I have not find its reason yet.
+                const bsOffcanvas = new bootstrap.Offcanvas($('#leftMenuBar')[0]);
+                $('#leftMenuBar').append(
+                    $('<div>')
+                        .addClass('offcanvas-header p-0')
+                        .append(this.createIconButton({ icon: 'fs-2 bi bi-arrow-left-circle text-secondary' })
+                            .click(function () {
+                                bsOffcanvas.hide();
+                            })),
+                    $('<div>')
+                        .addClass('offcanvas-body p-0')
+                        .append($('<div>')
+                            .addClass('list-group list-group-flush')
+                            .append(
+                                $('<button>')
+                                    .addClass('list-group-item list-group-item-action')
+                                    .attr({ type: 'button' })
+                                    .text(L10n.loadPresetLabel)
+                                    .click(function () {
+
+                                    }))));
                 this.$showLeftMenuBarButton = this.createIconButton({ icon: 'fs-1 bi bi-list text-main' })
                     .attr({
                         'data-bs-toggle': 'offcanvas',
