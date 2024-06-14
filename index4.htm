@@ -26,13 +26,20 @@
         [disabled] {
             filter: grayscale(100%);
         }
+
+        .offcanvas-width-50 {
+            /* the default value of --bs-offcanvas-width is 400px.
+             * it is defined as $offcanvas-horizontal-width in Saas.
+             */
+            --bs-offcanvas-width: min(400px, 50vw);
+        }
     </style>
 </head>
 
 <body>
     <div data-id="rootContainer">
     </div>
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="leftMenuBar">
+    <div class="offcanvas offcanvas-start offcanvas-width-50" tabindex="-1" id="leftMenuBar">
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
