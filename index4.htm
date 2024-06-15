@@ -705,7 +705,28 @@
                 this.$nameInput.val(this.model.stagedItemSet ? this.model.stagedItemSet.name : '');
                 this.$itemsContainer
                     .empty()
-                    .append((this.model.stagedItems ?? []).map(item => $('<div>').text(item.toString())));
+                    .append((this.model.stagedItems ?? []).map(item =>
+                        $('<div>')
+                            .addClass('row')
+                            .append(
+                                $('<div>')
+                                    .addClass('col ps-0 d-flex align-items-center')
+                                    .text(item.toString())
+                                    .click(function () {
+                                        $(this).prev().click();
+                                    }),
+                                $('<div>')
+                                    .addClass('col-auto p-0 d-flex align-items-center')
+                                    .append(
+                                        this.createIconButton({ icon: 'fs-4 bi bi-pencil-fill text-main', size: 'fit' })
+                                            .click(function () {
+                                            })),
+                                $('<div>')
+                                    .addClass('col-auto d-flex align-items-center')
+                                    .append(
+                                        this.createIconButton({ icon: 'fs-4 bi bi-dash-circle-fill text-danger', size: 'fit' })
+                                            .click(function () {
+                                            })))));
             }
 
             _isUpdateNeeded(...updatedModels) {
