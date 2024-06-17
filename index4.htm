@@ -252,6 +252,16 @@
                 this.stagedItems = undefined;
             }
 
+            empty() {
+                this.items.empty();
+                this.itemSets.empty();
+                this.selectedItemSets.empty();
+                this.shoppingItems.empty();
+                this.selectedShoppingItems.empty();
+                this.stagedItemSet = undefined;
+                this.stagedItems = undefined;
+            }
+
             serialize() {
                 return {
                     itemSets: this.itemSets.map(s => s.serialize()),
@@ -487,7 +497,8 @@
                                     .attr({ type: 'button' })
                                     .text(L10n.loadPresetLabel)
                                     .click(function () {
-
+                                        bsOffcanvas.hide();
+                                        myself.controller.run('loadPresetData');
                                     }))));
                 this.$showLeftMenuBarButton = this.createIconButton({ icon: 'fs-1 bi bi-list text-main' })
                     .attr({
@@ -861,6 +872,7 @@
                     removeItemSet: (...args) => this.removeItemSet(...args),
                     stageItemSet: (...args) => this.stageItemSet(...args),
                     unstageItemSet: (...args) => this.unstageItemSet(...args),
+                    loadPresetData: (...args) => this.loadPresetData(...args),
                     stageItem: (...args) => this.stageItem(...args),
                     loadModel: (...args) => this.loadModel(...args),
                 }[command](...args);
@@ -930,6 +942,11 @@
                 serialized_item.belongingTo = this.model.stagedItemSet.id;
                 this.model.stagedItems.push(new Item(this.model, serialized_item));
                 return [this.model.stagedItems]
+            }
+
+            loadPresetData() {
+                loadPresetData(this.model);
+                return [this.model];
             }
 
             writeCurrentShoppingListToClipboard() {
@@ -1116,8 +1133,6 @@
             const model = new Model();
             const view = new SingleViewPane();
             const controller = new Controller(model, view);
-            //loadPresetData(model);
-            //controller.saveModel();
             controller.run('loadModel');
         })
 
