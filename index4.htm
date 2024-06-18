@@ -41,6 +41,8 @@
     </div>
     <div class="offcanvas offcanvas-start offcanvas-width-50" tabindex="-1" id="leftMenuBar">
     </div>
+    <div class="modal" tabindex="-1" id="itemAdditionView">
+    </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
@@ -713,6 +715,7 @@
             _update(...updatedModels) {
                 super._update(...updatedModels);
 
+                const myself = this;
                 this.$nameInput.val(this.model.stagedItemSet ? this.model.stagedItemSet.name : '');
                 this.$itemsContainer
                     .empty()
@@ -731,6 +734,7 @@
                                     .append(
                                         this.createIconButton({ icon: 'fs-4 bi bi-pencil-fill text-main', size: 'fit' })
                                             .click(function () {
+                                                myself.view.switchOver(myself.view.itemAdditionView);
                                             })),
                                 $('<div>')
                                     .addClass('col-auto d-flex align-items-center')
@@ -749,7 +753,7 @@
                 super._updateOnce();
 
                 const myself = this;
-                this.$element = $('<div>');
+                this.modalId = '#itemAdditionView';
                 this.$nameInput = $('<input>')
                     .addClass('form-control')
                     .attr({ type: 'text' });
@@ -774,6 +778,25 @@
                                 unit: myself.$unitInput.val(),
                             });
                         }));
+                $(this.modalId).append(
+                    $('<div>')
+                        .addClass('modal-dialog')
+                        .append(
+                            $('<div>')
+                                .addClass('modal-content')
+                                .append(
+                                    $('<div>')
+                                        .addClass('modal-body')
+                                        .append(this.$element))));
+            }
+
+            show() {
+                const modal = new bootstrap.Modal(this.modalId);
+                modal.show();
+            }
+            hide() {
+                const modal = new bootstrap.Modal(this.modalId);
+                modal.hide();
             }
         }
         class AbstractViewPane extends AbstractView {
@@ -817,19 +840,25 @@
 
                 this.$element
                     .addClass('container-fluid p-0')
-                    .append(this.views.map(v => v.$element));
+                    .append(this.views
+                        .filter(v => !(v instanceof ItemAdditionView))
+                        .map(v => v.$element));
                 this.switchOver(this.shoppingListView);
             }
 
             switchOver(view) {
-                this.views.forEach(v => {
-                    if (v === view) {
-                        v.show();
-                        v.update();
-                    } else {
-                        v.hide();
-                    }
-                });
+                if (view instanceof ItemAdditionView) {
+                    view.show();
+                } else {
+                    this.views.forEach(v => {
+                        if (v === view) {
+                            v.show();
+                            v.update();
+                        } else {
+                            v.hide();
+                        }
+                    });
+                }
             }
         }
         class FlexViewPane extends AbstractViewPane {
