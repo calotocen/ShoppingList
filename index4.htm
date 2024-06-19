@@ -325,7 +325,7 @@
                 this.$element.hide();
             }
 
-            createIconButton({ type = 'push', size = 'normal', icon, off, on, toggleState = false }) {
+            createIconButton({ type = 'push', size = 'normal', icon, off, on, toggleState = false, toggleOnClick = true }) {
                 return $('<button>')
                     .addClass('btn')
                     .css({
@@ -343,6 +343,7 @@
                         toggle: {
                             'data-toggled': true,
                             'data-toggle-state': toggleState,
+                            'data-toggle-on-click': toggleOnClick,
                         },
                     }[type])
                     .append(
@@ -1129,6 +1130,9 @@
                     $element
                         .attr({ 'data-toggle-state': $element.attr('data-toggle-state') ?? 'false' })
                         .click(function () {
+                            const toggleOnClick = JSON.parse($element.attr('data-toggle-on-click'));
+                            if (!toggleOnClick) return;
+
                             const newToggleState = !JSON.parse($element.attr('data-toggle-state'));
                             $element.attr({ 'data-toggle-state': newToggleState });
                             $element.data({ 'toggle-state': newToggleState });
