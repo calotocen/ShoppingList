@@ -692,7 +692,13 @@
                 this.$nameInput = $('<input>')
                     .addClass('form-control border-0')
                     .css({ 'font-size': '1.5rem' })
-                    .attr({ type: 'text' });
+                    .attr({ type: 'text' })
+                    .change(function () {
+                        if (myself.model.stagedItemSet !== undefined) {
+                            myself.model.stagedItemSet.name = $(this).val();
+                            myself.update();
+                        }
+                    });
                 this.$itemsContainer = $('<div>');
                 this.$bodyPanel
                     .append(
@@ -735,6 +741,7 @@
 
                 const myself = this;
                 this.$nameInput.val(this.model.stagedItemSet ? this.model.stagedItemSet.name : '');
+                this.$commitButton.attr({ 'data-toggle-state': this.$nameInput.val() != '' });
                 this.$itemsContainer
                     .empty()
                     .append((this.model.stagedItems ?? []).map(item =>
