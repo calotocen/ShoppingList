@@ -667,11 +667,28 @@
                         myself.controller.run('unstageItemSet');
                         myself.view.switchOver(myself.view.itemSetSelectionView);
                     })
+                this.$commitButton = this.createIconButton({
+                    type: 'toggle',
+                    off: 'fs-2 bi bi-keyboard text-secondary',
+                    on: 'fs-2 bi bi-check-lg text-main',
+                    toggleState: false,
+                    toggleOnClick: false,
+                })
+                    .click(function () {
+                        if ($(this).data('toggle-state')) {
+                            myself.controller.run('commitItemSet');
+                            myself.view.switchOver(myself.view.itemSetSelectionView);
+                        } else {
+                            myself.$nameInput.focus();
+                        }
+                    });
                 this.$headerPanel.append(
                     $('<div>')
                         .addClass('col text-start')
                         .append(this.$backButton),
-                    $('<div>'));
+                    $('<div>')
+                        .addClass('col text-end')
+                        .append(this.$commitButton));
                 this.$nameInput = $('<input>')
                     .addClass('form-control border-0')
                     .css({ 'font-size': '1.5rem' })
@@ -902,6 +919,7 @@
                     removeItemSet: (...args) => this.removeItemSet(...args),
                     stageItemSet: (...args) => this.stageItemSet(...args),
                     unstageItemSet: (...args) => this.unstageItemSet(...args),
+                    commitItemSet: (...args) => this.commitItemSet(...args),
                     loadPresetData: (...args) => this.loadPresetData(...args),
                     stageItem: (...args) => this.stageItem(...args),
                     loadModel: (...args) => this.loadModel(...args),
@@ -965,6 +983,11 @@
                 this.model.stagedItems = undefined;
                 return [this.model.stageItemSet, this.model.stagedItems];
             }
+            commitItemSet() {
+                let changedModels = [];
+                return changedModels.concat([this.model.stagedItems, this.model.itemSets, this.model.stagedItemSet, this.model.stagedItems]);
+            }
+
             stageItem(item) {
                 this.model.stagedItems ??= new ItemArray(this.model);
 
