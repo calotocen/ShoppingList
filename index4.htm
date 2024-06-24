@@ -992,6 +992,17 @@
             }
             commitItemSet() {
                 let changedModels = [];
+                const oldItemSet = this.model.itemSets.get(this.model.stagedItemSet.id);
+                if (oldItemSet !== undefined) {
+                    changedModels.concat(this.removeItemSet(oldItemSet));
+                }
+
+                this.model.stagedItems.forEach(i => this.model.items.push(i));
+                this.model.itemSets.push(this.model.stagedItemSet);
+
+                this.model.stagedItemSet = undefined;
+                this.model.stagedItems = undefined;
+
                 return changedModels.concat([this.model.stagedItems, this.model.itemSets, this.model.stagedItemSet, this.model.stagedItems]);
             }
 
