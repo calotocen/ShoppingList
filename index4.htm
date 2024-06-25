@@ -727,10 +727,8 @@
                                         $('<div>').addClass('col-auto'),
                                         $('<div>')
                                             .addClass('col')
-                                            .append($('<button>')
-                                                .addClass('btn')
-                                                .attr({ type: 'button' })
-                                                .text('追加2')
+                                            .append(this.createIconButton({ icon: 'fs-3 bi bi-plus-circle', size: 'fit' })
+                                                .addClass('ps-3 pt-1')
                                                 .click(function () {
                                                     myself.controller.run('addItemSet', myself.$nameInput.val(), myself.model.stagedItems);
                                                 })))));
