@@ -62,10 +62,31 @@
         }
         let L10n = StringsInJapanese;
 
+        class DataReferenceArray extends Array {
+            constructor(model, values = []) {
+                super();
+                this.model = model;
+                this.push(...values);
+            }
+
+            serialize() {
+                return this.map(i => i.id);
+            }
+            deserialize(ids) {
+                this.empty();
+                this.push(...ids.map(id => this.model.get(id)));
+                return this;
+            }
+        }
+
         class Item {
             constructor(model, parameter = {}) {
                 this.model = model;
                 this.deserialize(parameter);
+            }
+
+            get belongingTo() {
+                return this.model.itemSets.find(itemSet => itemSet.items.find(item => item.id == this.id));
             }
 
             serialize() {
@@ -74,22 +95,13 @@
                     name: this.name,
                     amount: this.amount,
                     unit: this.unit,
-                    belongingTo: this.belongingTo.id,
                 };
             }
-            deserialize({ id = `item-${window.crypto.randomUUID()}`, name, amount, unit, belongingTo }) {
+            deserialize({ id = `item-${window.crypto.randomUUID()}`, name, amount, unit }) {
                 this.id = id;
                 this.name = name;
                 this.amount = amount;
                 this.unit = unit;
-                if (belongingTo !== undefined && !(belongingTo instanceof ItemSet)) {
-                    if (this.model.stagedItemSet !== undefined && belongingTo == this.model.stagedItemSet.id) {
-                        belongingTo = this.model.stagedItemSet;
-                    } else {
-                        belongingTo = this.model.itemSets.get(belongingTo);
-                    }
-                }
-                this.belongingTo = belongingTo;
                 return this;
             }
 
@@ -186,9 +198,15 @@
             }
         }
         class ItemSet {
+            static createId() {
+                return `itemSet-${window.crypto.randomUUID()}`
+            }
+
             constructor(model, parameters = {}) {
                 this.model = model;
-                this.deserialize(parameters);
+                this.id = parameters.id ?? ItemSet.createId();
+                this.name = parameters.name ?? '';
+                this.items = new DataReferenceArray(this.model, parameters.items ?? []);
             }
 
             toString() {
@@ -199,11 +217,13 @@
                 return {
                     id: this.id,
                     name: this.name,
+                    items: this.items.serialize(),
                 };
             }
-            deserialize({ id = `itemSet-${window.crypto.randomUUID()}`, name }) {
+            deserialize({ id = ItemSet.createId(), name = '', items = [] }) {
                 this.id = id;
                 this.name = name;
+                this.items = new DataReferenceArray(this.model).deserialize(items);
                 return this;
             }
         }
@@ -223,7 +243,7 @@
             }
             deserialize(serializedData) {
                 this.empty();
-                this.push(...serializedData.map(sis => new ItemSet(this.model, sis)));
+                this.push(...serializedData.map(sis => new ItemSet(this.model).deserialize(sis)));
                 return this;
             }
         }
@@ -254,6 +274,10 @@
                 this.stagedItems = undefined;
             }
 
+            get(id) {
+                return this.items.find(item => item.id == id);
+            }
+
             empty() {
                 this.items.empty();
                 this.itemSets.empty();
@@ -266,8 +290,8 @@
 
             serialize() {
                 return {
-                    itemSets: this.itemSets.map(s => s.serialize()),
                     items: this.items.map(i => i.serialize()),
+                    itemSets: this.itemSets.map(s => s.serialize()),
                     selectedItemSets: this.selectedItemSets.serialize(),
                     shoppingItems: this.shoppingItems.serialize(),
                     selectedShoppingItems: this.selectedShoppingItems.serialize(),
@@ -276,8 +300,8 @@
                 }
             }
             deserialize({ itemSets = [], items = [], selectedItemSets = [], shoppingItems = [], selectedShoppingItems = [], stagedItemSet, stagedItems }) {
-                this.itemSets.deserialize(itemSets);
                 this.items.deserialize(items);
+                this.itemSets.deserialize(itemSets);
                 this.selectedItemSets.deserialize(selectedItemSets);
                 this.shoppingItems.deserialize(shoppingItems);
                 this.selectedShoppingItems.deserialize(selectedShoppingItems);
@@ -1325,10 +1349,15 @@
                     ['キムチ', 1, 'パック'],
                 ],
             };
-            model.itemSets.push(...Object.keys(presetData).map(name => new ItemSet(model, { name: name })));
-            model.items.push(...model.itemSets.flatMap(
-                list => presetData[list.name].map(p => new Item(model, { name: p[0], amount: p[1], unit: p[2], belongingTo: list }))
-            ));
+
+            model.itemSets.push(...Object.keys(presetData).map(name => {
+                const items = presetData[name].flatMap(parameter => new Item(
+                    model,
+                    { name: parameter[0], amount: parameter[1], unit: parameter[2] }
+                ));
+                model.items.push(...items);
+                return new ItemSet(model, { name: name, items: items });
+            }));
         }
     </script>
 </body>
