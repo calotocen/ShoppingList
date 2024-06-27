@@ -62,6 +62,27 @@
         }
         let L10n = StringsInJapanese;
 
+        class DataArray extends Array {
+            constructor(model, dataClass, values = []) {
+                super();
+                this.model = model;
+                this.dataClass = dataClass;
+                this.push(...values);
+            }
+
+            get(id) {
+                return this.find(value => value.id == id);
+            }
+
+            serialize() {
+                return this.map(value => value.serialize());
+            }
+            deserialize(values) {
+                this.empty();
+                this.push(...values.map(value => new this.dataClass(this.model).deserialize(value)));
+                return this;
+            }
+        }
         class DataReferenceArray extends Array {
             constructor(model, values = []) {
                 super();
@@ -109,26 +130,6 @@
                 return `${this.name} ... ${this.amount} ${this.unit}`;
             }
         }
-        class ItemArray extends Array {
-            constructor(model, parameters = []) {
-                super();
-                this.model = model;
-                this.deserialize(parameters);
-            }
-
-            get(id) {
-                return this.find(i => i.id == id);
-            }
-
-            serialize() {
-                return this.map(i => i.serialize());
-            }
-            deserialize(serializedData) {
-                this.empty();
-                this.push(...serializedData.map(si => new Item(this.model, si)));
-                return this;
-            }
-        }
         class AggregatedItem {
             constructor(model, parameters = {}) {
                 this.model = model;
@@ -159,26 +160,6 @@
 
             toString() {
                 return `${this.name} ... ${this.amount} ${this.unit}`;
-            }
-        }
-        class AggregatedItemArray extends Array {
-            constructor(model, parameters = []) {
-                super();
-                this.model = model;
-                this.deserialize(parameters);
-            }
-
-            get(id) {
-                return this.find(i => i.id == id);
-            }
-
-            serialize() {
-                return this.map(i => i.serialize());
-            }
-            deserialize(serializedData) {
-                this.empty();
-                this.push(...serializedData.map(si => new AggregatedItem(this.model, si)));
-                return this;
             }
         }
         class AggregatedItemReferenceArray extends Array {
@@ -227,26 +208,6 @@
                 return this;
             }
         }
-        class ItemSetArray extends Array {
-            constructor(model, parameters = []) {
-                super();
-                this.model = model;
-                this.deserialize(parameters);
-            }
-
-            get(id) {
-                return this.find(s => s.id == id);
-            }
-
-            serialize() {
-                return this.map(is => is.serialize());
-            }
-            deserialize(serializedData) {
-                this.empty();
-                this.push(...serializedData.map(sis => new ItemSet(this.model).deserialize(sis)));
-                return this;
-            }
-        }
         class ItemSetReferenceArray extends Array {
             constructor(model, parameters = []) {
                 super();
@@ -265,10 +226,10 @@
         }
         class Model {
             constructor() {
-                this.items = new ItemArray(this);
-                this.itemSets = new ItemSetArray(this);
+                this.items = new DataArray(this, Item);
+                this.itemSets = new DataArray(this, ItemSet);
                 this.selectedItemSets = new ItemSetReferenceArray(this);
-                this.shoppingItems = new AggregatedItemArray(this);
+                this.shoppingItems = new DataArray(this, AggregatedItem);
                 this.selectedShoppingItems = new AggregatedItemReferenceArray(this);
                 this.stagedItemSet = undefined;
                 this.stagedItems = undefined;
@@ -309,7 +270,7 @@
                     this.stagedItemSet = new ItemSet(this, stagedItemSet);
                 }
                 if (stagedItems !== undefined) {
-                    this.stagedItems = new ItemArray(this, stagedItems);
+                    this.stagedItems = new DataArray(this, Item).deserialize(stagedItems);
                 }
             }
         }
@@ -1029,7 +990,7 @@
             }
 
             stageItem(item) {
-                this.model.stagedItems ??= new ItemArray(this.model);
+                this.model.stagedItems ??= new DataArray(this.model, Item);
 
                 let serialized_item = item.serialize();
                 serialized_item.belongingTo = this.model.stagedItemSet.id;
