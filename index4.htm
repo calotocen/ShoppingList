@@ -162,22 +162,6 @@
                 return `${this.name} ... ${this.amount} ${this.unit}`;
             }
         }
-        class AggregatedItemReferenceArray extends Array {
-            constructor(model, parameters = []) {
-                super();
-                this.model = model;
-                this.deserialize(parameters);
-            }
-
-            serialize() {
-                return this.map(i => i.id);
-            }
-            deserialize(serializedData) {
-                this.empty();
-                this.push(...serializedData.map(id => this.model.shoppingItems.get(id)));
-                return this;
-            }
-        }
         class ItemSet {
             static createId() {
                 return `itemSet-${window.crypto.randomUUID()}`
@@ -208,35 +192,21 @@
                 return this;
             }
         }
-        class ItemSetReferenceArray extends Array {
-            constructor(model, parameters = []) {
-                super();
-                this.model = model;
-                this.deserialize(parameters);
-            }
-
-            serialize() {
-                return this.map(is => is.id);
-            }
-            deserialize(serializedData) {
-                this.empty();
-                this.push(...serializedData.map(id => this.model.itemSets.get(id)));
-                return this;
-            }
-        }
         class Model {
             constructor() {
                 this.items = new DataArray(this, Item);
                 this.itemSets = new DataArray(this, ItemSet);
-                this.selectedItemSets = new ItemSetReferenceArray(this);
+                this.selectedItemSets = new DataReferenceArray(this);
                 this.shoppingItems = new DataArray(this, AggregatedItem);
-                this.selectedShoppingItems = new AggregatedItemReferenceArray(this);
+                this.selectedShoppingItems = new DataReferenceArray(this);
                 this.stagedItemSet = undefined;
                 this.stagedItems = undefined;
             }
 
             get(id) {
-                return this.items.find(item => item.id == id);
+                return this.items.find(item => item.id == id)
+                    ?? this.itemSets.find(itemSet => itemSet.id == id)
+                    ?? this.shoppingItems.find(item => item.id == id);
             }
 
             empty() {
