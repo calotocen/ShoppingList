@@ -62,6 +62,24 @@
         }
         let L10n = StringsInJapanese;
 
+        class Entity {
+            constructor(model, parameter = {}) {
+                this.model = model;
+                this.type = this.constructor.name;
+                this.id = parameter.id ?? `${this.type}_${window.crypto.randomUUID()}`;
+            }
+
+            serialize() {
+                return {
+                    type: this.type,
+                    id: this.id,
+                };
+            }
+            deserialize({ type, id }) {
+                this.type = type;
+                this.id = id;
+            }
+        }
         class DataArray extends Array {
             constructor(model, dataClass, values = []) {
                 super();
@@ -100,10 +118,12 @@
             }
         }
 
-        class Item {
+        class Item extends Entity {
             constructor(model, parameter = {}) {
-                this.model = model;
-                this.deserialize(parameter);
+                super(model, parameter);
+                this.name = parameter.name ?? '';
+                this.amount = parameter.amount ?? 0;
+                this.unit = parameter.unit ?? '';
             }
 
             get belongingTo() {
@@ -111,15 +131,17 @@
             }
 
             serialize() {
-                return {
-                    id: this.id,
-                    name: this.name,
-                    amount: this.amount,
-                    unit: this.unit,
-                };
+                return Object.assign({
+                    ...super.serialize(),
+                    ...{
+                        name: this.name,
+                        amount: this.amount,
+                        unit: this.unit,
+                    },
+                });
             }
-            deserialize({ id = `item-${window.crypto.randomUUID()}`, name, amount, unit }) {
-                this.id = id;
+            deserialize({ type, id, name, amount, unit }) {
+                super.deserialize({ type: type, id: id });
                 this.name = name;
                 this.amount = amount;
                 this.unit = unit;
@@ -130,10 +152,10 @@
                 return `${this.name} ... ${this.amount} ${this.unit}`;
             }
         }
-        class AggregatedItem {
+        class AggregatedItem extends Entity {
             constructor(model, parameters = {}) {
-                this.model = model;
-                this.deserialize(parameters);
+                super(model, parameters);
+                this.items = new DataReferenceArray(this.model, ...(parameters.items ?? []));
             }
 
             get name() {
@@ -147,14 +169,14 @@
             }
 
             serialize() {
-                return {
-                    id: this.id,
-                    items: this.items.map(i => i.id),
-                };
+                return Object.assign({
+                    ...super.serialize(),
+                    ...{ items: this.items.serialize() },
+                });
             }
-            deserialize({ id = `aggregated-item-${window.crypto.randomUUID()}`, items = [] }) {
-                this.id = id;
-                this.items = items.map(i => i instanceof Item ? i : this.model.items.get(i));
+            deserialize({ type, id, items = [] }) {
+                super.deserialize({ type: type, id: id });
+                this.items = new DataReferenceArray(this.model).deserialize(items);
                 return this;
             }
 
@@ -162,14 +184,9 @@
                 return `${this.name} ... ${this.amount} ${this.unit}`;
             }
         }
-        class ItemSet {
-            static createId() {
-                return `itemSet-${window.crypto.randomUUID()}`
-            }
-
+        class ItemSet extends Entity {
             constructor(model, parameters = {}) {
-                this.model = model;
-                this.id = parameters.id ?? ItemSet.createId();
+                super(model, parameters);
                 this.name = parameters.name ?? '';
                 this.items = new DataReferenceArray(this.model, parameters.items ?? []);
             }
@@ -179,14 +196,16 @@
             }
 
             serialize() {
-                return {
-                    id: this.id,
-                    name: this.name,
-                    items: this.items.serialize(),
-                };
+                return Object.assign({
+                    ...super.serialize(),
+                    ...{
+                        name: this.name,
+                        items: this.items.serialize(),
+                    },
+                });
             }
-            deserialize({ id = ItemSet.createId(), name = '', items = [] }) {
-                this.id = id;
+            deserialize({ type, id, name = '', items = [] }) {
+                super.deserialize({ type: type, id: id });
                 this.name = name;
                 this.items = new DataReferenceArray(this.model).deserialize(items);
                 return this;
