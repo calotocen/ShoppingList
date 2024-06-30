@@ -81,10 +81,9 @@
             }
         }
         class DataArray extends Array {
-            constructor(model, dataClass, values = []) {
+            constructor(model, values = []) {
                 super();
                 this.model = model;
-                this.dataClass = dataClass;
                 this.push(...values);
             }
 
@@ -97,7 +96,7 @@
             }
             deserialize(values) {
                 this.empty();
-                this.push(...values.map(value => new this.dataClass(this.model).deserialize(value)));
+                this.push(...values.map(value => new (new Function(`return ${value.type}`)())(this.model).deserialize(value)));
                 return this;
             }
         }
@@ -213,10 +212,10 @@
         }
         class Model {
             constructor() {
-                this.items = new DataArray(this, Item);
-                this.itemSets = new DataArray(this, ItemSet);
+                this.items = new DataArray(this);
+                this.itemSets = new DataArray(this);
                 this.selectedItemSets = new DataReferenceArray(this);
-                this.shoppingItems = new DataArray(this, AggregatedItem);
+                this.shoppingItems = new DataArray(this);
                 this.selectedShoppingItems = new DataReferenceArray(this);
                 this.stagedItemSet = undefined;
                 this.stagedItems = undefined;
@@ -259,7 +258,7 @@
                     this.stagedItemSet = new ItemSet(this, stagedItemSet);
                 }
                 if (stagedItems !== undefined) {
-                    this.stagedItems = new DataArray(this, Item).deserialize(stagedItems);
+                    this.stagedItems = new DataArray(this).deserialize(stagedItems);
                 }
             }
         }
@@ -979,7 +978,7 @@
             }
 
             stageItem(item) {
-                this.model.stagedItems ??= new DataArray(this.model, Item);
+                this.model.stagedItems ??= new DataArray(this.model);
 
                 let serialized_item = item.serialize();
                 serialized_item.belongingTo = this.model.stagedItemSet.id;
