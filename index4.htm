@@ -403,9 +403,11 @@
                         .forEach(entry => {
                             if (!this.$headerContainer.hasClass('fixed-top')) {
                                 this.$headerContainer.addClass('fixed-top');
+
+                                // The following paddings must be changed only once to prevent the header flickering on iPhone.
+                                this.$bodyPanel.css({ 'padding-top': `${this.$headerContainer.innerHeight()}px` });
+                                this.$bodyPanel.css({ 'padding-bottom': `${this.$footerContainer.innerHeight()}px` });
                             }
-                            this.$bodyPanel.css({ 'padding-top': `${this.$headerContainer.innerHeight()}px` });
-                            this.$bodyPanel.css({ 'padding-bottom': `${this.$footerContainer.innerHeight()}px` });
                         }))
                     .observe(this.$element[0]);
 
