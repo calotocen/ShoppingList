@@ -215,7 +215,7 @@
                 this.items = new DataArray(this);
                 this.itemSets = new DataArray(this);
                 this.selectedItemSets = new DataReferenceArray(this);
-                this.shoppingItems = new DataArray(this);
+                this.shoppingItems = new DataReferenceArray(this);
                 this.selectedShoppingItems = new DataReferenceArray(this);
                 this.stagedItemSet = undefined;
                 this.stagedItems = undefined;
@@ -223,8 +223,7 @@
 
             get(id) {
                 return this.items.find(item => item.id == id)
-                    ?? this.itemSets.find(itemSet => itemSet.id == id)
-                    ?? this.shoppingItems.find(item => item.id == id);
+                    ?? this.itemSets.find(itemSet => itemSet.id == id);
             }
 
             empty() {
@@ -248,7 +247,7 @@
                     stagedItems: this.stagedItems !== undefined ? this.stagedItems.serialize() : undefined,
                 }
             }
-            deserialize({ itemSets = [], items = [], selectedItemSets = [], shoppingItems = [], selectedShoppingItems = [], stagedItemSet, stagedItems }) {
+            deserialize({ itemSets = [], items = [], selectedItems = [], selectedItemSets = [], shoppingItems = [], selectedShoppingItems = [], stagedItemSet, stagedItems }) {
                 this.items.deserialize(items);
                 this.itemSets.deserialize(itemSets);
                 this.selectedItemSets.deserialize(selectedItemSets);
@@ -522,20 +521,29 @@
                 const myself = this;
                 this.$bodyPanel.empty();
                 this.$bodyPanel.append(
-                    this.model.shoppingItems.map(item =>
-                        $('<div>')
+                    Object.values(Object.groupBy(this.model.shoppingItems, item => `${item.name}@${item.unit}`)).map(groupedItems => {
+                        const toggleState =
+                            groupedItems.every(item => this.model.selectedShoppingItems.includes(item)) ? true :
+                                groupedItems.some(item => this.model.selectedShoppingItems.includes(item)) ? 2 : false;
+                        const button = this.createCheckButton({ state: toggleState })
+                            .append($('<i>').addClass('fs-4 bi bi-stop-circle text-main'))
+                            .click(function () {
+                                myself.controller.run('changeShoppingItem2SelectionState', groupedItems, $(this).data('toggle-state'));
+                            });
+                        const name = groupedItems[0].name;
+                        const amount = groupedItems.reduce((sum, item) => sum + item.amount, 0);
+                        const unit = groupedItems[0].unit;
+                        return $('<div>')
                             .addClass('containter-fluid px-3 d-flex align-items-center')
                             .append(
-                                this.createCheckButton({ state: this.model.selectedShoppingItems.includes(item) })
-                                    .click(function () {
-                                        myself.controller.run('changeShoppingItemSelectionState', item, $(this).data('toggle-state'));
-                                    }),
+                                button,
                                 $('<div>')
                                     .addClass('ps-3')
-                                    .text(item.toString())
+                                    .text(`${name} ... ${amount} ${unit}`)
                                     .click(function () {
                                         $(this).prev().click();
-                                    }))));
+                                    }))
+                    }));
             }
 
             _isUpdateNeeded(...updatedModels) {
@@ -894,7 +902,7 @@
             run(command, ...args) {
                 const changedModels = {
                     changeItemSetSelectionState: (...args) => this.changeItemSetSelectionState(...args),
-                    changeShoppingItemSelectionState: (...args) => this.changeShoppingItemSelectionState(...args),
+                    changeShoppingItem2SelectionState: (...args) => this.changeShoppingItem2SelectionState(...args),
                     addItemSet: (...args) => this.addItemSet(...args),
                     removeItemSet: (...args) => this.removeItemSet(...args),
                     stageItemSet: (...args) => this.stageItemSet(...args),
@@ -908,28 +916,20 @@
                 this.modelStore.save();
             }
 
-            changeShoppingItemSelectionState(item, selected) {
-                selected ? this.model.selectedShoppingItems.push(item) : this.model.selectedShoppingItems.remove(item);
+            changeShoppingItem2SelectionState(items, selected) {
+                items.forEach(item => selected ? this.model.selectedShoppingItems.push(item) : this.model.selectedShoppingItems.remove(item));
                 return [this.model.selectedShoppingItems];
             }
 
             changeItemSetSelectionState(itemSet, selected) {
                 if (selected) {
                     this.model.selectedItemSets.push(itemSet);
-                    this.model.items.filter(i => i.belongingTo == itemSet).forEach(i => {
-                        let aggregatedItem = this.model.shoppingItems.find(ai => i.name == ai.name && i.unit == ai.unit);
-                        if (aggregatedItem === undefined) {
-                            aggregatedItem = new AggregatedItem(this.model);
-                            this.model.shoppingItems.push(aggregatedItem);
-                        }
-                        aggregatedItem.items.push(i);
-                    });
+                    this.model.shoppingItems.push(...itemSet.items);
                 } else {
                     this.model.selectedItemSets.remove(itemSet);
-                    this.model.shoppingItems.forEach(ai => ai.items.removeIf(i => i.belongingTo == itemSet));
-                    this.model.shoppingItems.removeIf(ai => ai.items.length == 0);
+                    this.model.shoppingItems.removeIf(item => itemSet.items.includes(item));
+                    this.model.selectedShoppingItems.removeIf(item => itemSet.items.includes(item));
                 }
-                this.model.selectedShoppingItems.removeIf(ai => !this.model.shoppingItems.includes(ai));
                 return [this.model.shoppingItems, this.model.selectedShoppingItems, this.model.selectedItemSets];
             }
 
@@ -997,7 +997,12 @@
             writeCurrentShoppingListToClipboard() {
                 const text = this.model.selectedItemSets.map(s => s.name).join('\n')
                     + '\n'
-                    + this.model.shoppingItems.map(i => i.toString()).join('\n');
+                    + Object.values(Object.groupBy(this.model.shoppingItems, item => `${item.name}@${item.unit}`)).map(groupedItems => {
+                        const name = groupedItems[0].name;
+                        const amount = groupedItems.reduce((sum, item) => sum + item.amount, 0);
+                        const unit = groupedItems[0].unit;
+                        return `${name} ... ${amount} ${unit}`
+                    }).join('\n');
                 navigator.clipboard.writeText(text);
             }
 
@@ -1017,8 +1022,8 @@
 
                 Object.groupBy = function (items, callbackFn) {
                     let groupedItems = {};
-                    items.forEach(item => {
-                        const key = callbackFn.call(this, item).toString();
+                    items.forEach((item, index) => {
+                        const key = callbackFn.call(this, item, index).toString();
                         if (!(key in groupedItems)) {
                             groupedItems[key] = [];
                         }
@@ -1133,8 +1138,8 @@
                         .map(mutation => $(mutation.target))
                         .forEach($target => {
                             const toggleState = JSON.parse($target.attr('data-toggle-state'));
-                            $target.children(toggleState ? ':first' : ':last').hide();
-                            $target.children(toggleState ? ':last' : ':first').show();
+                            $target.children().hide();
+                            $target.children().eq(Number(toggleState)).show();
                             $target.data({ 'toggle-state': toggleState });
                         })))
                         .observe(this, { attributes: true, attributeFilter: ['data-toggle-state'] });
@@ -1147,7 +1152,7 @@
                             const toggleOnClick = JSON.parse($element.attr('data-toggle-on-click'));
                             if (!toggleOnClick) return;
 
-                            const newToggleState = !JSON.parse($element.attr('data-toggle-state'));
+                            const newToggleState = Number(JSON.parse($element.attr('data-toggle-state'))) != 1;
                             $element.attr({ 'data-toggle-state': newToggleState });
                             $element.data({ 'toggle-state': newToggleState });
                         });
