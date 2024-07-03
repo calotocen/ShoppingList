@@ -275,6 +275,51 @@
             }
         }
 
+        class MultiStateButton {
+            constructor(parameters = {}) {
+                this.transitionState = parameters.transitionState ?? (myself => {
+                    const childrenLength = myself.$element.children().length;
+                    return childrenLength > 0 ? (Number(myself.state) + 1) % childrenLength : 0
+                });
+                this.$element = $('<button>')
+                    .attr({
+                        'data-sl-btn-state': parameters.initialState ?? 0,
+                        'data-sl-btn-transition-on-click': parameters.transitionOnClick ?? true,
+                    })
+                    .data({
+                        'msb-instance': this,
+                    })
+                    .click(function () {
+                        const myself = $(this).data('msb-instance');
+                        if (!myself.transitionOnClick) return;
+                        myself.state = myself.transitionState(myself);
+                    });
+                this.stateObserver = new MutationObserver(mutations => mutations
+                    .map(mutations => $(mutations.target))
+                    .forEach($element => {
+                        const myself = $element.data('msb-instance');
+                        $element.children().hide();
+                        $element.children().eq(Number(myself.state)).show();
+                    }));
+                this.stateObserver.observe(this.$element[0], { attributes: true, attributeFilter: ['data-sl-btn-state'] });
+                this.state = this.state;    // update its view
+            }
+
+            get state() {
+                return JSON.parse(this.$element.attr('data-sl-btn-state'));
+            }
+            set state(newState) {
+                this.$element.attr({ 'data-sl-btn-state': newState });
+            }
+
+            get transitionOnClick() {
+                return JSON.parse(this.$element.attr('data-sl-btn-transition-on-click'));
+            }
+            set transitionOnClick(enabled) {
+                this.$element.attr({ 'data-sl-btn-transition-on-click': newState });
+            }
+        }
+
         class AbstractView {
             get controller() {
                 return this._controller;
