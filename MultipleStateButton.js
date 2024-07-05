@@ -1,6 +1,12 @@
 (function (global) {
     const ns = global.bootcamp ??= {};
 
+    const jQuerize = args => {
+        if (args instanceof jQuery) return args;
+        if (args instanceof Node || args instanceof NodeList) return $(args);
+        return undefined;
+    }
+
     ns.MultipleStateButton = class {
         static create(args = {}) {
             return (new ns.MultipleStateButton(args)).$element;
@@ -9,7 +15,7 @@
         constructor(args = {}) {
             const myself = this;
 
-            this.$element = args instanceof Element ? $(args) : args.jquery ? args : args.$element ?? $('<button>');
+            this.$element = jQuerize(args) ?? args.$element ?? $('<button>');
             this.$element.attr('data-bc-msbtn') ?? this.$element.attr({ 'data-bc-msbtn': '' });
             this.$element.data({ 'bc-msbtn-instance': this });
 
