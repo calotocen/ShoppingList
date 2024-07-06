@@ -27,7 +27,7 @@
 
             // This event handler must be executed before any other click event handlers
             // because other handlers will expected a state of buttons after pushing them.
-            const handlers = $._data(this.$element[0], 'events')?.click.map(handler => handler.handler) ?? [];
+            const handlers = $._data(this.$element[0], 'events')?.click?.map(handler => handler.handler) ?? [];
             handlers.forEach(handler => this.$element.off('click', handler));
             this.$element.click(function () {
                 if (!myself.transitionOnClick) return;
