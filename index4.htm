@@ -275,51 +275,73 @@
             }
         }
 
-        class MultiStateButton {
-            constructor(parameters = {}) {
-                this.transitionState = parameters.transitionState ?? (myself => {
-                    const childrenLength = myself.$element.children().length;
-                    return childrenLength > 0 ? (Number(myself.state) + 1) % childrenLength : 0
+        class IconButton {
+            static create({ icon, size = 'fs-1', padding = 'normal', color = '' }) {
+                return $('<button>')
+                    .addClass('btn')
+                    .css({ '--bs-btn-border-width': '0px' })
+                    .css({
+                        normal: {},
+                        fit: {
+                            '--bs-btn-padding-x': '0px',
+                            '--bs-btn-padding-y': '0px',
+                        },
+                    }[padding])
+                    .append($('<i>').addClass(`bi ${icon} ${size} ${color}`));
+            }
+
+            static checkbox(args = {}) {
+                const state = args.state ?? 0;
+                return this.create({
+                    ...[
+                        { icon: 'bi-circle' },
+                        { icon: 'bi-check-circle-fill', color: 'text-main' },
+                        { icon: 'bi-stop-circle', color: 'text-main' }
+                    ][Number(state)],
+                    ...{
+                        size: 'fs-4',
+                        padding: 'fit',
+                    },
+                    ...args,
+                })
+                    .data({ state: state });
+            }
+
+            static back(args = {}) {
+                return this.create({
+                    ...{
+                        icon: 'bi-arrow-left-circle',
+                        size: 'fs-2',
+                        color: 'text-secondary',
+                    },
+                    ...args,
                 });
-                this.$element = $('<button>')
-                    .attr({
-                        'data-sl-btn-state': parameters.initialState ?? 0,
-                        'data-sl-btn-transition-on-click': parameters.transitionOnClick ?? true,
-                    })
-                    .data({
-                        'msb-instance': this,
-                    })
-                    .click(function () {
-                        const myself = $(this).data('msb-instance');
-                        if (!myself.transitionOnClick) return;
-                        myself.state = myself.transitionState(myself);
-                    });
-                this.stateObserver = new MutationObserver(mutations => mutations
-                    .map(mutations => $(mutations.target))
-                    .forEach($element => {
-                        const myself = $element.data('msb-instance');
-                        $element.children().hide();
-                        $element.children().eq(Number(myself.state)).show();
-                    }));
-                this.stateObserver.observe(this.$element[0], { attributes: true, attributeFilter: ['data-sl-btn-state'] });
-                this.state = this.state;    // update its view
             }
 
-            get state() {
-                return JSON.parse(this.$element.attr('data-sl-btn-state'));
-            }
-            set state(newState) {
-                this.$element.attr({ 'data-sl-btn-state': newState });
+            static edit(args = {}) {
+                return this.create({
+                    ...{
+                        icon: 'bi-pencil-fill',
+                         size: 'fs-4',
+                          color: 'text-main',
+                           padding: 'fit'
+                    },
+                    ...args,
+                });
             }
 
-            get transitionOnClick() {
-                return JSON.parse(this.$element.attr('data-sl-btn-transition-on-click'));
-            }
-            set transitionOnClick(enabled) {
-                this.$element.attr({ 'data-sl-btn-transition-on-click': newState });
+            static delete(args = {}) {
+                return this.create({
+                    ...{
+                        icon: 'bi-dash-circle-fill',
+                         size: 'fs-4',
+                          color: 'text-danger',
+                           padding: 'fit'
+                    },
+                    ...args,
+                });
             }
         }
-
         class AbstractView {
             get controller() {
                 return this._controller;
@@ -340,43 +362,6 @@
             }
             hide() {
                 this.$element.hide();
-            }
-
-            createIconButton({ type = 'push', size = 'normal', icon, off, on, toggleState = false, toggleOnClick = true }) {
-                return $('<button>')
-                    .addClass('btn')
-                    .css({
-                        normal: {
-                            '--bs-btn-border-width': '0px',
-                        },
-                        fit: {
-                            '--bs-btn-padding-x': '0px',
-                            '--bs-btn-padding-y': '0px',
-                            '--bs-btn-border-width': '0px',
-                        },
-                    }[size])
-                    .attr({
-                        push: {},
-                        toggle: {
-                            'data-toggled': true,
-                            'data-toggle-state': toggleState,
-                            'data-toggle-on-click': toggleOnClick,
-                        },
-                    }[type])
-                    .append(
-                        [icon, off, on]
-                            .filter(c => c !== undefined)
-                            .map(c => $('<i>').addClass(c)));
-            }
-
-            createCheckButton({ off = 'fs-4 bi bi-circle', on = 'fs-4 bi bi-check-circle-fill text-main', state = false }) {
-                return this.createIconButton({
-                    type: 'toggle',
-                    size: 'fit',
-                    off: off,
-                    on: on,
-                    toggleState: state,
-                });
             }
 
             _updateOnce() {
@@ -505,7 +490,7 @@
                 $('#leftMenuBar').append(
                     $('<div>')
                         .addClass('offcanvas-header p-0')
-                        .append(this.createIconButton({ icon: 'fs-2 bi bi-arrow-left-circle text-secondary' })
+                        .append(IconButton.back()
                             .click(function () {
                                 bsOffcanvas.hide();
                             })),
@@ -522,7 +507,7 @@
                                         bsOffcanvas.hide();
                                         myself.controller.run('loadPresetData');
                                     }))));
-                this.$showLeftMenuBarButton = this.createIconButton({ icon: 'fs-1 bi bi-list text-main' })
+                this.$showLeftMenuBarButton = IconButton.create({ icon: 'bi-list', color: 'text-secondary' })
                     .attr({
                         'data-bs-toggle': 'offcanvas',
                         'data-bs-target': '#leftMenuBar',
@@ -534,18 +519,18 @@
                             .append(this.$showLeftMenuBarButton),
                         $('<div>')
                             .addClass('col text-center')
-                            .append($('<i>').addClass('fs-1 bi bi-bag text-main')),
+                            .append(IconButton.create({ icon: 'bi-bag', color: 'text-main' })),
                         $('<div>')
                             .addClass('col text-right'));
-                this.$showItemSetSelectionViewButton = this.createIconButton({ icon: 'fs-1 bi bi-journals text-main' })
+                this.$showItemSetSelectionViewButton = IconButton.create({ icon: 'bi-journals', color: 'text-main' })
                     .click(function () {
                         myself.view.switchOver(myself.view.itemSetSelectionView);
                     });
                 this.$copyButton = $('<div>')
                     .addClass('position-relative')
                     .append(
-                        this.createIconButton({ icon: 'fs-1 bi bi-clipboard text-main' }),
-                        this.createIconButton({ icon: 'fs-1 bi bi-clipboard-check-fill text-main' })
+                        IconButton.create({ icon: 'bi-clipboard', color: 'text-main' }),
+                        IconButton.create({ icon: 'bi-clipboard-check-fill', color: 'text-main' })
                             .addClass('position-absolute top-0 start-0')
                             .hide())
                     .click(function () {
@@ -567,13 +552,12 @@
                 this.$bodyPanel.empty();
                 this.$bodyPanel.append(
                     Object.values(Object.groupBy(this.model.shoppingItems, item => `${item.name}@${item.unit}`)).map(groupedItems => {
-                        const toggleState =
-                            groupedItems.every(item => this.model.selectedShoppingItems.includes(item)) ? true :
-                                groupedItems.some(item => this.model.selectedShoppingItems.includes(item)) ? 2 : false;
-                        const button = this.createCheckButton({ state: toggleState })
-                            .append($('<i>').addClass('fs-4 bi bi-stop-circle text-main'))
+                        const checkboxState =
+                            groupedItems.every(item => this.model.selectedShoppingItems.includes(item)) ? 1 :
+                                groupedItems.some(item => this.model.selectedShoppingItems.includes(item)) ? 2 : 0;
+                        const button = IconButton.checkbox({ state: checkboxState })
                             .click(function () {
-                                myself.controller.run('changeShoppingItem2SelectionState', groupedItems, $(this).data('toggle-state'));
+                                myself.controller.run('changeShoppingItem2SelectionState', groupedItems, $(this).data('state') != 1);
                             });
                         const name = groupedItems[0].name;
                         const amount = groupedItems.reduce((sum, item) => sum + item.amount, 0);
@@ -596,11 +580,13 @@
             }
         }
         class ItemSetSelectionView extends BaseView {
+            #mode
+
             _updateOnce() {
                 super._updateOnce();
 
                 const myself = this;
-                this.$backButton = this.createIconButton({ icon: 'fs-2 bi bi-arrow-left-circle text-secondary' })
+                this.$backButton = IconButton.back()
                     .click(function () {
                         myself.view.switchOver(myself.view.shoppingListView);
                     })
@@ -615,17 +601,18 @@
                         .addClass('col text-right'));
                 this.$itemsContainer = $('<div>').addClass('containter-fluid px-3');
                 this.$bodyPanel.append(this.$itemsContainer);
-                this.$addButton = this.createIconButton({ icon: 'fs-1 bi bi-journal-plus text-main' })
+                this.$addButton = IconButton.create({ icon: 'bi-journal-plus', color: 'text-main' })
                     .click(function () {
                         myself.controller.run('stageItemSet', new ItemSet());
                         myself.view.switchOver(myself.view.itemSetAdditionView);
                     });
-                this.$changeModeButton = this.createIconButton({
-                    type: 'toggle',
-                    off: 'fs-1 bi bi-pencil-square text-main',
-                    on: 'fs-1 bi bi-list-ul text-main'
-                })
+                this.$changeModeButton = $('<div>')
+                    .append(
+                        IconButton.create({ icon: 'bi-pencil-square', color: 'text-main' }),
+                        IconButton.create({ icon: 'bi-list-ul', color: 'text-main' }).hide(),
+                    )
                     .click(function () {
+                        myself.mode = myself.mode == 'view' ? 'edit' : 'view';
                         myself.update();
                     });
                 this.$footerPanel.append(
@@ -635,6 +622,13 @@
                     $('<div>'),
                     this.$changeModeButton,
                 );
+            }
+
+            get mode() {
+                return this.#mode ?? 'view';
+            }
+            set mode(newMode) {
+                this.#mode = newMode;
             }
 
             _update(...updatedModels) {
@@ -649,12 +643,9 @@
                             .append(
                                 $('<div>')
                                     .addClass('col-auto d-flex align-items-center')
-                                    .append(this.createCheckButton({
-                                        on: 'fs-4 bi bi-plus-circle-fill text-main',
-                                        state: this.model.selectedItemSets.includes(itemSet)
-                                    })
+                                    .append(IconButton.checkbox({ state: this.model.selectedItemSets.includes(itemSet) })
                                         .click(function () {
-                                            myself.controller.run('changeItemSetSelectionState', itemSet, $(this).data('toggle-state'));
+                                            myself.controller.run('changeItemSetSelectionState', itemSet, !$(this).data('state'));
                                         })),
                                 $('<div>')
                                     .addClass('col ps-0 d-flex align-items-center')
@@ -665,8 +656,8 @@
                                 $('<div>')
                                     .addClass('col-auto p-0 d-flex align-items-center')
                                     .append(
-                                        this.createIconButton({ icon: 'fs-4 bi bi-pencil-fill text-main', size: 'fit' })
-                                            .toggle(this.$changeModeButton.data('toggle-state'))
+                                        IconButton.edit()
+                                            .toggle(myself.mode == 'edit')
                                             .click(function () {
                                                 myself.controller.run('stageItemSet', itemSet);
                                                 myself.view.switchOver(myself.view.itemSetAdditionView);
@@ -674,11 +665,13 @@
                                 $('<div>')
                                     .addClass('col-auto d-flex align-items-center')
                                     .append(
-                                        this.createIconButton({ icon: 'fs-4 bi bi-dash-circle-fill text-danger', size: 'fit' })
-                                            .toggle(this.$changeModeButton.data('toggle-state'))
+                                        IconButton.delete()
+                                            .toggle(myself.mode == 'edit')
                                             .click(function () {
                                                 myself.controller.run('removeItemSet', itemSet);
                                             })))));
+                this.$changeModeButton.children().eq(0).toggle(this.mode == 'view');
+                this.$changeModeButton.children().eq(1).toggle(this.mode == 'edit');
             }
 
             _isUpdateNeeded(...updatedModels) {
@@ -690,20 +683,17 @@
                 super._updateOnce();
 
                 const myself = this;
-                this.$backButton = this.createIconButton({ icon: 'fs-2 bi bi-x-circle text-secondary' })
+                this.$backButton = IconButton.create({ icon: 'bi-x-circle', size: 'fs-2', color: 'text-secondary' })
                     .click(function () {
                         myself.controller.run('unstageItemSet');
                         myself.view.switchOver(myself.view.itemSetSelectionView);
                     });
-                this.$commitButton = this.createIconButton({
-                    type: 'toggle',
-                    off: 'fs-2 bi bi-keyboard text-secondary',
-                    on: 'fs-2 bi bi-check-lg text-main',
-                    toggleState: false,
-                    toggleOnClick: false,
-                })
+                this.$commitButton = $('<div>').append(
+                    IconButton.create({ icon: 'bi-keyboard', size: 'fs-2', color: 'text-secondary' }),
+                    IconButton.create({ icon: 'bi-check-lg', size: 'fs-2', color: 'text-main'}).hide(),
+                )
                     .click(function () {
-                        if ($(this).data('toggle-state')) {
+                        if (myself.checkName()) {
                             myself.controller.run('commitItemSet');
                             myself.view.switchOver(myself.view.itemSetSelectionView);
                         } else {
@@ -755,11 +745,15 @@
                                         $('<div>').addClass('col-auto'),
                                         $('<div>')
                                             .addClass('col')
-                                            .append(this.createIconButton({ icon: 'fs-3 bi bi-plus-circle', size: 'fit' })
+                                            .append(IconButton.create({ icon: 'bi-plus-circle', size: 'fs-3', padding: 'fit' })
                                                 .addClass('ps-3 pt-1')
                                                 .click(function () {
                                                     myself.controller.run('addItemSet', myself.$nameInput.val(), myself.model.stagedItems);
                                                 })))));
+            }
+
+            checkName() {
+                return (this.model?.stagedItemSet?.name ?? '') != '';
             }
 
             _update(...updatedModels) {
@@ -767,7 +761,6 @@
 
                 const myself = this;
                 this.$nameInput.val(this.model.stagedItemSet ? this.model.stagedItemSet.name : '');
-                this.$commitButton.attr({ 'data-toggle-state': this.$nameInput.val() != '' });
                 this.$itemsContainer
                     .empty()
                     .append((this.model.stagedItems ?? []).map(item =>
@@ -783,16 +776,18 @@
                                 $('<div>')
                                     .addClass('col-auto p-0 d-flex align-items-center')
                                     .append(
-                                        this.createIconButton({ icon: 'fs-4 bi bi-pencil-fill text-main', size: 'fit' })
+                                        IconButton.edit()
                                             .click(function () {
                                                 myself.view.switchOver(myself.view.itemAdditionView);
                                             })),
                                 $('<div>')
                                     .addClass('col-auto d-flex align-items-center')
                                     .append(
-                                        this.createIconButton({ icon: 'fs-4 bi bi-dash-circle-fill text-danger', size: 'fit' })
+                                        IconButton.delete()
                                             .click(function () {
                                             })))));
+                this.$commitButton.children().eq(0).toggle(!this.checkName());
+                this.$commitButton.children().eq(1).toggle(this.checkName());
             }
 
             _isUpdateNeeded(...updatedModels) {
@@ -1163,51 +1158,6 @@
             }
         }
 
-        class Togglizer {
-            static enable_auto_togglize() {
-                this.togglize($('[data-toggled="true"]'));
-                (new MutationObserver(mutations => mutations
-                    .map(mutation => $(mutation.addedNodes).find('[data-toggled="true"]'))
-                    .forEach(node => this.togglize($(node)))))
-                    .observe(document.getElementsByTagName('body')[0], { childList: true, subtree: true });
-            }
-
-            static togglize($elements) {
-                $elements.each(function () {
-                    const $element = $(this);
-                    if ($element.data('toggle-initialized')) return;
-
-                    // This observing should start before adding data-toggle-state attribute to $element
-                    // in order to match its state and its display.
-                    (new MutationObserver(mutations => mutations
-                        .map(mutation => $(mutation.target))
-                        .forEach($target => {
-                            const toggleState = JSON.parse($target.attr('data-toggle-state'));
-                            $target.children().hide();
-                            $target.children().eq(Number(toggleState)).show();
-                            $target.data({ 'toggle-state': toggleState });
-                        })))
-                        .observe(this, { attributes: true, attributeFilter: ['data-toggle-state'] });
-
-                    let handlers = $._data(this, 'events') ? $._data(this, 'events').click.map(handler => handler.handler) : [];
-                    handlers.forEach(handler => $element.off('click', handler));
-                    $element
-                        .attr({ 'data-toggle-state': $element.attr('data-toggle-state') ?? 'false' })
-                        .click(function () {
-                            const toggleOnClick = JSON.parse($element.attr('data-toggle-on-click'));
-                            if (!toggleOnClick) return;
-
-                            const newToggleState = Number(JSON.parse($element.attr('data-toggle-state'))) != 1;
-                            $element.attr({ 'data-toggle-state': newToggleState });
-                            $element.data({ 'toggle-state': newToggleState });
-                        });
-                    handlers.forEach(handler => $element.on('click', handler));
-
-                    $element.data({ 'toggle-initialized': true });
-                })
-            }
-        }
-
         class Platform {
             static isSmartPhone() {
                 return navigator.userAgent.match(/iPhone|Android.+Mobile/);
@@ -1225,8 +1175,6 @@
             BuiltinObjectsExtension.defineArrayPrototypeEmpty();
             BuiltinObjectsExtension.defineArrayPrototypeRemove();
             BuiltinObjectsExtension.defineArrayPrototypeRemoveIf();
-
-            Togglizer.enable_auto_togglize();
 
             const model = new Model();
             const view = new SingleViewPane();
