@@ -215,8 +215,8 @@
                 this.items = new DataArray(this);
                 this.itemSets = new DataArray(this);
                 this.selectedItemSets = new DataReferenceArray(this);
-                this.shoppingItems = new DataReferenceArray(this);
-                this.selectedShoppingItems = new DataReferenceArray(this);
+                this.activeItems = new DataReferenceArray(this);
+                this.selectedActiveItems = new DataReferenceArray(this);
                 this.stagedItemSet = undefined;
                 this.stagedItems = undefined;
             }
@@ -230,8 +230,8 @@
                 this.items.empty();
                 this.itemSets.empty();
                 this.selectedItemSets.empty();
-                this.shoppingItems.empty();
-                this.selectedShoppingItems.empty();
+                this.activeItems.empty();
+                this.selectedActiveItems.empty();
                 this.stagedItemSet = undefined;
                 this.stagedItems = undefined;
             }
@@ -241,18 +241,18 @@
                     items: this.items.map(i => i.serialize()),
                     itemSets: this.itemSets.map(s => s.serialize()),
                     selectedItemSets: this.selectedItemSets.serialize(),
-                    shoppingItems: this.shoppingItems.serialize(),
-                    selectedShoppingItems: this.selectedShoppingItems.serialize(),
+                    activeItems: this.activeItems.serialize(),
+                    selectedActiveItems: this.selectedActiveItems.serialize(),
                     stagedItemSet: this.stagedItemSet !== undefined ? this.stagedItemSet.serialize() : undefined,
                     stagedItems: this.stagedItems !== undefined ? this.stagedItems.serialize() : undefined,
                 }
             }
-            deserialize({ itemSets = [], items = [], selectedItems = [], selectedItemSets = [], shoppingItems = [], selectedShoppingItems = [], stagedItemSet, stagedItems }) {
+            deserialize({ itemSets = [], items = [], selectedItems = [], selectedItemSets = [], activeItems = [], selectedActiveItems = [], stagedItemSet, stagedItems }) {
                 this.items.deserialize(items);
                 this.itemSets.deserialize(itemSets);
                 this.selectedItemSets.deserialize(selectedItemSets);
-                this.shoppingItems.deserialize(shoppingItems);
-                this.selectedShoppingItems.deserialize(selectedShoppingItems);
+                this.activeItems.deserialize(activeItems);
+                this.selectedActiveItems.deserialize(selectedActiveItems);
                 if (stagedItemSet !== undefined) {
                     this.stagedItemSet = new ItemSet(this, stagedItemSet);
                 }
@@ -556,13 +556,13 @@
                 const myself = this;
                 this.$bodyPanel.empty();
                 this.$bodyPanel.append(
-                    Object.values(Object.groupBy(this.model.shoppingItems, item => `${item.name}@${item.unit}`)).map(groupedItems => {
+                    Object.values(Object.groupBy(this.model.activeItems, item => `${item.name}@${item.unit}`)).map(groupedItems => {
                         const checkboxState =
-                            groupedItems.every(item => this.model.selectedShoppingItems.includes(item)) ? 1 :
-                                groupedItems.some(item => this.model.selectedShoppingItems.includes(item)) ? 2 : 0;
+                            groupedItems.every(item => this.model.selectedActiveItems.includes(item)) ? 1 :
+                                groupedItems.some(item => this.model.selectedActiveItems.includes(item)) ? 2 : 0;
                         const button = IconButton.checkbox({ state: checkboxState })
                             .click(function () {
-                                myself.controller.run('changeShoppingItem2SelectionState', groupedItems, $(this).data('state') != 1);
+                                myself.controller.run('changeActiveItemSelectionState', groupedItems, $(this).data('state') != 1);
                             });
                         const name = groupedItems[0].name;
                         const amount = groupedItems.reduce((sum, item) => sum + item.amount, 0);
@@ -581,7 +581,7 @@
             }
 
             _isUpdateNeeded(...updatedModels) {
-                return updatedModels.length == 0 || updatedModels.some(m => [this.model, this.model.shoppingItems].includes(m));
+                return updatedModels.length == 0 || updatedModels.some(m => [this.model, this.model.activeItems].includes(m));
             }
         }
         class ItemSetSelectionView extends BaseView {
@@ -941,21 +941,21 @@
                 this.modelStore.save();
             }
 
-            changeShoppingItem2SelectionState(items, selected) {
-                items.forEach(item => selected ? this.model.selectedShoppingItems.push(item) : this.model.selectedShoppingItems.remove(item));
-                return [this.model.selectedShoppingItems];
+            changeActiveItemSelectionState(items, selected) {
+                items.forEach(item => selected ? this.model.selectedActiveItems.push(item) : this.model.selectedActiveItems.remove(item));
+                return [this.model.selectedActiveItems];
             }
 
             changeItemSetSelectionState(itemSet, selected) {
                 if (selected) {
                     this.model.selectedItemSets.push(itemSet);
-                    this.model.shoppingItems.push(...itemSet.items);
+                    this.model.activeItems.push(...itemSet.items);
                 } else {
                     this.model.selectedItemSets.remove(itemSet);
-                    this.model.shoppingItems.removeIf(item => itemSet.items.includes(item));
-                    this.model.selectedShoppingItems.removeIf(item => itemSet.items.includes(item));
+                    this.model.activeItems.removeIf(item => itemSet.items.includes(item));
+                    this.model.selectedActiveItems.removeIf(item => itemSet.items.includes(item));
                 }
-                return [this.model.shoppingItems, this.model.selectedShoppingItems, this.model.selectedItemSets];
+                return [this.model.activeItems, this.model.selectedActiveItems, this.model.selectedItemSets];
             }
 
             addItemSet(parameters) {
@@ -1022,7 +1022,7 @@
             writeCurrentShoppingListToClipboard() {
                 const text = this.model.selectedItemSets.map(s => s.name).join('\n')
                     + '\n'
-                    + Object.values(Object.groupBy(this.model.shoppingItems, item => `${item.name}@${item.unit}`)).map(groupedItems => {
+                    + Object.values(Object.groupBy(this.model.activeItems, item => `${item.name}@${item.unit}`)).map(groupedItems => {
                         const name = groupedItems[0].name;
                         const amount = groupedItems.reduce((sum, item) => sum + item.amount, 0);
                         const unit = groupedItems[0].unit;
