@@ -276,9 +276,10 @@
         }
 
         class IconButton {
-            static create({ icon, size = 'fs-1', padding = 'normal', color = '' }) {
+            static create({ icon = undefined, size = 'fs-1', padding = 'normal', color = '', state = 0, overlapped = false, buttons = [] }) {
                 return $('<button>')
                     .addClass('btn')
+                    .addClass(overlapped ? 'position-relative' : '')
                     .css({ '--bs-btn-border-width': '0px' })
                     .css({
                         normal: {},
@@ -287,24 +288,28 @@
                             '--bs-btn-padding-y': '0px',
                         },
                     }[padding])
-                    .append($('<i>').addClass(`bi ${icon} ${size} ${color}`));
+                    .append((icon !== undefined ? [icon] : buttons).map((parameter, i) => $('<i>')
+                        .addClass(typeof parameter === 'string'
+                            ? `bi ${parameter} ${size} ${color}`
+                            : `bi ${parameter.icon} ${parameter.size ?? size} ${parameter.color ?? color}`)
+                        .addClass(overlapped ? 'position-absolute top-0 start-0' : '')
+                        .toggle(state == i)))
+                    .data({ state: state });
             }
 
             static checkbox(args = {}) {
-                const state = args.state ?? 0;
                 return this.create({
-                    ...[
-                        { icon: 'bi-circle' },
-                        { icon: 'bi-check-circle-fill', color: 'text-main' },
-                        { icon: 'bi-stop-circle', color: 'text-main' }
-                    ][Number(state)],
                     ...{
+                        buttons: [
+                            { icon: 'bi-circle' },
+                            { icon: 'bi-check-circle-fill', color: 'text-main' },
+                            { icon: 'bi-circle-half', color: 'text-main' }
+                        ],
                         size: 'fs-4',
                         padding: 'fit',
                     },
                     ...args,
-                })
-                    .data({ state: state });
+                });
             }
 
             static back(args = {}) {
@@ -340,6 +345,12 @@
                     },
                     ...args,
                 });
+            }
+
+            static toggle($button, state) {
+                $button.children().hide();
+                $button.children().eq(Number(state)).show();
+                $button.data({ 'state': state });
             }
         }
         class AbstractView {
@@ -526,16 +537,10 @@
                     .click(function () {
                         myself.view.switchOver(myself.view.itemSetSelectionView);
                     });
-                this.$copyButton = $('<div>')
-                    .addClass('position-relative')
-                    .append(
-                        IconButton.create({ icon: 'bi-clipboard', color: 'text-main' }),
-                        IconButton.create({ icon: 'bi-clipboard-check-fill', color: 'text-main' })
-                            .addClass('position-absolute top-0 start-0')
-                            .hide())
+                this.$copyButton = IconButton.create({ buttons: ['bi-clipboard', 'bi-clipboard-check-fill'], color: 'text-main', overlapped: true })
                     .click(function () {
                         myself.controller.writeCurrentShoppingListToClipboard();
-                        $(this).children().eq(1).show().fadeOut(1000);
+                        $(this).children(':last').show().fadeOut(1000);
                     });
                 this.$footerPanel.append(
                     this.$showItemSetSelectionViewButton,
@@ -606,13 +611,9 @@
                         myself.controller.run('stageItemSet', new ItemSet());
                         myself.view.switchOver(myself.view.itemSetAdditionView);
                     });
-                this.$changeModeButton = $('<div>')
-                    .append(
-                        IconButton.create({ icon: 'bi-pencil-square', color: 'text-main' }),
-                        IconButton.create({ icon: 'bi-list-ul', color: 'text-main' }).hide(),
-                    )
+                this.$changeModeButton = IconButton.create({ buttons: ['bi-pencil-square', 'bi-list-ul'], color: 'text-main'})
                     .click(function () {
-                        myself.mode = myself.mode == 'view' ? 'edit' : 'view';
+                        IconButton.toggle($(this), !$(this).data('state'));
                         myself.update();
                     });
                 this.$footerPanel.append(
@@ -622,13 +623,6 @@
                     $('<div>'),
                     this.$changeModeButton,
                 );
-            }
-
-            get mode() {
-                return this.#mode ?? 'view';
-            }
-            set mode(newMode) {
-                this.#mode = newMode;
             }
 
             _update(...updatedModels) {
@@ -656,8 +650,8 @@
                                 $('<div>')
                                     .addClass('col-auto p-0 d-flex align-items-center')
                                     .append(
-                                        IconButton.edit()
-                                            .toggle(myself.mode == 'edit')
+                                        IconButton.editButton()
+                                            .toggle(this.$changeModeButton.data('state'))
                                             .click(function () {
                                                 myself.controller.run('stageItemSet', itemSet);
                                                 myself.view.switchOver(myself.view.itemSetAdditionView);
@@ -670,8 +664,6 @@
                                             .click(function () {
                                                 myself.controller.run('removeItemSet', itemSet);
                                             })))));
-                this.$changeModeButton.children().eq(0).toggle(this.mode == 'view');
-                this.$changeModeButton.children().eq(1).toggle(this.mode == 'edit');
             }
 
             _isUpdateNeeded(...updatedModels) {
@@ -688,12 +680,12 @@
                         myself.controller.run('unstageItemSet');
                         myself.view.switchOver(myself.view.itemSetSelectionView);
                     });
-                this.$commitButton = $('<div>').append(
-                    IconButton.create({ icon: 'bi-keyboard', size: 'fs-2', color: 'text-secondary' }),
-                    IconButton.create({ icon: 'bi-check-lg', size: 'fs-2', color: 'text-main'}).hide(),
-                )
+                this.$commitButton = IconButton.create({ buttons: [
+                    { icon: 'bi-keyboard', size: 'fs-2', color: 'text-secondary' },
+                    { icon: 'bi-check-lg', size: 'fs-2', color: 'text-main' },
+                ]})
                     .click(function () {
-                        if (myself.checkName()) {
+                        if ($(this).data('state')) {
                             myself.controller.run('commitItemSet');
                             myself.view.switchOver(myself.view.itemSetSelectionView);
                         } else {
@@ -712,10 +704,8 @@
                     .css({ 'font-size': '1.5rem' })
                     .attr({ type: 'text' })
                     .change(function () {
-                        if (myself.model.stagedItemSet !== undefined) {
-                            myself.model.stagedItemSet.name = $(this).val();
-                            myself.update();
-                        }
+                        myself.model.stagedItemSet.name = $(this).val();
+                        myself.update();
                     });
                 this.$itemsContainer = $('<div>');
                 this.$bodyPanel
@@ -752,10 +742,6 @@
                                                 })))));
             }
 
-            checkName() {
-                return (this.model?.stagedItemSet?.name ?? '') != '';
-            }
-
             _update(...updatedModels) {
                 super._update(...updatedModels);
 
@@ -786,8 +772,7 @@
                                         IconButton.delete()
                                             .click(function () {
                                             })))));
-                this.$commitButton.children().eq(0).toggle(!this.checkName());
-                this.$commitButton.children().eq(1).toggle(this.checkName());
+                IconButton.toggle(this.$commitButton, (this.model?.stagedItemSet?.name ?? '') != '');
             }
 
             _isUpdateNeeded(...updatedModels) {
