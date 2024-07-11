@@ -925,18 +925,7 @@
             }
 
             run(command, ...args) {
-                const changedModels = {
-                    changeItemSetSelectionState: (...args) => this.changeItemSetSelectionState(...args),
-                    changeShoppingItem2SelectionState: (...args) => this.changeShoppingItem2SelectionState(...args),
-                    addItemSet: (...args) => this.addItemSet(...args),
-                    removeItemSet: (...args) => this.removeItemSet(...args),
-                    stageItemSet: (...args) => this.stageItemSet(...args),
-                    unstageItemSet: (...args) => this.unstageItemSet(...args),
-                    commitItemSet: (...args) => this.commitItemSet(...args),
-                    loadPresetData: (...args) => this.loadPresetData(...args),
-                    stageItem: (...args) => this.stageItem(...args),
-                    loadModel: (...args) => this.loadModel(...args),
-                }[command](...args);
+                const changedModels = Function('instance', `return instance.${command}`)(this).call(this, ...args);
                 this.view.update(...changedModels);
                 this.modelStore.save();
             }
