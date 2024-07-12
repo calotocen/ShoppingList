@@ -312,7 +312,7 @@
                 });
             }
 
-            static back(args = {}) {
+            static backButton(args = {}) {
                 return this.create({
                     ...{
                         icon: 'bi-arrow-left-circle',
@@ -323,25 +323,25 @@
                 });
             }
 
-            static edit(args = {}) {
+            static editButton(args = {}) {
                 return this.create({
                     ...{
                         icon: 'bi-pencil-fill',
-                         size: 'fs-4',
-                          color: 'text-main',
-                           padding: 'fit'
+                        size: 'fs-4',
+                        color: 'text-main',
+                        padding: 'fit'
                     },
                     ...args,
                 });
             }
 
-            static delete(args = {}) {
+            static deleteButton(args = {}) {
                 return this.create({
                     ...{
                         icon: 'bi-dash-circle-fill',
-                         size: 'fs-4',
-                          color: 'text-danger',
-                           padding: 'fit'
+                        size: 'fs-4',
+                        color: 'text-danger',
+                        padding: 'fit'
                     },
                     ...args,
                 });
@@ -501,7 +501,7 @@
                 $('#leftMenuBar').append(
                     $('<div>')
                         .addClass('offcanvas-header p-0')
-                        .append(IconButton.back()
+                        .append(IconButton.backButton()
                             .click(function () {
                                 bsOffcanvas.hide();
                             })),
@@ -591,7 +591,7 @@
                 super._updateOnce();
 
                 const myself = this;
-                this.$backButton = IconButton.back()
+                this.$backButton = IconButton.backButton()
                     .click(function () {
                         myself.view.switchOver(myself.view.shoppingListView);
                     })
@@ -659,8 +659,8 @@
                                 $('<div>')
                                     .addClass('col-auto d-flex align-items-center')
                                     .append(
-                                        IconButton.delete()
-                                            .toggle(myself.mode == 'edit')
+                                        IconButton.deleteButton()
+                                            .toggle(this.$changeModeButton.data('state'))
                                             .click(function () {
                                                 myself.controller.run('removeItemSet', itemSet);
                                             })))));
@@ -762,14 +762,14 @@
                                 $('<div>')
                                     .addClass('col-auto p-0 d-flex align-items-center')
                                     .append(
-                                        IconButton.edit()
+                                        IconButton.editButton()
                                             .click(function () {
                                                 myself.view.switchOver(myself.view.itemAdditionView);
                                             })),
                                 $('<div>')
                                     .addClass('col-auto d-flex align-items-center')
                                     .append(
-                                        IconButton.delete()
+                                        IconButton.deleteButton()
                                             .click(function () {
                                             })))));
                 IconButton.toggle(this.$commitButton, (this.model?.stagedItemSet?.name ?? '') != '');
