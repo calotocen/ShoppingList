@@ -947,8 +947,8 @@
                 return [this.model.activeItems, this.model.selectedActiveItems, this.model.selectedItemSets];
             }
 
-            addItemSet(parameters) {
-                this.model.itemSets.push(new ItemSet(this.model, parameters));
+            addItemSet(args) {
+                this.model.itemSets.push(new ItemSet(this.model, args));
                 return [this.model.itemSets];
             }
             removeItemSet(itemSet) {
