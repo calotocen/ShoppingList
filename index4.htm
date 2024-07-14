@@ -238,8 +238,8 @@
 
             serialize() {
                 return {
-                    items: this.items.map(i => i.serialize()),
-                    itemSets: this.itemSets.map(s => s.serialize()),
+                    items: this.items.serialize(),
+                    itemSets: this.itemSets.serialize(),
                     selectedItemSets: this.selectedItemSets.serialize(),
                     activeItems: this.activeItems.serialize(),
                     selectedActiveItems: this.selectedActiveItems.serialize(),
