@@ -243,8 +243,8 @@
                     selectedItemSets: this.selectedItemSets.serialize(),
                     activeItems: this.activeItems.serialize(),
                     selectedActiveItems: this.selectedActiveItems.serialize(),
-                    stagedItemSet: this.stagedItemSet !== undefined ? this.stagedItemSet.serialize() : undefined,
-                    stagedItems: this.stagedItems !== undefined ? this.stagedItems.serialize() : undefined,
+                    stagedItemSet: this.stagedItemSet?.serialize(),
+                    stagedItems: this.stagedItems?.serialize(),
                 }
             }
             deserialize({ itemSets = [], items = [], selectedItems = [], selectedItemSets = [], activeItems = [], selectedActiveItems = [], stagedItemSet, stagedItems }) {
