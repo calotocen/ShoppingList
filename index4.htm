@@ -958,12 +958,6 @@
                 return changedModels.concat([this.model.itemSets]);
             }
 
-            addItemToItemSet(item, itemSet) {
-                item.belongingTo = itemSet;
-                this.model.items.push(item);
-                return [this.model.items];
-            }
-
             stageItemSet(itemSet) {
                 this.model.stagedItemSet = Object.assign(new ItemSet(), itemSet);
                 this.model.stagedItems = undefined;
