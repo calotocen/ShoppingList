@@ -151,38 +151,6 @@
                 return `${this.name} ... ${this.amount} ${this.unit}`;
             }
         }
-        class AggregatedItem extends Entity {
-            constructor(model, parameters = {}) {
-                super(model, parameters);
-                this.items = new DataReferenceArray(this.model, ...(parameters.items ?? []));
-            }
-
-            get name() {
-                return this.items[0].name;
-            }
-            get amount() {
-                return this.items.reduce((total, item) => total + item.amount, 0);
-            }
-            get unit() {
-                return this.items[0].unit;
-            }
-
-            serialize() {
-                return Object.assign({
-                    ...super.serialize(),
-                    ...{ items: this.items.serialize() },
-                });
-            }
-            deserialize({ type, id, items = [] }) {
-                super.deserialize({ type: type, id: id });
-                this.items = new DataReferenceArray(this.model).deserialize(items);
-                return this;
-            }
-
-            toString() {
-                return `${this.name} ... ${this.amount} ${this.unit}`;
-            }
-        }
         class ItemSet extends Entity {
             constructor(model, parameters = {}) {
                 super(model, parameters);
