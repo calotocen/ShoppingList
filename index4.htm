@@ -322,6 +322,10 @@
             }
         }
         class AbstractView {
+            constructor($element = $('<div>')) {
+                this.$element = $element;
+            }
+
             get controller() {
                 return this._controller;
             }
@@ -343,10 +347,6 @@
                 this.$element.hide();
             }
 
-            _updateOnce() {
-                this.$element = $('<div>');
-            }
-
             _update(...updatedModels) {
             }
 
@@ -357,17 +357,12 @@
             update(...updatedModels) {
                 if (!this._isUpdateNeeded()) return;
 
-                if (!this._initialized) {
-                    this._updateOnce();
-                    this._initialized = true;
-                }
-
                 this._update(...updatedModels);
             }
         }
         class BaseView extends AbstractView {
-            _updateOnce() {
-                super._updateOnce();
+            constructor($element = $('<div>')) {
+                super($element);
 
                 const myself = this;
                 this.$headerPanel = $('<div>')
@@ -458,8 +453,8 @@
             }
         }
         class ShoppingListView extends BaseView {
-            _updateOnce() {
-                super._updateOnce();
+            constructor() {
+                super();
 
                 const myself = this;
                 // it seems that bootstrap.Offcanvs.hide() dows not work
@@ -555,8 +550,8 @@
         class ItemSetSelectionView extends BaseView {
             #mode
 
-            _updateOnce() {
-                super._updateOnce();
+            constructor() {
+                super();
 
                 const myself = this;
                 this.$backButton = IconButton.backButton()
@@ -639,8 +634,8 @@
             }
         }
         class ItemSetAdditionView extends BaseView {
-            _updateOnce() {
-                super._updateOnce();
+            constructor() {
+                super();
 
                 const myself = this;
                 this.$backButton = IconButton.create({ icon: 'bi-x-circle', size: 'fs-2', color: 'text-secondary' })
@@ -748,8 +743,8 @@
             }
         }
         class ItemAdditionView extends AbstractView {
-            _updateOnce() {
-                super._updateOnce();
+            constructor() {
+                super();
 
                 const myself = this;
                 this.modalId = '#itemAdditionView';
@@ -800,7 +795,7 @@
         }
         class AbstractViewPane extends AbstractView {
             constructor() {
-                super();
+                super($('[data-id="rootContainer"]'));
                 this.shoppingListView = new ShoppingListView();
                 this.itemSetSelectionView = new ItemSetSelectionView();
                 this.itemSetAdditionView = new ItemSetAdditionView();
@@ -824,25 +819,19 @@
             switchOver(view) {
             }
 
-            _updateOnce() {
-                this.views.forEach(v => v.update());
-                this.$element = $('[data-id="rootContainer"]');
-            }
-
             _update(...updatedModels) {
                 this.views.forEach(v => v.update(...updatedModels));
             }
         }
         class SingleViewPane extends AbstractViewPane {
-            _updateOnce() {
-                super._updateOnce();
+            constructor() {
+                super();
 
                 this.$element
                     .addClass('container-fluid p-0')
                     .append(this.views
                         .filter(v => !(v instanceof ItemAdditionView))
                         .map(v => v.$element));
-                this.switchOver(this.shoppingListView);
             }
 
             switchOver(view) {
@@ -861,8 +850,8 @@
             }
         }
         class FlexViewPane extends AbstractViewPane {
-            _updateOnce() {
-                super._updateOnce();
+            constructor() {
+                super();
 
                 const $template = $('<div>').css({
                     width: '372px',
@@ -889,7 +878,7 @@
                 this.modelStore = new NonVolatileModelStore(model);
 
                 this.view.controller = this;
-                this.view.update();
+                this.view.switchOver(this.view.shoppingListView);
             }
 
             run(command, ...args) {
