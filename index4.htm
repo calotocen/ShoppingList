@@ -340,6 +340,10 @@
                 return this._controller.view;
             }
 
+            get dependedModels() {
+                return [];
+            }
+
             show() {
                 this.$element.show();
             }
@@ -350,13 +354,7 @@
             _update(...updatedModels) {
             }
 
-            _isUpdateNeeded(...updatedModels) {
-                return true;
-            }
-
             update(...updatedModels) {
-                if (!this._isUpdateNeeded()) return;
-
                 this._update(...updatedModels);
             }
         }
@@ -543,8 +541,8 @@
                     }));
             }
 
-            _isUpdateNeeded(...updatedModels) {
-                return updatedModels.length == 0 || updatedModels.some(m => [this.model, this.model.activeItems].includes(m));
+            get dependedModels() {
+                return [this.model.activeItems, this.model.selectedActiveItems];
             }
         }
         class ItemSetSelectionView extends BaseView {
@@ -629,8 +627,8 @@
                                             })))));
             }
 
-            _isUpdateNeeded(...updatedModels) {
-                return updatedModels.length == 0 || updatedModels.some(m => [this.model, this.model.itemSets].includes(m));
+            get dependedModels() {
+                return [this.model.itemSets, this.model.selectedItemSets];
             }
         }
         class ItemSetAdditionView extends BaseView {
@@ -738,8 +736,8 @@
                 IconButton.toggle(this.$commitButton, (this.model?.stagedItemSet?.name ?? '') != '');
             }
 
-            _isUpdateNeeded(...updatedModels) {
-                return updatedModels.length == 0 || updatedModels.some(m => [this.model, this.model.stagedItems].includes(m));
+            get dependedModels() {
+                return [this.model.stagedItems];
             }
         }
         class ItemAdditionView extends AbstractView {
@@ -820,7 +818,11 @@
             }
 
             _update(...updatedModels) {
-                this.views.forEach(v => v.update(...updatedModels));
+                this.views
+                    .filter(view => updatedModels.length == 0
+                        || updatedModels.includes(this.model)
+                        || view.dependedModels.some(model => updatedModels.includes(model)))
+                    .forEach(view => view.update());
             }
         }
         class SingleViewPane extends AbstractViewPane {
