@@ -350,12 +350,7 @@
             hide() {
                 this.$element.hide();
             }
-
-            _update(...updatedModels) {
-            }
-
-            update(...updatedModels) {
-                this._update(...updatedModels);
+            update() {
             }
         }
         class BaseView extends AbstractView {
@@ -511,8 +506,8 @@
                     this.$copyButton);
             }
 
-            _update(...updatedModels) {
-                super._update(...updatedModels);
+            update() {
+                super.update();
 
                 const myself = this;
                 this.$bodyPanel.empty();
@@ -586,8 +581,8 @@
                 );
             }
 
-            _update(...updatedModels) {
-                super._update(...updatedModels);
+            update() {
+                super.update();
 
                 const myself = this;
                 this.$itemsContainer.empty();
@@ -703,8 +698,8 @@
                                                 })))));
             }
 
-            _update(...updatedModels) {
-                super._update(...updatedModels);
+            update() {
+                super.update();
 
                 const myself = this;
                 this.$nameInput.val(this.model.stagedItemSet ? this.model.stagedItemSet.name : '');
@@ -817,7 +812,7 @@
             switchOver(view) {
             }
 
-            _update(...updatedModels) {
+            update(...updatedModels) {
                 this.views
                     .filter(view => updatedModels.length == 0
                         || updatedModels.includes(this.model)
