@@ -567,7 +567,7 @@
                         myself.controller.run('stageItemSet', new ItemSet());
                         myself.view.switchOver(myself.view.itemSetAdditionView);
                     });
-                this.$changeModeButton = IconButton.create({ buttons: ['bi-pencil-square', 'bi-list-ul'], color: 'text-main'})
+                this.$changeModeButton = IconButton.create({ buttons: ['bi-pencil-square', 'bi-list-ul'], color: 'text-main' })
                     .click(function () {
                         IconButton.toggle($(this), !$(this).data('state'));
                         myself.update();
@@ -636,10 +636,12 @@
                         myself.controller.run('unstageItemSet');
                         myself.view.switchOver(myself.view.itemSetSelectionView);
                     });
-                this.$commitButton = IconButton.create({ buttons: [
-                    { icon: 'bi-keyboard', size: 'fs-2', color: 'text-secondary' },
-                    { icon: 'bi-check-lg', size: 'fs-2', color: 'text-main' },
-                ]})
+                this.$commitButton = IconButton.create({
+                    buttons: [
+                        { icon: 'bi-keyboard', size: 'fs-2', color: 'text-secondary' },
+                        { icon: 'bi-check-lg', size: 'fs-2', color: 'text-main' },
+                    ]
+                })
                     .click(function () {
                         if ($(this).data('state')) {
                             myself.controller.run('commitItemSet');
