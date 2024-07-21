@@ -350,6 +350,10 @@
             hide() {
                 this.$element.hide();
             }
+            isDisplayed() {
+                return this.$element.css('display') != 'none';
+            }
+
             update() {
             }
         }
@@ -366,10 +370,6 @@
 
                 this.$bodyPanel = $('<div>')
                     .addClass('container-fluid px-0')
-                    .data({
-                        adjusted: false,
-                        previousScrollTop: 0,
-                    });
 
                 this.$footerPanel = $('<div>')
                     .addClass('d-flex justify-content-around bg-main-subtle');
@@ -407,8 +407,9 @@
                         }))
                     .observe(this.$element[0]);
 
-                this.previousScrollTop = 0;
-                this.changeHeaderAndFooterViewByScrollPosition = function () {
+                $(window).scroll(function () {
+                    if (!myself.isDisplayed()) return;
+
                     // The code absorbs differences between browsers.
                     // More details: https://ja.javascript.info/size-and-scroll-window
                     const scrollHeight = Math.max(
@@ -423,7 +424,7 @@
                     // This is why the following code checks if the scroll position is at the bottom when scrolling up.
                     const scrolledToTop = scrollTop <= 0;
                     const scrolledToBottom = scrollHeight - clientHeight - scrollTop <= 1;
-                    const scrolledUp = myself.previousScrollTop > scrollTop;
+                    const scrolledUp = (myself.$element.data('previousScrollTop') ?? 0) > scrollTop;
                     if (scrolledToTop || (scrolledUp && !scrolledToBottom)) {
                         myself.$headerContainer.show();
                         myself.$footerContainer.show();
@@ -432,17 +433,8 @@
                         myself.$footerContainer.hide();
                     }
 
-                    myself.previousScrollTop = scrollTop;
-                };
-            }
-
-            show() {
-                super.show();
-                $(window).scroll(this.changeHeaderAndFooterViewByScrollPosition);
-            }
-            hide() {
-                super.hide();
-                window.removeEventListener('scroll', this.changeHeaderAndFooterViewByScrollPosition);
+                    myself.$element.data({ previousScrollTop: scrollTop });
+                });
             }
         }
         class ShoppingListView extends BaseView {
