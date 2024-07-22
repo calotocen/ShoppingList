@@ -387,25 +387,20 @@
                             .append(this.$headerContainer, this.$bodyPanel, this.$footerContainer));
 
                 // The code adds paddings to the body after the header and the footer sizes are determined.
-                // That processing must not be done in the event handler of scroll
-                // because a scroll bar will not be shown and some items in the bottom will be hide by the footer
-                // in the following conditions:
+                // This is not a good idea for the processing to be done in the scroll event handler.
+                // In the following condition, a scroll bar will not be shown, so some items in the bottom will be hide by the footer.
                 //     - [header size] + [body size] < [viewport size]
                 //     - [header size] + [body size] > [viewport size] - [footer size]
-                new IntersectionObserver(entries =>
-                    entries
-                        .filter(entry => entry.isIntersecting)
-                        .filter(() => this.$headerContainer.height() > 0 || this.$footerContainer.height() > 0)
-                        .forEach(entry => {
-                            if (!this.$headerContainer.hasClass('fixed-top')) {
-                                this.$headerContainer.addClass('fixed-top');
-
-                                // The following paddings must be changed only once to prevent the header flickering on iPhone.
-                                this.$bodyPanel.css({ 'padding-top': `${this.$headerContainer.innerHeight()}px` });
-                                this.$bodyPanel.css({ 'padding-bottom': `${this.$footerContainer.innerHeight()}px` });
-                            }
-                        }))
-                    .observe(this.$element[0]);
+                new ResizeObserver(entries => {
+                    // The padding must be changed only when necessary to prevent the header flickering when scrolling up on iPhone.
+                    const headerHeight = this.$headerContainer.innerHeight();
+                    if (this.$bodyPanel.css('padding-top') != headerHeight) {
+                        this.$bodyPanel.css({ 'padding-top': headerHeight });
+                    }
+                }).observe(this.$headerContainer[0]);
+                new ResizeObserver(entries => {
+                    this.$bodyPanel.css({ 'padding-bottom': this.$footerContainer.innerHeight() });
+                }).observe(this.$footerContainer[0]);
 
                 $(window).scroll(function () {
                     if (!myself.isDisplayed()) return;
