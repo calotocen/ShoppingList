@@ -39,8 +39,6 @@
 <body>
     <div data-id="rootContainer">
     </div>
-    <div class="offcanvas offcanvas-start offcanvas-width-50" tabindex="-1" id="leftMenuBar">
-    </div>
     <div class="modal" tabindex="-1" id="itemAdditionView">
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
@@ -437,40 +435,48 @@
                 super();
 
                 const myself = this;
-                // it seems that bootstrap.Offcanvs.hide() dows not work
-                // when the boostrap.Offcanvas instance was created in the click event handler.
-                // I have not find its reason yet.
-                const bsOffcanvas = new bootstrap.Offcanvas($('#leftMenuBar')[0]);
-                $('#leftMenuBar').append(
-                    $('<div>')
-                        .addClass('offcanvas-header p-0')
-                        .append(IconButton.backButton()
-                            .click(function () {
-                                bsOffcanvas.hide();
-                            })),
-                    $('<div>')
-                        .addClass('offcanvas-body p-0')
-                        .append($('<div>')
-                            .addClass('list-group list-group-flush')
-                            .append(
-                                $('<button>')
-                                    .addClass('list-group-item list-group-item-action')
-                                    .attr({ type: 'button' })
-                                    .text(L10n.loadPresetLabel)
-                                    .click(function () {
-                                        bsOffcanvas.hide();
-                                        myself.controller.run('loadPresetData');
-                                    }))));
+                const $leftMenuBar = $('<div>')
+                    .addClass('offcanvas offcanvas-start offcanvas-width-50')
+                    .attr({ tabindex: -1 })
+                    .append(
+                        $('<div>')
+                            .addClass('offcanvas-header p-0')
+                            .append(IconButton.backButton()
+                                .click(function () {
+                                    myself.$showLeftMenuBarButton.data('bsOffcanvas').hide();
+                                })),
+                        $('<div>')
+                            .addClass('offcanvas-body p-0')
+                            .append($('<div>')
+                                .addClass('list-group list-group-flush')
+                                .append(
+                                    $('<button>')
+                                        .addClass('list-group-item list-group-item-action')
+                                        .attr({ type: 'button' })
+                                        .text(L10n.loadPresetLabel)
+                                        .click(function () {
+                                            myself.$showLeftMenuBarButton.data('bsOffcanvas').hide();
+                                            myself.controller.run('loadPresetData');
+                                        }))));
                 this.$showLeftMenuBarButton = IconButton.create({ icon: 'bi-list', color: 'text-secondary' })
-                    .attr({
-                        'data-bs-toggle': 'offcanvas',
-                        'data-bs-target': '#leftMenuBar',
+                    .click(function () {
+                        // bootstrap#offcanvas instance can be created under the following conditions:
+                        //     - The specified element exists in DOM.
+                        //     - The offcanvas does not open.
+                        //       If it is created while opening its offcanvas, its internal state becomes incosistent
+                        //       and the offcanvas cannot be operated by the instance.
+                        if (myself.$showLeftMenuBarButton.data('bsOffcanvas') === undefined) {
+                            myself.$showLeftMenuBarButton.data({ 'bsOffcanvas': new bootstrap.Offcanvas($leftMenuBar) });
+                        }
+                        myself.$showLeftMenuBarButton.data('bsOffcanvas').show();
                     });
                 this.$headerPanel
                     .append(
                         $('<div>')
                             .addClass('col text-left')
-                            .append(this.$showLeftMenuBarButton),
+                            .append(
+                                this.$showLeftMenuBarButton,
+                                $leftMenuBar),
                         $('<div>')
                             .addClass('col text-center')
                             .append(IconButton.create({ icon: 'bi-bag', color: 'text-main' })),
