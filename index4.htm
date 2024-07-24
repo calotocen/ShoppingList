@@ -360,29 +360,25 @@
                 super($element);
 
                 const myself = this;
-                this.$headerPanel = $('<div>')
-                    .addClass('row bg-main-subtle');
-                this.$headerContainer = $('<div>')
-                    .addClass('container-fluid p-0')
-                    .append(this.$headerPanel);
-
-                this.$bodyPanel = $('<div>')
-                    .addClass('container-fluid px-0')
-
-                this.$footerPanel = $('<div>')
-                    .addClass('d-flex justify-content-around bg-main-subtle');
-                this.$footerContainer = $('<div>')
-                    // d-flex needs to wrap by a div because hide() does not work for d-flex.
-                    .addClass('container-fluid p-0 fixed-bottom')
-                    .append(this.$footerPanel);
-
                 this.$element
                     // d-flex needs to wrap by a div because hide() does not work for d-flex.
                     .addClass('container-fluid p-0')
-                    .append(
-                        $('<div>')
-                            .addClass('d-flex flex-column')
-                            .append(this.$headerContainer, this.$bodyPanel, this.$footerContainer));
+                    .append($('<div>')
+                        .addClass('d-flex flex-column')
+                        .append(
+                            this.$headerContainer = $('<div>')
+                                .addClass('container-fluid p-0 fixed-top')
+                                .append(this.$headerPanel = $('<div>')
+                                    .addClass('row bg-main-subtle')),
+                            this.$bodyContainer = $('<div>')
+                                .addClass('container-fluid p-0')
+                                .append(this.$bodyPanel = $('<div>')
+                                    .addClass('container-fluid px-0')),
+                            this.$footerContainer = $('<div>')
+                                // d-flex needs to wrap by a div because hide() does not work for d-flex.
+                                .addClass('container-fluid p-0 fixed-bottom')
+                                .append(this.$footerPanel = $('<div>')
+                                    .addClass('d-flex justify-content-around bg-main-subtle'))));
 
                 // The code adds paddings to the body after the header and the footer sizes are determined.
                 // This is not a good idea for the processing to be done in the scroll event handler.
