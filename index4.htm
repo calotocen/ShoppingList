@@ -219,12 +219,8 @@
                 this.selectedItemSets.deserialize(selectedItemSets);
                 this.activeItems.deserialize(activeItems);
                 this.selectedActiveItems.deserialize(selectedActiveItems);
-                if (stagedItemSet !== undefined) {
-                    this.stagedItemSet = new ItemSet(this, stagedItemSet);
-                }
-                if (stagedItems !== undefined) {
-                    this.stagedItems = new DataArray(this).deserialize(stagedItems);
-                }
+                this.stagedItemSet = (stagedItemSet !== undefined) ? new ItemSet(this).deserialize(stagedItemSet) : undefined;
+                this.stagedItems = (stagedItems !== undefined) ? new DataArray(this).deserialize(stagedItems) : undefined;
             }
         }
 
