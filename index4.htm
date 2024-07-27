@@ -316,22 +316,24 @@
             }
         }
         class AbstractView {
+            #controller
+
             constructor($element = $('<div>')) {
                 this.$element = $element;
             }
 
             get controller() {
-                return this._controller;
+                return this.#controller;
             }
             set controller(controller) {
-                this._controller = controller;
+                this.#controller = controller;
             }
 
             get model() {
-                return this._controller.model;
+                return this.#controller.model;
             }
             get view() {
-                return this._controller.view;
+                return this.#controller.view;
             }
 
             get dependedModels() {
