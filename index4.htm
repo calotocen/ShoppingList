@@ -33,6 +33,26 @@
              */
             --bs-offcanvas-width: min(400px, 50vw);
         }
+
+        .anim-box.slidein.is-animated {
+            animation: slideIn 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes slideIn {
+            0% {
+                transform: translateY(180px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+            }
+
+            40%,
+            100% {
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 
@@ -683,6 +703,12 @@
                                                 .click(function () {
                                                     myself.controller.run('addItemSet', myself.$nameInput.val(), myself.model.stagedItems);
                                                 })))));
+                this.$element.addClass('anim-box slidein');
+            }
+
+            show() {
+                this.$element.addClass('is-animated');
+                super.show();
             }
 
             update() {
