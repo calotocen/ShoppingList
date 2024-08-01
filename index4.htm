@@ -626,30 +626,32 @@
                 super();
 
                 const myself = this;
-                this.$headerPanel.append(
-                    $('<div>')
-                        .addClass('col text-start')
-                        .append(this.$backButton = IconButton.create({ icon: 'bi-x-circle', size: 'fs-2', color: 'text-secondary' })
-                            .click(function () {
-                                myself.controller.run('unstageItemSet');
-                                myself.view.switchOver(myself.view.itemSetSelectionView);
-                            })),
-                    $('<div>')
-                        .addClass('col text-end')
-                        .append(this.$commitButton = IconButton.create({
-                            buttons: [
-                                { icon: 'bi-keyboard', size: 'fs-2', color: 'text-secondary' },
-                                { icon: 'bi-check-lg', size: 'fs-2', color: 'text-main' },
-                            ]
-                        })
-                            .click(function () {
-                                if ($(this).data('state')) {
-                                    myself.controller.run('commitItemSet');
+                this.$headerPanel.append($('<div>')
+                    .addClass('mt-3')
+                    .append(
+                        $('<div>')
+                            .addClass('col text-start')
+                            .append(this.$backButton = IconButton.create({ icon: 'bi-x-circle', size: 'fs-2', color: 'text-secondary' })
+                                .click(function () {
+                                    myself.controller.run('unstageItemSet');
                                     myself.view.switchOver(myself.view.itemSetSelectionView);
-                                } else {
-                                    myself.$nameInput.focus();
-                                }
-                            })));
+                                })),
+                        $('<div>')
+                            .addClass('col text-end')
+                            .append(this.$commitButton = IconButton.create({
+                                buttons: [
+                                    { icon: 'bi-keyboard', size: 'fs-2', color: 'text-secondary' },
+                                    { icon: 'bi-check-lg', size: 'fs-2', color: 'text-main' },
+                                ]
+                            })
+                                .click(function () {
+                                    if ($(this).data('state')) {
+                                        myself.controller.run('commitItemSet');
+                                        myself.view.switchOver(myself.view.itemSetSelectionView);
+                                    } else {
+                                        myself.$nameInput.focus();
+                                    }
+                                }))));
                 this.$bodyPanel
                     .append(
                         $('<div>')
