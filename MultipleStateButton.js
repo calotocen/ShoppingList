@@ -35,18 +35,14 @@
             });
             handlers.forEach(handler => this.$element.click(handler));
 
-            new MutationObserver(_ => {
-                myself.$element.children().hide();
-                myself.$element.children().eq(Number(myself.state)).show();
-            })
+            new MutationObserver(() => this.updateView())
                 .observe(this.$element[0], {
                     childList: true,
                     attributes: true,
                     attributeFilter: ['data-bc-msbtn-state'],
                 });
 
-            this.$element.children().hide();
-            this.$element.children().eq(Number(myself.state)).show();
+            this.updateView();
         }
 
         get state() {
@@ -61,6 +57,15 @@
         }
         set transitionOnClick(enabled) {
             this.$element.attr({ 'data-bc-msbtn-transition-on-click': newState });
+        }
+
+        updateView() {
+            const myself = this;
+
+            this.$element.children().hide();
+            this.$element.each(function () {
+                $(this).children().eq(Number(myself.state)).show();
+            });
         }
     };
 }(this));
