@@ -29,7 +29,7 @@
             // because other handlers will expected a state of buttons after pushing them.
             const handlers = $._data(this.$element[0], 'events')?.click?.map(handler => handler.handler) ?? [];
             handlers.forEach(handler => this.$element.off('click', handler));
-            this.$element.click(function () {
+            handlers.unshift(function () {
                 if (!myself.transitionOnClick) return;
                 myself.state = myself.transitionState(myself);
             });
