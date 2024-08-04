@@ -423,22 +423,33 @@
                     const scrolledToBottom = scrollHeight - clientHeight - scrollTop <= 1;
                     const scrolledUp = (myself.$element.data('previousScrollTop') ?? 0) > scrollTop;
                     if (scrolledToTop || (scrolledUp && !scrolledToBottom)) {
-                        myself.$headerContainer.css({
-                            visibility: '',
-                            opacity: '',
-                        });
+                        myself.toggleHeader(true);
                         myself.$footerContainer.show();
                     } else {
-                        if (myself.$headerContainer.css('opacity') == 1) {
-                            myself.$headerContainer.fadeTo(500, 0, function () {
-                                $(this).css({ visibility: 'none' });
-                            });
-                        }
+                        myself.toggleHeader(false, { duration: 500 });
                         myself.$footerContainer.hide();
                     }
 
                     myself.$element.data({ previousScrollTop: scrollTop });
                 });
+            }
+
+            #toggleElement($element, displayed = undefined, options = {}) {
+                const currentState = $element.data('displayed') ?? $element.css('visibility') == 'visible';
+                displayed ??= !currentState;
+                if (currentState == displayed) return;
+
+                $element.fadeTo(options.duration ?? 0, Number(displayed), function () {
+                    $element.css({ visibility: displayed ? 'visible' : 'hidden' });
+                });
+
+                // The guard is necessary because jQuery#fadeTo is run as many times as it is called.
+                // I decided that the 'displayed' state is managed with inner data
+                // because 'visibility' style takes time to reflect the state depending on the fade duration.
+                $element.data({ displayed: displayed });
+            }
+            toggleHeader(displayed = undefined, options = {}) {
+                this.#toggleElement(this.$headerContainer, displayed, options)
             }
         }
         class ShoppingListView extends ThreePanelView {
