@@ -423,10 +423,17 @@
                     const scrolledToBottom = scrollHeight - clientHeight - scrollTop <= 1;
                     const scrolledUp = (myself.$element.data('previousScrollTop') ?? 0) > scrollTop;
                     if (scrolledToTop || (scrolledUp && !scrolledToBottom)) {
-                        myself.$headerContainer.show();
+                        myself.$headerContainer.css({
+                            visibility: '',
+                            opacity: '',
+                        });
                         myself.$footerContainer.show();
                     } else {
-                        myself.$headerContainer.fadeOut();
+                        if (myself.$headerContainer.css('opacity') == 1) {
+                            myself.$headerContainer.fadeTo(500, 0, function () {
+                                $(this).css({ visibility: 'none' });
+                            });
+                        }
                         myself.$footerContainer.hide();
                     }
 
