@@ -424,10 +424,10 @@
                     const scrolledUp = (myself.$element.data('previousScrollTop') ?? 0) > scrollTop;
                     if (scrolledToTop || (scrolledUp && !scrolledToBottom)) {
                         myself.toggleHeader(true);
-                        myself.$footerContainer.show();
+                        myself.toggleFooter(true);
                     } else {
                         myself.toggleHeader(false, { duration: 500 });
-                        myself.$footerContainer.hide();
+                        myself.toggleFooter(false);
                     }
 
                     myself.$element.data({ previousScrollTop: scrollTop });
@@ -450,6 +450,9 @@
             }
             toggleHeader(displayed = undefined, options = {}) {
                 this.#toggleElement(this.$headerContainer, displayed, options)
+            }
+            toggleFooter(displayed = undefined, options = {}) {
+                this.#toggleElement(this.$footerContainer, displayed, options)
             }
         }
         class ShoppingListView extends ThreePanelView {
