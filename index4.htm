@@ -375,7 +375,7 @@
                         .addClass('d-flex flex-column')
                         .append(
                             this.$headerContainer = $('<div>')
-                                .addClass('container-fluid p-0 fixed-top')
+                                .addClass(`container-fluid p-0 sticky-top`)
                                 .append(this.$headerPanel = $('<div>')
                                     .addClass('row bg-main-subtle')),
                             this.$bodyContainer = $('<div>')
@@ -393,13 +393,6 @@
                 // In the following condition, a scroll bar will not be shown, so some items in the bottom will be hide by the footer.
                 //     - [header size] + [body size] < [viewport size]
                 //     - [header size] + [body size] > [viewport size] - [footer size]
-                new ResizeObserver(entries => {
-                    // The padding must be changed only when necessary to prevent the header flickering when scrolling up on iPhone.
-                    const headerHeight = this.$headerContainer.innerHeight();
-                    if (this.$bodyPanel.css('padding-top') != headerHeight) {
-                        this.$bodyPanel.css({ 'padding-top': headerHeight });
-                    }
-                }).observe(this.$headerContainer[0]);
                 new ResizeObserver(entries => {
                     this.$bodyPanel.css({ 'padding-bottom': this.$footerContainer.innerHeight() });
                 }).observe(this.$footerContainer[0]);
