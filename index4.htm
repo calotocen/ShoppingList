@@ -9,6 +9,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
+        body {
+            height: 100dvh;
+        }
+
         .btn-icon {
             --bs-btn-padding-x: 0rem;
             --bs-btn-padding-y: 0rem;
@@ -370,32 +374,23 @@
                 const myself = this;
                 this.$element
                     // d-flex needs to wrap by a div because hide() does not work for d-flex.
-                    .addClass('container-fluid p-0')
+                    .addClass('container-fluid p-0 h-100')
                     .append($('<div>')
-                        .addClass('d-flex flex-column')
+                        .addClass('d-flex flex-column h-100')
                         .append(
                             this.$headerContainer = $('<div>')
                                 .addClass(`container-fluid p-0 sticky-top`)
                                 .append(this.$headerPanel = $('<div>')
                                     .addClass('row bg-main-subtle')),
                             this.$bodyContainer = $('<div>')
-                                .addClass('container-fluid p-0')
+                                .addClass('container-fluid p-0 flex-fill')
                                 .append(this.$bodyPanel = $('<div>')
                                     .addClass('container-fluid px-0')),
                             this.$footerContainer = $('<div>')
                                 // d-flex needs to wrap by a div because hide() does not work for d-flex.
-                                .addClass('container-fluid p-0 fixed-bottom')
+                                .addClass('container-fluid p-0 sticky-bottom')
                                 .append(this.$footerPanel = $('<div>')
                                     .addClass('d-flex justify-content-around bg-main-subtle'))));
-
-                // The code adds paddings to the body after the header and the footer sizes are determined.
-                // This is not a good idea for the processing to be done in the scroll event handler.
-                // In the following condition, a scroll bar will not be shown, so some items in the bottom will be hide by the footer.
-                //     - [header size] + [body size] < [viewport size]
-                //     - [header size] + [body size] > [viewport size] - [footer size]
-                new ResizeObserver(entries => {
-                    this.$bodyPanel.css({ 'padding-bottom': this.$footerContainer.innerHeight() });
-                }).observe(this.$footerContainer[0]);
 
                 $(window).scroll(function () {
                     if (!myself.isDisplayed()) return;
@@ -838,7 +833,7 @@
                 super();
 
                 this.$element
-                    .addClass('container-fluid p-0')
+                    .addClass('container-fluid p-0 h-100')
                     .append(this.views
                         .filter(v => !(v instanceof ItemAdditionView))
                         .map(v => v.$element));
