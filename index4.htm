@@ -1088,6 +1088,61 @@
             }
         }
 
+        class JQueryExtension {
+            static defineVisualize(force = false) {
+                if ($.fn.visualize !== undefined && !force) return;
+
+                $.fn.extend({
+                    visualize: function (properties = undefined, options = {}) {
+                        $(this).animate(properties ?? {}, {
+                            ...(properties === undefined ? { duration: 0 } : {}),
+                            ...options,
+                            ...{
+                                start: function () {
+                                    options.start?.apply(this);
+                                    $(this).css({ visibility: '' });
+                                },
+                            }
+                        });
+                    }
+                });
+            }
+
+            static defineInvisualize(force = false) {
+                if ($.fn.invisualize !== undefined && !force) return;
+
+                $.fn.extend({
+                    invisualize: function (properties = undefined, options = {}) {
+                        $(this).animate(properties ?? {}, {
+                            ...(properties === undefined ? { duration: 0 } : {}),
+                            ...options,
+                            ...{
+                                complete: function () {
+                                    $(this).css({ visibility: 'hidden' });
+                                    options.complete?.apply(this);
+                                },
+                            }
+                        });
+                    }
+                });
+            }
+
+            static defineAnimation(force = false) {
+                if ($.animation !== undefined && !force) return;
+
+                $.extend({
+                    animation: function (name) {
+                        return {
+                            untransparentize: [{ opacity: 1 }, { duration: 0 }],
+                            transparentize: [{ opacity: 0 }, { duration: 0 }],
+                            fadein: [{ opacity: 1 }, { duration: 500 }],
+                            fadeout: [{ opacity: 0 }, { duration: 500 }],
+                        }[name.toLowerCase()];
+                    }
+                });
+            }
+        }
+
         class Platform {
             static isSmartPhone() {
                 return navigator.userAgent.match(/iPhone|Android.+Mobile/);
@@ -1105,6 +1160,9 @@
             BuiltinObjectsExtension.defineArrayPrototypeEmpty();
             BuiltinObjectsExtension.defineArrayPrototypeRemove();
             BuiltinObjectsExtension.defineArrayPrototypeRemoveIf();
+            JQueryExtension.defineVisualize();
+            JQueryExtension.defineInvisualize();
+            JQueryExtension.defineAnimation();
 
             const model = new Model();
             const view = new SingleViewPane();
