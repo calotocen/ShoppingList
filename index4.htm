@@ -405,17 +405,20 @@
                     const clientHeight = window.innerHeight;
                     const scrollTop = window.pageYOffset;
 
-                    // Scroll can be bounced in iOS-Safari.
-                    // This is why the following code checks if the scroll position is at the bottom when scrolling up.
-                    const scrolledToTop = scrollTop <= 0;
-                    const scrolledToBottom = scrollHeight - clientHeight - scrollTop <= 1;
-                    const scrolledUp = (myself.$element.data('previousScrollTop') ?? 0) > scrollTop;
-                    if (scrolledToTop || (scrolledUp && !scrolledToBottom)) {
-                        myself.toggleHeader(true);
-                        myself.toggleFooter(true);
-                    } else {
-                        myself.toggleHeader(false, { duration: 500 });
-                        myself.toggleFooter(false);
+                    const scrollDirection = (myself.$element.data('previousScrollTop') ?? 0) > scrollTop ? 'up' : 'down';
+                    if (scrollDirection !== myself.$element.data('previousScrollDirection')) {
+                        // Scroll can be bounced in iOS-Safari.
+                        // This is why the following code checks if the scroll position is at the bottom when scrolling up.
+                        const scrolledToTop = scrollTop <= 0;
+                        const scrolledToBottom = scrollHeight - clientHeight - scrollTop <= 1;
+                        if (scrolledToTop || ((scrollDirection === 'up') && !scrolledToBottom)) {
+                            myself.toggleHeader(true);
+                            myself.toggleFooter(true);
+                        } else {
+                            myself.toggleHeader(false, { duration: 500 });
+                            myself.toggleFooter(false);
+                        }
+                        myself.$element.data({ previousScrollDirection: scrollDirection });
                     }
 
                     myself.$element.data({ previousScrollTop: scrollTop });
