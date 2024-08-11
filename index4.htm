@@ -988,7 +988,7 @@
             }
         }
 
-        class BuiltinObjectsExtension {
+        class BuiltinLibraryExtension {
             // Safari bundled in iOS 16 does not support Object.groupBy function yet.
             static defineObjectGroupBy(force = false) {
                 if (Object.groupBy !== undefined && !force) return;
@@ -1157,12 +1157,12 @@
         }
 
         $(function () {
-            BuiltinObjectsExtension.defineObjectGroupBy();
-            BuiltinObjectsExtension.defineWindowCryptoRandomUUID();
-            BuiltinObjectsExtension.defineNavigatorClipboardWriteText();
-            BuiltinObjectsExtension.defineArrayPrototypeEmpty();
-            BuiltinObjectsExtension.defineArrayPrototypeRemove();
-            BuiltinObjectsExtension.defineArrayPrototypeRemoveIf();
+            BuiltinLibraryExtension.defineObjectGroupBy();
+            BuiltinLibraryExtension.defineWindowCryptoRandomUUID();
+            BuiltinLibraryExtension.defineNavigatorClipboardWriteText();
+            BuiltinLibraryExtension.defineArrayPrototypeEmpty();
+            BuiltinLibraryExtension.defineArrayPrototypeRemove();
+            BuiltinLibraryExtension.defineArrayPrototypeRemoveIf();
             JQueryExtension.defineVisualize();
             JQueryExtension.defineInvisualize();
             JQueryExtension.defineAnimation();
