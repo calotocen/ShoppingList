@@ -412,11 +412,11 @@
                         const scrolledToTop = scrollTop <= 0;
                         const scrolledToBottom = scrollHeight - clientHeight - scrollTop <= 1;
                         if (scrolledToTop || ((scrollDirection === 'up') && !scrolledToBottom)) {
-                            myself.toggleHeader(true);
-                            myself.toggleFooter(true);
+                            myself.visualizeHeader();
+                            myself.visualizeFooter();
                         } else {
-                            myself.toggleHeader(false, { duration: 500 });
-                            myself.toggleFooter(false);
+                            myself.invisualizeHeader();
+                            myself.invisualizeFooter();
                         }
                         myself.$element.data({ previousScrollDirection: scrollDirection });
                     }
@@ -439,11 +439,22 @@
                 // because 'visibility' style takes time to reflect the state depending on the fade duration.
                 $element.data({ displayed: displayed });
             }
-            toggleHeader(displayed = undefined, options = {}) {
-                this.#toggleElement(this.$headerContainer, displayed, options)
+
+            visualizeHeader() {
+                this.$headerContainer.stop(true, true);
+                this.$headerContainer.visualize(...$.animation('untransparentize'));
             }
-            toggleFooter(displayed = undefined, options = {}) {
-                this.#toggleElement(this.$footerContainer, displayed, options)
+            invisualizeHeader() {
+                this.$headerContainer.stop(true, true);
+                this.$headerContainer.invisualize(...$.animation('fadeOut'));
+            }
+            visualizeFooter() {
+                this.$footerContainer.stop(true, true);
+                this.$footerContainer.visualize(...$.animation('untransparentize'));
+            }
+            invisualizeFooter() {
+                this.$footerContainer.stop(true, true);
+                this.$footerContainer.invisualize(...$.animation('transparentize'));
             }
         }
         class ShoppingListView extends ThreePanelView {
