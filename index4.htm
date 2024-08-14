@@ -1057,7 +1057,7 @@
             }
 
             static defineArrayPrototypeEmpty(force = false) {
-                if (Array.prototype.empty !== undefined) return;
+                if (Array.prototype.empty !== undefined && !force) return;
 
                 Array.prototype.empty = function () {
                     // splice() will call constructor().
@@ -1070,7 +1070,7 @@
             }
 
             static defineArrayPrototypeRemove(force = false) {
-                if (Array.prototype.remove !== undefined) return;
+                if (Array.prototype.remove !== undefined && !force) return;
 
                 Array.prototype.remove = function (value) {
                     let lastRemovedElement = undefined;
@@ -1086,7 +1086,7 @@
             }
 
             static defineArrayPrototypeRemoveIf(force = false) {
-                if (Array.prototype.removeIf !== undefined) return;
+                if (Array.prototype.removeIf !== undefined && !force) return;
 
                 Array.prototype.removeIf = function (callbackFn, thisArg) {
                     let lastRemovedElement = undefined;
