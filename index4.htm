@@ -31,6 +31,18 @@
             filter: grayscale(100%);
         }
 
+        .view {
+            overflow: auto;
+            scrollbar-gutter: stable;
+        }
+
+        .view:has(~ .modal-view:not([style*="display: none;"])) {
+            pointer-events: none;
+            user-select: none;
+            overflow: hidden;
+            filter: saturate(30%) contrast(60%) blur(1px);
+        }
+
         .offcanvas-width-50 {
             /* the default value of --bs-offcanvas-width is 400px.
              * it is defined as $offcanvas-horizontal-width in Saas.
@@ -322,7 +334,7 @@
         class AbstractView {
             #controller
 
-            constructor($element = $('<div>')) {
+            constructor($element = $('<div>').addClass('bg-main-subtle view')) {
                 this.$element = $element;
             }
 
@@ -368,7 +380,7 @@
             }
         }
         class ThreePanelView extends AbstractView {
-            constructor($element = $('<div>')) {
+            constructor($element = undefined) {
                 super($element);
 
                 const myself = this;
