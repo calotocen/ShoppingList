@@ -23,6 +23,10 @@
             color: #31bc92;
         }
 
+        .bg-main {
+            background-color: #31bc92;
+        }
+
         .bg-main-subtle {
             background-color: #ffffff;
         }
@@ -306,11 +310,13 @@
                     ...{
                         icon: 'bi-pencil-fill',
                         size: 'fs-4',
-                        color: 'text-main',
-                        padding: 'fit'
+                        color: 'text-light',
+                        padding: 'fit',
                     },
                     ...args,
-                });
+                })
+                .addClass('bg-main px-3')
+                .css({ borderRadius: 'initial' });
             }
 
             static deleteButton(args = {}) {
