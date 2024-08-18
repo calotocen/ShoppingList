@@ -322,13 +322,15 @@
             static deleteButton(args = {}) {
                 return this.create({
                     ...{
-                        icon: 'bi-dash-circle-fill',
+                        icon: 'bi-trash3',
                         size: 'fs-4',
-                        color: 'text-danger',
-                        padding: 'fit'
+                        color: 'text-light',
+                        padding: 'fit',
                     },
                     ...args,
-                });
+                })
+                .addClass('bg-danger px-3')
+                .css({ borderRadius: 'initial' });
             }
 
             static toggle($button, state) {
