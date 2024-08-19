@@ -292,17 +292,12 @@
                     },
                     ...args,
                 });
+            static back() {
+                return $('<button>')
+                    .attr({ type: 'button' })
+                    .addClass('btn border-0 fs-2 text-secondary bi bi-arrow-left-circle');
             }
 
-            static backButton(args = {}) {
-                return this.create({
-                    ...{
-                        icon: 'bi-arrow-left-circle',
-                        size: 'fs-2',
-                        color: 'text-secondary',
-                    },
-                    ...args,
-                });
             }
 
             static editButton(args = {}) {
@@ -488,7 +483,7 @@
                     .append(
                         $('<div>')
                             .addClass('offcanvas-header p-0')
-                            .append(IconButton.backButton()
+                            .append(IconButton.back()
                                 .click(function () {
                                     myself.$showLeftMenuBarButton.data('bsOffcanvas').hide();
                                 })),
@@ -585,7 +580,7 @@
                 super();
 
                 const myself = this;
-                this.$backButton = IconButton.backButton()
+                this.$backButton = IconButton.back()
                     .click(function () {
                         myself.view.switchOver(myself.view.shoppingListView);
                     })
