@@ -314,6 +314,10 @@
                 .css({ borderRadius: 'initial' });
             }
 
+            static menu() {
+                return $('<button>')
+                    .attr({ type: 'button' })
+                    .addClass('btn border-0 fs-1 text-secondary bi bi-list');
             static deleteButton(args = {}) {
                 return this.create({
                     ...{
@@ -500,7 +504,7 @@
                                             myself.$showLeftMenuBarButton.data('bsOffcanvas').hide();
                                             myself.controller.run('loadPresetData');
                                         }))));
-                this.$showLeftMenuBarButton = IconButton.create({ icon: 'bi-list', color: 'text-secondary' })
+                this.$showLeftMenuBarButton = IconButton.menu()
                     .click(function () {
                         // bootstrap#offcanvas instance can be created under the following conditions:
                         //     - The specified element exists in DOM.
