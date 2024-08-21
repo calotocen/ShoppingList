@@ -300,6 +300,10 @@
 
             }
 
+            static delete() {
+                return $('<button>')
+                    .attr({ type: 'button' })
+                    .addClass('btn border-0 px-3 py-0 rounded-0 fs-4 text-light bg-danger bi bi-trash3');
             static editButton(args = {}) {
                 return this.create({
                     ...{
@@ -318,18 +322,6 @@
                 return $('<button>')
                     .attr({ type: 'button' })
                     .addClass('btn border-0 fs-1 text-secondary bi bi-list');
-            static deleteButton(args = {}) {
-                return this.create({
-                    ...{
-                        icon: 'bi-trash3',
-                        size: 'fs-4',
-                        color: 'text-light',
-                        padding: 'fit',
-                    },
-                    ...args,
-                })
-                .addClass('bg-danger px-3')
-                .css({ borderRadius: 'initial' });
             }
 
             static toggle($button, state) {
@@ -652,7 +644,7 @@
                                 $('<div>')
                                     .addClass('col-auto p-0 d-flex align-items-center')
                                     .append(
-                                        IconButton.deleteButton()
+                                        IconButton.delete()
                                             .toggle(this.$changeModeButton.data('state'))
                                             .click(function () {
                                                 myself.controller.run('removeItemSet', itemSet);
@@ -766,7 +758,7 @@
                                 $('<div>')
                                     .addClass('col-auto p-0 d-flex align-items-center')
                                     .append(
-                                        IconButton.deleteButton()
+                                        IconButton.delete()
                                             .click(function () {
                                             })))));
                 IconButton.toggle(this.$commitButton, (this.model?.stagedItemSet?.name ?? '') != '');
