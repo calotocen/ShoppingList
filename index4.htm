@@ -35,6 +35,71 @@
             filter: grayscale(100%);
         }
 
+        .circle-checkbox {
+            display: flex;
+            position: relative;
+            align-items: center;
+            column-gap: 0.5rem;
+        }
+
+        .circle-checkbox::before {
+            /* bi */
+            display: inline-block;
+            font-family: bootstrap-icons !important;
+            font-style: normal;
+            font-weight: normal !important;
+            font-variant: normal;
+            text-transform: none;
+            line-height: 1;
+            vertical-align: -.125em;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+
+            /* py-1 */
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+
+            /* fs-4 */
+            font-size: calc(1.275rem + 0.3vw);
+
+            color: black;
+        }
+
+        .circle-checkbox:has(input[type="checkbox"]:not(:checked))::before {
+            /* bi-circle */
+            content: "\f28a";
+        }
+
+        .circle-checkbox:has(input[type="checkbox"]:checked)::before {
+            /* bi-check-circle-fill */
+            content: "\f26a";
+
+            /* text-main */
+            color: #31bc92;
+        }
+
+        .circle-checkbox:has(input[type="checkbox"]:indeterminate)::before {
+            /* bi-dash-circle */
+            content: "\f2e6";
+        }
+
+        .circle-checkbox:has(input[type="checkbox"]:focus)::before {
+            outline: gray dotted;
+        }
+
+        .circle-checkbox:has(input[type="checkbox"]:disabled)::before {
+            color: gray;
+        }
+
+        .circle-checkbox>input[type="checkbox"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            opacity: 0;
+        }
+
         .view {
             overflow: auto;
             scrollbar-gutter: stable;
@@ -279,19 +344,21 @@
                     .data({ state: state });
             }
 
-            static checkbox(args = {}) {
-                return this.create({
-                    ...{
-                        buttons: [
-                            { icon: 'bi-circle' },
-                            { icon: 'bi-check-circle-fill', color: 'text-main' },
-                            { icon: 'bi-circle-half', color: 'text-main' }
-                        ],
-                        size: 'fs-4',
-                        padding: 'fit',
-                    },
-                    ...args,
-                });
+            static checkbox({ checked = false, indeterminate = false, priority = 'checked' }) {
+                return $('<label>')
+                    .addClass('circle-checkbox')
+                    .append(
+                        $('<input>')
+                            .attr({ type: 'checkbox' })
+                            .prop({
+                                checked: checked,
+                                // pure checkbox priotizes the indeterminate attribute over the checked attribute,
+                                // but it is easier to use by prioritizing the latter in this code.
+                                // this is why I exchanged the default priorities between checked and indeterminate.
+                                indeterminate: (priority !== 'checked' || !checked) && indeterminate,
+                            }));
+            }
+
             static back() {
                 return $('<button>')
                     .attr({ type: 'button' })
@@ -536,20 +603,19 @@
                 this.$bodyPanel.empty();
                 this.$bodyPanel.append(
                     Object.values(Object.groupBy(this.model.activeItems, item => `${item.name}@${item.unit}`)).map(groupedItems => {
-                        const checkboxState =
-                            groupedItems.every(item => this.model.selectedActiveItems.includes(item)) ? 1 :
-                                groupedItems.some(item => this.model.selectedActiveItems.includes(item)) ? 2 : 0;
-                        const button = IconButton.checkbox({ state: checkboxState })
-                            .click(function () {
-                                myself.controller.run('changeActiveItemSelectionState', groupedItems, $(this).data('state') != 1);
-                            });
                         const name = groupedItems[0].name;
                         const amount = groupedItems.reduce((sum, item) => sum + item.amount, 0);
                         const unit = groupedItems[0].unit;
                         return $('<div>')
                             .addClass('containter-fluid px-3 d-flex align-items-center')
                             .append(
-                                button,
+                                IconButton.checkbox({
+                                    checked: groupedItems.every(item => this.model.selectedActiveItems.includes(item)),
+                                    indeterminate: groupedItems.some(item => this.model.selectedActiveItems.includes(item)),
+                                })
+                                    .change(function () {
+                                        myself.controller.run('changeActiveItemSelectionState', groupedItems, $(this).children().prop('checked'));
+                                    }),
                                 $('<div>')
                                     .addClass('ps-3')
                                     .text(`${name} ... ${amount} ${unit}`)
@@ -614,9 +680,9 @@
                             .append(
                                 $('<div>')
                                     .addClass('col-auto d-flex align-items-center')
-                                    .append(IconButton.checkbox({ state: this.model.selectedItemSets.includes(itemSet) })
-                                        .click(function () {
-                                            myself.controller.run('changeItemSetSelectionState', itemSet, !$(this).data('state'));
+                                    .append(IconButton.checkbox({ checked: this.model.selectedItemSets.includes(itemSet) })
+                                        .change(function () {
+                                            myself.controller.run('changeItemSetSelectionState', itemSet, $(this).children().prop('checked'));
                                         })),
                                 $('<div>')
                                     .addClass('col ps-0 d-flex align-items-center')
