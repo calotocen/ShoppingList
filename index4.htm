@@ -298,24 +298,16 @@
                     .addClass('btn border-0 fs-2 text-secondary bi bi-arrow-left-circle');
             }
 
+            static edit() {
+                return $('<button>')
+                    .attr({ type: 'button' })
+                    .addClass('btn border-0 px-3 py-0 rounded-0 fs-4 text-light bg-main bi bi-pencil-fill');
             }
 
             static delete() {
                 return $('<button>')
                     .attr({ type: 'button' })
                     .addClass('btn border-0 px-3 py-0 rounded-0 fs-4 text-light bg-danger bi bi-trash3');
-            static editButton(args = {}) {
-                return this.create({
-                    ...{
-                        icon: 'bi-pencil-fill',
-                        size: 'fs-4',
-                        color: 'text-light',
-                        padding: 'fit',
-                    },
-                    ...args,
-                })
-                .addClass('bg-main px-3')
-                .css({ borderRadius: 'initial' });
             }
 
             static menu() {
@@ -635,7 +627,7 @@
                                 $('<div>')
                                     .addClass('col-auto p-0 d-flex align-items-center')
                                     .append(
-                                        IconButton.editButton()
+                                        IconButton.edit()
                                             .toggle(this.$changeModeButton.data('state'))
                                             .click(function () {
                                                 myself.controller.run('stageItemSet', itemSet);
@@ -751,7 +743,7 @@
                                 $('<div>')
                                     .addClass('col-auto p-0 d-flex align-items-center')
                                     .append(
-                                        IconButton.editButton()
+                                        IconButton.edit()
                                             .click(function () {
                                                 myself.view.switchOver(myself.view.itemAdditionView);
                                             })),
