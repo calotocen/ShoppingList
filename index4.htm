@@ -365,12 +365,6 @@
                     .addClass('btn border-0 fs-2 text-secondary bi bi-arrow-left-circle');
             }
 
-            static edit() {
-                return $('<button>')
-                    .attr({ type: 'button' })
-                    .addClass('btn border-0 px-3 py-0 rounded-0 fs-4 text-light bg-main bi bi-pencil-fill');
-            }
-
             static delete() {
                 return $('<button>')
                     .attr({ type: 'button' })
@@ -693,7 +687,9 @@
                                 $('<div>')
                                     .addClass('col-auto p-0 d-flex align-items-center')
                                     .append(
-                                        IconButton.edit()
+                                        $('<button>')
+                                            .attr({ type: 'button' })
+                                            .addClass('btn border-0 px-3 py-0 rounded-0 fs-4 text-light bg-main bi bi-pencil-fill')
                                             .toggle(this.$changeModeButton.data('state'))
                                             .click(function () {
                                                 myself.controller.run('stageItemSet', itemSet);
@@ -809,7 +805,9 @@
                                 $('<div>')
                                     .addClass('col-auto p-0 d-flex align-items-center')
                                     .append(
-                                        IconButton.edit()
+                                        $('<button>')
+                                            .attr({ type: 'button' })
+                                            .addClass('btn border-0 px-3 py-0 rounded-0 fs-4 text-light bg-main bi bi-pencil-fill')
                                             .click(function () {
                                                 myself.view.switchOver(myself.view.itemAdditionView);
                                             })),
