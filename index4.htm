@@ -359,12 +359,6 @@
                             }));
             }
 
-            static delete() {
-                return $('<button>')
-                    .attr({ type: 'button' })
-                    .addClass('btn border-0 px-3 py-0 rounded-0 fs-4 text-light bg-danger bi bi-trash3');
-            }
-
             static toggle($button, state) {
                 $button.children().hide();
                 $button.children().eq(Number(state)).show();
@@ -806,10 +800,12 @@
                                             })),
                                 $('<div>')
                                     .addClass('col-auto p-0 d-flex align-items-center')
-                                    .append(
-                                        IconButton.delete()
-                                            .click(function () {
-                                            })))));
+                                    .append($('<button>')
+                                        .attr({ type: 'button' })
+                                        .addClass('btn border-0 px-3 py-0 rounded-0 fs-4 text-light bg-danger bi bi-trash3')
+
+                                        .click(function () {
+                                        })))));
                 IconButton.toggle(this.$commitButton, (this.model?.stagedItemSet?.name ?? '') != '');
             }
 
