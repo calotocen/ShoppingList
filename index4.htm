@@ -344,21 +344,6 @@
                     .data({ state: state });
             }
 
-            static checkbox({ checked = false, indeterminate = false, priority = 'checked' }) {
-                return $('<label>')
-                    .addClass('circle-checkbox')
-                    .append(
-                        $('<input>')
-                            .attr({ type: 'checkbox' })
-                            .prop({
-                                checked: checked,
-                                // pure checkbox priotizes the indeterminate attribute over the checked attribute,
-                                // but it is easier to use by prioritizing the latter in this code.
-                                // this is why I exchanged the default priorities between checked and indeterminate.
-                                indeterminate: (priority !== 'checked' || !checked) && indeterminate,
-                            }));
-            }
-
             static toggle($button, state) {
                 $button.children().hide();
                 $button.children().eq(Number(state)).show();
@@ -582,19 +567,24 @@
                 this.$bodyPanel.empty();
                 this.$bodyPanel.append(
                     Object.values(Object.groupBy(this.model.activeItems, item => `${item.name}@${item.unit}`)).map(groupedItems => {
+                        const selectedGroupedItems = groupedItems.filter(item => this.model.selectedActiveItems.includes(item));
                         const name = groupedItems[0].name;
                         const amount = groupedItems.reduce((sum, item) => sum + item.amount, 0);
                         const unit = groupedItems[0].unit;
                         return $('<div>')
                             .addClass('containter-fluid px-3 d-flex align-items-center')
-                            .append(
-                                IconButton.checkbox({
-                                    checked: groupedItems.every(item => this.model.selectedActiveItems.includes(item)),
-                                    indeterminate: groupedItems.some(item => this.model.selectedActiveItems.includes(item)),
-                                })
-                                    .change(function () {
-                                        myself.controller.run('changeActiveItemSelectionState', groupedItems, $(this).children().prop('checked'));
-                                    }),
+                            .append($('<label>')
+                                .addClass('circle-checkbox')
+                                .append(
+                                    $('<input>')
+                                        .attr({ type: 'checkbox' })
+                                        .prop({
+                                            checked: groupedItems.length === selectedGroupedItems.length,
+                                            indeterminate: 0 < selectedGroupedItems.length && selectedGroupedItems.length < groupedItems.length,
+                                        })
+                                        .change(function () {
+                                            myself.controller.run('changeActiveItemSelectionState', groupedItems, $(this).prop('checked'));
+                                        })),
                                 $('<div>')
                                     .addClass('ps-3')
                                     .text(`${name} ... ${amount} ${unit}`)
@@ -661,35 +651,41 @@
                             .append(
                                 $('<div>')
                                     .addClass('col-auto d-flex align-items-center')
-                                    .append(IconButton.checkbox({ checked: this.model.selectedItemSets.includes(itemSet) })
-                                        .change(function () {
-                                            myself.controller.run('changeItemSetSelectionState', itemSet, $(this).children().prop('checked'));
-                                        })),
-                                $('<div>')
-                                    .addClass('col ps-0 d-flex align-items-center')
-                                    .text(itemSet.toString())
-                                    .click(function () {
-                                        $(this).prev().children(':first').click();
-                                    }),
-                                $('<div>')
-                                    .addClass('col-auto p-0 d-flex align-items-center')
                                     .append(
-                                        $('<button>')
-                                            .attr({ type: 'button' })
-                                            .addClass('btn border-0 px-3 py-0 rounded-0 fs-4 text-light bg-main bi bi-pencil-fill')
-                                            .toggle(this.$changeModeButton.data('state'))
+                                        $('<label>')
+                                            .addClass('circle-checkbox')
+                                            .append(
+                                                $('<input>')
+                                                    .attr({ type: 'checkbox' })
+                                                    .prop({ checked: this.model.selectedItemSets.includes(itemSet) })
+                                                    .change(function () {
+                                                        myself.controller.run('changeItemSetSelectionState', itemSet, $(this).prop('checked'));
+                                                    })),
+                                        $('<div>')
+                                            .addClass('col ps-0 d-flex align-items-center')
+                                            .text(itemSet.toString())
                                             .click(function () {
-                                                myself.controller.run('stageItemSet', itemSet);
-                                                myself.view.switchOver(myself.view.itemSetAdditionView);
-                                            })),
-                                $('<div>')
-                                    .addClass('col-auto p-0 d-flex align-items-center')
-                                    .append(
-                                        IconButton.delete()
-                                            .toggle(this.$changeModeButton.data('state'))
-                                            .click(function () {
-                                                myself.controller.run('removeItemSet', itemSet);
-                                            })))));
+                                                $(this).prev().children(':first').click();
+                                            }),
+                                        $('<div>')
+                                            .addClass('col-auto p-0 d-flex align-items-center')
+                                            .append($('<button>')
+                                                .attr({ type: 'button' })
+                                                .addClass('btn border-0 px-3 py-0 rounded-0 fs-4 text-light bg-main bi bi-pencil-fill')
+                                                .toggle(this.$changeModeButton.data('state'))
+                                                .click(function () {
+                                                    myself.controller.run('stageItemSet', itemSet);
+                                                    myself.view.switchOver(myself.view.itemSetAdditionView);
+                                                })),
+                                        $('<div>')
+                                            .addClass('col-auto p-0 d-flex align-items-center')
+                                            .append($('<button>')
+                                                .attr({ type: 'button' })
+                                                .addClass('btn border-0 px-3 py-0 rounded-0 fs-4 text-light bg-danger bi bi-trash3')
+                                                .toggle(this.$changeModeButton.data('state'))
+                                                .click(function () {
+                                                    myself.controller.run('removeItemSet', itemSet);
+                                                }))))));
             }
 
             get dependedModels() {
