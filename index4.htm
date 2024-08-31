@@ -508,15 +508,14 @@
                             .addClass('offcanvas-body p-0')
                             .append($('<div>')
                                 .addClass('list-group list-group-flush')
-                                .append(
-                                    $('<button>')
-                                        .addClass('list-group-item list-group-item-action')
-                                        .attr({ type: 'button' })
-                                        .text(L10n.loadPresetLabel)
-                                        .click(function () {
-                                            myself.$showLeftMenuBarButton.data('bsOffcanvas').hide();
-                                            myself.controller.run('loadPresetData');
-                                        }))));
+                                .append($('<button>')
+                                    .addClass('list-group-item list-group-item-action')
+                                    .attr({ type: 'button' })
+                                    .text(L10n.loadPresetLabel)
+                                    .click(function () {
+                                        myself.$showLeftMenuBarButton.data('bsOffcanvas').hide();
+                                        myself.controller.run('loadPresetData');
+                                    }))));
                 this.$showLeftMenuBarButton = $('<button>')
                     .attr({ type: 'button' })
                     .addClass('btn border-0 fs-1 text-secondary bi bi-list')
@@ -787,13 +786,12 @@
                                     }),
                                 $('<div>')
                                     .addClass('col-auto p-0 d-flex align-items-center')
-                                    .append(
-                                        $('<button>')
-                                            .attr({ type: 'button' })
-                                            .addClass('btn border-0 px-3 py-0 rounded-0 fs-4 text-light bg-main bi bi-pencil-fill')
-                                            .click(function () {
-                                                myself.view.switchOver(myself.view.itemAdditionView);
-                                            })),
+                                    .append($('<button>')
+                                        .attr({ type: 'button' })
+                                        .addClass('btn border-0 px-3 py-0 rounded-0 fs-4 text-light bg-main bi bi-pencil-fill')
+                                        .click(function () {
+                                            myself.view.switchOver(myself.view.itemAdditionView);
+                                        })),
                                 $('<div>')
                                     .addClass('col-auto p-0 d-flex align-items-center')
                                     .append($('<button>')
