@@ -539,10 +539,14 @@
                                 $leftMenuBar),
                         $('<div>')
                             .addClass('col text-center')
-                            .append(IconButton.create({ icon: 'bi-bag', color: 'text-main' })),
+                            .append($('<button>')
+                                .attr({ type: 'button' })
+                                .addClass('btn border-0 fs-1 text-main bi bi-bag')),
                         $('<div>')
                             .addClass('col text-right'));
-                this.$showItemSetSelectionViewButton = IconButton.create({ icon: 'bi-journals', color: 'text-main' })
+                this.$showItemSetSelectionViewButton = $('<button>')
+                    .attr({ type: 'button' })
+                    .addClass('btn border-0 fs-1 text-main bi bi-journals')
                     .click(function () {
                         myself.view.switchOver(myself.view.itemSetSelectionView);
                     });
@@ -619,7 +623,9 @@
                         .addClass('col text-right'));
                 this.$itemsContainer = $('<div>').addClass('containter-fluid px-3');
                 this.$bodyPanel.append(this.$itemsContainer);
-                this.$addButton = IconButton.create({ icon: 'bi-journal-plus', color: 'text-main' })
+                this.$addButton = $('<button>')
+                    .attr({ type: 'button' })
+                    .addClass('btn border-0 fs-1 text-main bi bi-journal-plus')
                     .click(function () {
                         myself.controller.run('stageItemSet', new ItemSet());
                         myself.view.switchOver(myself.view.itemSetAdditionView);
@@ -701,7 +707,9 @@
                     .append(
                         $('<div>')
                             .addClass('col text-start')
-                            .append(this.$backButton = IconButton.create({ icon: 'bi-x-circle', size: 'fs-2', color: 'text-secondary' })
+                            .append(this.$backButton = $('<button>')
+                                .attr({ type: 'button' })
+                                .addClass('btn border-0 fs-2 text-secondary bi bi-x-circle')
                                 .click(function () {
                                     myself.controller.run('unstageItemSet');
                                     myself.view.switchOver(myself.view.itemSetSelectionView);
@@ -756,8 +764,9 @@
                                         $('<div>').addClass('col-auto'),
                                         $('<div>')
                                             .addClass('col')
-                                            .append(IconButton.create({ icon: 'bi-plus-circle', size: 'fs-3', padding: 'fit' })
-                                                .addClass('ps-3 pt-1')
+                                            .append($('<button>')
+                                                .attr({ type: 'button' })
+                                                .addClass('btn pt-1 pb-0 ps-3 pe-0 border-0 fs-3 text-secondary bi bi-plus-circle')
                                                 .click(function () {
                                                     myself.controller.run('addItemSet', myself.$nameInput.val(), myself.model.stagedItems);
                                                 })))));
