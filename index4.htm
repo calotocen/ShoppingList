@@ -42,29 +42,6 @@
             column-gap: 0.5rem;
         }
 
-        .circle-checkbox::before {
-            /* bi */
-            display: inline-block;
-            font-family: bootstrap-icons !important;
-            font-style: normal;
-            font-weight: normal !important;
-            font-variant: normal;
-            text-transform: none;
-            line-height: 1;
-            vertical-align: -.125em;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-
-            /* py-1 */
-            padding-top: 0.25rem;
-            padding-bottom: 0.25rem;
-
-            /* fs-4 */
-            font-size: calc(1.275rem + 0.3vw);
-
-            color: black;
-        }
-
         .circle-checkbox:has(input[type="checkbox"]:not(:checked))::before {
             /* bi-circle */
             content: "\f28a";
@@ -577,7 +554,7 @@
                         return $('<div>')
                             .addClass('containter-fluid px-3 d-flex align-items-center')
                             .append($('<label>')
-                                .addClass('circle-checkbox')
+                                .addClass('circle-checkbox py-1 fs-4 bi')
                                 .append(
                                     $('<input>')
                                         .attr({ type: 'checkbox' })
@@ -658,7 +635,7 @@
                                     .addClass('col-auto d-flex align-items-center')
                                     .append(
                                         $('<label>')
-                                            .addClass('circle-checkbox')
+                                            .addClass('circle-checkbox py-1 fs-4 bi')
                                             .append(
                                                 $('<input>')
                                                     .attr({ type: 'checkbox' })
