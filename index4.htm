@@ -527,10 +527,23 @@
                     .click(function () {
                         myself.view.switchOver(myself.view.itemSetSelectionView);
                     });
-                this.$copyButton = IconButton.create({ buttons: ['bi-clipboard', 'bi-clipboard-check-fill'], color: 'text-main', overlapped: true })
+                this.$copyButton = $('<button>')
+                    .attr({ type: 'button' })
+                    .addClass('btn position-relative border-0 fs-1 text-main')
+                    .append(
+                        $('<i>').addClass('bi bi-clipboard'),
+                        $('<i>')
+                            .addClass('position-absolute top-0 start-0 bi bi-clipboard-check-fill')
+                            .css({
+                                padding: 'inherit',
+                                opacity: 0,
+                            }))
                     .click(function () {
                         myself.controller.writeCurrentShoppingListToClipboard();
-                        $(this).children(':last').show().fadeOut(1000);
+                        $(this)
+                            .find(':last')
+                            .css({ opacity: 1 })
+                            .animate(...$.animation('fadeOut'));
                     });
                 this.$footerPanel.append(
                     this.$showItemSetSelectionViewButton,
