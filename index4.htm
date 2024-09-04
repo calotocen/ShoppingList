@@ -577,13 +577,10 @@
                                         })
                                         .change(function () {
                                             myself.controller.run('changeActiveItemSelectionState', groupedItems, $(this).prop('checked'));
-                                        })),
-                                $('<div>')
-                                    .addClass('ps-3')
-                                    .text(`${name} ... ${amount} ${unit}`)
-                                    .click(function () {
-                                        $(this).prev().click();
-                                    }))
+                                        }),
+                                    $('<span>')
+                                        .css({ fontSize: 'initial' })
+                                        .text(`${name} ... ${amount} ${unit}`)))
                     }));
             }
 
@@ -655,13 +652,10 @@
                                                     .prop({ checked: this.model.selectedItemSets.includes(itemSet) })
                                                     .change(function () {
                                                         myself.controller.run('changeItemSetSelectionState', itemSet, $(this).prop('checked'));
-                                                    })),
-                                        $('<div>')
-                                            .addClass('col ps-0 d-flex align-items-center')
-                                            .text(itemSet.toString())
-                                            .click(function () {
-                                                $(this).prev().children(':first').click();
-                                            }),
+                                                    }),
+                                                $('<span>')
+                                                    .css({ fontSize: 'initial' })
+                                                    .text(itemSet.toString())),
                                         $('<div>')
                                             .addClass('col-auto p-0 d-flex align-items-center')
                                             .append($('<button>')
