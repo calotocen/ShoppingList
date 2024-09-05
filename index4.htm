@@ -605,7 +605,9 @@
                         .append(this.$backButton),
                     $('<div>')
                         .addClass('col text-center')
-                        .append($('<i>').addClass('fs-1 bi bi-journals text-main')),
+                        .append($('<button>')
+                            .attr({ type: 'button' })
+                            .addClass('btn border-0 fs-1 bi bi-journals text-main')),
                     $('<div>')
                         .addClass('col text-right'));
                 this.$itemsContainer = $('<div>').addClass('containter-fluid px-3');
