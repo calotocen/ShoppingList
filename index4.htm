@@ -672,7 +672,7 @@
                                             .addClass('col-auto p-0 d-flex align-items-center')
                                             .append($('<button>')
                                                 .attr({ type: 'button' })
-                                                .addClass('btn border-0 px-3 py-0 rounded-0 fs-4 text-light bg-danger bi bi-trash3')
+                                                .addClass('btn btn-danger border-0 px-3 py-0 rounded-0 fs-4 bi bi-trash3')
                                                 .toggle(this.$changeModeButton.data('state'))
                                                 .click(function () {
                                                     myself.controller.run('removeItemSet', itemSet);
