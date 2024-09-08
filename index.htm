@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>買い物リスト</title>
+</head>
+
+<body>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script>
+        class Item {
+            constructor(properties = {}) {
+                Object
+                    .entries({ name: '', amount: 0, unit: '', displayed: false, selected: false })
+                    .forEach(([key, value]) => this[key] = properties[key] ?? value);
+            }
+        }
+        class ItemSet {
+            constructor(properties = {}) {
+                Object
+                    .entries({ name: '', items: [] })
+                    .forEach(([key, value]) => this[key] = properties[key] ?? value);
+            }
+        }
+        class Items extends Array {
+            get displays() {
+                return this.filter(item => item.displayed);
+            }
+            get selections() {
+                return this.filter(item => item.selected);
+            }
+        }
+
+        class Model {
+            constructor() {
+                this.itemSets = [];
+                this.draftItemSet = undefined;
+                this.independentItems = [];
+                this.draftIndependentItem = undefined;
+            }
+
+            get items() {
+                return new Items(...this.itemSets.flatMap(itemSet => itemSet.items), ...this.independentItems);
+            }
+
+            commitDraftItemSet() {
+                this.itemSets.push(draftItemSet);
+                this.draftItemSet = undefined;
+            }
+            discardDraftItemSet() {
+                this.draftItemSet = undefined;
+            }
+            
+            commitDraftIndependentItem() {
+                this.independentItems.push(draftIndependentItem);
+                this.draftIndependentItem = undefined;
+            }
+            discardDraftIndependentItem() {
+                this.draftIndependentItem = undefined;
+            }
+
+            save() {
+                localStorage['model'] = JSON.stringify(this);
+                return this;
+            }
+            load() {
+                Object.assign(this, JSON.parse(localStorage['model']));
+                return this;
+            }
+        }
+    </script>
+</body>
+
+</html>
