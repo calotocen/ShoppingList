@@ -57,6 +57,48 @@
         .text-main {
             color: #36b389;
         }
+
+        .circle-checkbox {
+            display: flex;
+            position: relative;
+            align-items: center;
+            column-gap: 0.5rem;
+        }
+
+        .circle-checkbox:has(input[type="checkbox"]:not(:checked))::before {
+            /* bi-circle */
+            content: "\f28a";
+        }
+
+        .circle-checkbox:has(input[type="checkbox"]:checked)::before {
+            /* bi-check-circle-fill */
+            content: "\f26a";
+
+            /* text-main */
+            color: #36b389;
+        }
+
+        .circle-checkbox:has(input[type="checkbox"]:indeterminate)::before {
+            /* bi-dash-circle */
+            content: "\f2e6";
+        }
+
+        .circle-checkbox:has(input[type="checkbox"]:focus)::before {
+            outline: gray dotted;
+        }
+
+        .circle-checkbox:has(input[type="checkbox"]:disabled)::before {
+            color: gray;
+        }
+
+        .circle-checkbox>input[type="checkbox"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            opacity: 0;
+        }
     </style>
 </head>
 
