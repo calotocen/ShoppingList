@@ -150,6 +150,18 @@
             height: 0;
             opacity: 0;
         }
+
+        .list-group-with-horizontal-border-only {
+            border-radius: 0;
+        }
+
+        .list-group-with-horizontal-border-only>.list-group-item {
+            border-width: 0 0 var(--bs-list-group-border-width);
+        }
+
+        .list-group-with-horizontal-border-only>.list-group-item:first-child {
+            border-top-width: var(--bs-list-group-border-width);
+        }
     </style>
 </head>
 
