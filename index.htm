@@ -162,6 +162,23 @@
         .list-group-with-horizontal-border-only>.list-group-item:first-child {
             border-top-width: var(--bs-list-group-border-width);
         }
+
+        @keyframes slidein-to-right {
+            from {
+                transform: translateX(-100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        .slidein-to-right {
+            animation-name: slidein-to-right;
+            animation-fill-mode: forwards;
+            animation-duration: 200ms;
+            animation-timing-function: ease-out;
+        }
     </style>
 </head>
 
