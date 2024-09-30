@@ -223,6 +223,15 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script>
+
+        window.crypto.randomUUID ??= function () {
+            let random_numbers = new Uint8Array(16);
+            window.crypto.getRandomValues(random_numbers);
+            random_numbers[6] = 0x40 | (random_numbers[6] & 0x0f);
+            random_numbers[8] = 0x80 | (random_numbers[8] & 0x3f);
+            random_numbers = Array.from(random_numbers);
+            return 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'.replaceAll('xx', s => random_numbers.shift().toString(16).padStart(2, '0'));
+        }
         class Item {
             constructor(properties = {}) {
                 Object
