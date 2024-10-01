@@ -233,6 +233,17 @@
             random_numbers = Array.from(random_numbers);
             return 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'.replaceAll('xx', s => random_numbers.shift().toString(16).padStart(2, '0'));
         }
+
+        Map.groupBy ??= function (items, callbackFn) {
+            const map = new Map();
+            let i = 0;
+            for (const item of items) {
+                const key = callbackFn(item, i);
+                map.set(key, (map.get(key) ?? []).concat([item]));
+                ++i;
+            }
+            return map;
+        }
         class Item {
             constructor(properties = {}) {
                 Object
