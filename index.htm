@@ -215,6 +215,22 @@
             backdrop-filter: saturate(30%) contrast(60%) blur(2px);
             -webkit-backdrop-filter: saturate(30%) contrast(60%) blur(2px);
         }
+
+        @keyframes slideout-to-up {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-100%);
+            }
+        }
+
+        .slideout-to-up {
+            animation-name: slideout-to-up;
+            animation-fill-mode: forwards;
+            animation-timing-function: ease-out;
+        }
     </style>
 </head>
 
