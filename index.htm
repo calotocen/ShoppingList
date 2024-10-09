@@ -244,6 +244,45 @@
             }
             return map;
         }
+
+        $.fn.extend({
+            assign: function (data) {
+                return $(this).each(function () {
+                    ({
+                        array: () => {
+                            $(this)
+                                .children(':not(template)')
+                                .remove();
+                            $(this)
+                                .data({ data: data })
+                                // template.clone() returns a document-fragment element.
+                                // since the element will remove when it is appended to the main DOM,
+                                // there will be no way to reference values later if they are assigned to the element.
+                                // that means it needs to assign values to the child elements of the document-flagment.
+                                .append(data.map(value => $($(this).children('template')[0].content).clone(true).children().assign(value)))
+                                .find('[data-assign]')
+                                .attr({ 'data-update': false });
+                        },
+                        object: () => $(this)
+                            .data({ data: data })
+                            .find('[data-assign]')
+                            .each(function () {
+                                $(this).assign(data[$(this).attr('data-assign')]);
+                            }),
+                        other: () => $(this)
+                            .data({ data: data })
+                            .each(function () {
+                                return ({
+                                    input: () => $(this).prop({
+                                        checked: data !== undefined && data,
+                                        indeterminate: data === undefined,
+                                    })
+                                }[this.tagName.toLowerCase()] ?? (() => $(this).text(data)))();
+                            }),
+                    })[(data instanceof Array || data instanceof Collection) ? 'array' : data instanceof Object ? 'object' : 'other']();
+                });
+            },
+        });
         class Item {
             constructor(properties = {}) {
                 Object
