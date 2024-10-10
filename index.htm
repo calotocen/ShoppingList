@@ -282,6 +282,16 @@
                     })[(data instanceof Array || data instanceof Collection) ? 'array' : data instanceof Object ? 'object' : 'other']();
                 });
             },
+            nearest: function (callback) {
+                for (let $element = this; $element.length > 0; $element = $element.parent()) {
+                    for (let i = 0; i < $element.length; ++i) {
+                        if (callback.apply($element[i])) {
+                            return $($element[i]);
+                        }
+                    }
+                }
+                return $();
+            },
         });
         class Item {
             constructor(properties = {}) {
