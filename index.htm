@@ -293,6 +293,56 @@
                 return $();
             },
         });
+
+        class AttributeMutationObserver {
+            #observer;
+
+            constructor(attribute, callback) {
+                this.#observer = new MutationObserver(records => {
+                    callback([
+                        ...records
+                            .flatMap(record => Array
+                                .from(record.addedNodes)
+                                .flatMap(node => $([...$(node).filter(`[${attribute}]`).get(), ...$(node).find(`[${attribute}]`).get()]).get())
+                                .map(target => ({
+                                    type: 'addedNode',
+                                    target: target,
+                                    value: $(target).attr(attribute) ?? null,
+                                    oldValue: null,
+                                    record: record,
+                                }))),
+                        ...records
+                            .flatMap(record => Array
+                                .from(record.removedNodes)
+                                .flatMap(node => $([...$(node).filter(`[${attribute}]`).get(), ...$(node).find(`[${attribute}]`).get()]).get())
+                                .map(target => ({
+                                    type: 'removedNode',
+                                    target: target,
+                                    value: $(target).attr(attribute) ?? null,
+                                    oldValue: null,
+                                    record: record,
+                                }))),
+                        ...records
+                            .filter(({ attributeName }) => attributeName === attribute)
+                            .map(record => ({
+                                type: 'changedAttribute',
+                                target: record.target,
+                                value: $(record.target).attr(attribute) ?? null,
+                                oldValue: record.oldValue,
+                                record: record,
+                            }))
+                    ]);
+                });
+            }
+
+            static {
+                Reflect.ownKeys(MutationObserver.prototype)
+                    .filter(name => !['constructor', Symbol.toStringTag].includes(name))
+                    .forEach(name => this.prototype[name] = function (...args) {
+                        this.#observer[name](...args);
+                    });
+            }
+        }
         class Item {
             constructor(properties = {}) {
                 Object
