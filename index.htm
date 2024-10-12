@@ -343,6 +343,26 @@
                     });
             }
         }
+
+        class ModelAssigner {
+            static get $targets() {
+                return $('[data-assign]');
+            }
+
+            static assign($targets = this.$targets) {
+                $targets.each(function () {
+                    $(this).assign(eval($(this).attr('data-assign')));
+                });
+            }
+
+            static update($targets = this.$targets) {
+                $targets
+                    .filter(':not([data-update="false"])')
+                    .each(function () {
+                        $(this).assign(eval($(this).attr('data-assign')));
+                    });
+            }
+        }
         class Item {
             constructor(properties = {}) {
                 Object
