@@ -363,6 +363,15 @@
                     });
             }
         }
+
+        class LiveNotification {
+            static info(message, summary = '') {
+                $('#liveNotificationPlaceholder').assign([{
+                    message: message,
+                    summary: summary,
+                }]);
+            }
+        }
         class Item {
             constructor(properties = {}) {
                 Object
