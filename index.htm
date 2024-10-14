@@ -372,6 +372,16 @@
                 }]);
             }
         }
+
+        class Action {
+            constructor(event, $owner, $receiver) {
+                this.event = event;
+                this.$owner = $owner;
+                this.$receiver = $receiver;
+            }
+            run() { }
+            roleback() { }
+        }
         class Item {
             constructor(properties = {}) {
                 Object
