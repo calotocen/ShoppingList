@@ -382,6 +382,12 @@
             run() { }
             roleback() { }
         }
+        class LoadPresetAction extends Action {
+            run() {
+                new WebModelLoader().load('./preset.json');
+                LiveNotification.info('Preset was loaded.', 'Load preset');
+            }
+        }
         class Item {
             constructor(properties = {}) {
                 Object
