@@ -388,6 +388,30 @@
                 LiveNotification.info('Preset was loaded.', 'Load preset');
             }
         }
+        class RootPaneActions {
+            static get containerId() {
+                return `${this.name[0].toLowerCase()}${this.name.slice(1, -7)}`;
+            }
+            static get ShowAction() {
+                const containerId = this.containerId;
+                return class extends Action {
+                    run() {
+                        $(`#${containerId}`).css({ display: '' });
+                    }
+                };
+            }
+            static get HideAction() {
+                const containerId = this.containerId;
+                return class extends Action {
+                    run() {
+                        $(`#${containerId}`).queue(function () {
+                            $(this).css({ display: 'none' });
+                            $(this).dequeue();
+                        })
+                    }
+                };
+            }
+        }
         class Item {
             constructor(properties = {}) {
                 Object
