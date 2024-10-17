@@ -412,6 +412,23 @@
                 };
             }
         }
+        class ShoppingListTabActions extends RootPaneActions {
+            static get ToggleItemAction() {
+                return class extends Action {
+                    run() {
+                        $(this.$owner.closest('form')).data('data').selected = this.$owner.prop('checked');
+                    }
+                }
+            }
+            static get CopyAction() {
+                const myself = this;
+                return class extends Action {
+                    run() {
+                        LiveNotification.info('The list was copied to the clipboard.', 'Copy');
+                    }
+                }
+            }
+        }
         class Item {
             constructor(properties = {}) {
                 Object
