@@ -429,6 +429,15 @@
                 }
             }
         }
+        class ItemSetTabActions extends RootPaneActions {
+            static get ToggleItemSetAction() {
+                return class extends Action {
+                    run() {
+                        $(this.$owner.closest('form')).data('data').selected = this.$owner.prop('checked');
+                    }
+                }
+            }
+        }
         class Item {
             constructor(properties = {}) {
                 Object
