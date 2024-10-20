@@ -439,6 +439,15 @@
             }
         }
         class MainMenuActions extends RootPaneActions { }
+        class VisualizeAction extends Action {
+            run() {
+                this.$owner.queue(function () {
+                    $(this)
+                        .css({ visibility: '' })
+                        .dequeue();
+                });
+            }
+        }
         class Item {
             constructor(properties = {}) {
                 Object
