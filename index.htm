@@ -457,6 +457,11 @@
                 });
             }
         }
+        class HideTabAction extends Action {
+            run() {
+                $(this.$owner.closest('[data-role="root-pane"]')).css({ display: 'none' });
+            }
+        }
         class Item {
             constructor(properties = {}) {
                 Object
