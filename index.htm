@@ -462,6 +462,11 @@
                 $(this.$owner.closest('[data-role="root-pane"]')).css({ display: 'none' });
             }
         }
+        class StopPropagationAction extends Action {
+            run() {
+                this.event.stopPropagation();
+            }
+        }
         class Item {
             constructor(properties = {}) {
                 Object
