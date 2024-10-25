@@ -475,6 +475,14 @@
                 });
             }
         }
+        class SlideinToBottomAction extends Action {
+            run() {
+                this.$owner.queue(async function () {
+                    await this.animate({ translate: ['0 -100%', '0 0'] }, { duration: 200, fill: 'forwards' }).finished;
+                    $(this).dequeue();
+                });
+            }
+        }
         class Item {
             constructor(properties = {}) {
                 Object
