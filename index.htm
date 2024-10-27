@@ -555,6 +555,21 @@
                 return owner;
             }
         }
+        class ActionSchemaArray extends Array {
+            static parse(schema) {
+                return this.from(schema
+                    .matchAll(/([-\w]+) *: *\[?((?:[.\w]+)?(?:, *[.\w]+)*)(?![-\w]* *:)\]?,? */g))
+                    .flatMap(match => match[2].split(',').map(action => new ActionSchema({
+                        name: action.trim(),
+                        type: match[1].split('-')[0],
+                        qualifiers: match[1].split('-').slice(1),
+                    })));
+            }
+
+            inject(owner) {
+                this.forEach(schema => schema.inject(owner));
+            }
+        }
         class Item {
             constructor(properties = {}) {
                 Object
