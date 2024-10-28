@@ -591,6 +591,13 @@
                     });
             }
         }
+
+        function updateViews() {
+            $('[data-assign]:not([data-update="false"])')
+                .each(function () {
+                    if ($(this).length > 0) $(this).assign(eval($(this).attr('data-assign')));
+                });
+        }
         class Item {
             constructor(properties = {}) {
                 Object
