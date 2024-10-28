@@ -570,6 +570,27 @@
                 this.forEach(schema => schema.inject(owner));
             }
         }
+        class ActionMutationObserver {
+            static #observer;
+
+            static observe() {
+                $('[data-action]').each(function () {
+                    ActionSchemaArray.parse($(this).attr('data-action')).inject(this);
+                })
+                this.#observer = new AttributeMutationObserver('data-action', records => records
+                    .filter(record => record.type === 'addedNode')
+                    .forEach(({ target }) => ActionSchemaArray.parse($(target).attr('data-action')).inject(target)))
+                    .observe($('body')[0], { subtree: true, childList: true });
+            }
+
+            static {
+                Reflect.ownKeys(AttributeMutationObserver.prototype)
+                    .filter(name => !['constructor', 'observe'])
+                    .forEach(name => this[name] = function (...args) {
+                        this.#observer[name](...args);
+                    });
+            }
+        }
         class Item {
             constructor(properties = {}) {
                 Object
