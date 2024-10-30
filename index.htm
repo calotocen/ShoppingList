@@ -598,6 +598,20 @@
                     if ($(this).length > 0) $(this).assign(eval($(this).attr('data-assign')));
                 });
         }
+
+        class Collection {
+            static {
+                Reflect.ownKeys(Array.prototype)
+                    .filter(name => !['copyWithin', 'fill', 'length', 'pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift', Symbol.unscopables].includes(name))
+                    .forEach(name => this.prototype[name] = function (...args) {
+                        return this.data[name](...args);
+                    });
+            }
+
+            get length() {
+                return this.data.length;
+            }
+        }
         class Item {
             constructor(properties = {}) {
                 Object
