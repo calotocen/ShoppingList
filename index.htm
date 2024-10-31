@@ -612,6 +612,71 @@
                 return this.data.length;
             }
         }
+        class ObservableCollection extends Collection {
+            constructor() {
+                super();
+                this.data = [];
+                this.handlers = {};
+            }
+
+            bind(type, handler) {
+                this.handlers[type] ??= [];
+                this.handlers[type].push(handler);
+                return this;
+            }
+            unbind(type, handler) {
+                const index = this.handlers[type]?.indexOf(handler);
+                if (index !== undefined && index != -1) {
+                    this.handlers[type].splice(index, 1);
+                }
+                return this;
+            }
+            #callHandlers(type, event) {
+                this.handlers[type]?.forEach(handler => handler.call(this, event));
+            }
+
+            insert(index, ...elements) {
+                const event = {
+                    target: this,
+                    index: index,
+                    elements: elements,
+                };
+                this.#callHandlers('beforeinsert', event);
+                this.data.splice(index, 0, ...event.elements);
+                this.#callHandlers('insert', { target: this, index: index, elements: event.elements });
+                return this;
+            }
+
+            removeAt(index, count = Infinity) {
+                if (index >= this.data.length || count === 0) return this;
+                if (index < 0) {
+                    index = Math.max(index + this.data.length, 0);
+                }
+                const removedElements = this.data.splice(index, count);
+                this.#callHandlers('remove', { target: this, index: index, elements: removedElements });
+                return this;
+            }
+            remove(...args) {
+                args.forEach(element => {
+                    for (let i = this.data.indexOf(element); i != -1; i = this.data.indexOf(element, i)) {
+                        this.removeAt(i, 1);
+                    }
+                });
+                return this;
+            }
+            removeAll() {
+                return this.removeAt(0);
+            }
+
+            push(...elements) {
+                return this.insert(this.data.length, ...elements);
+            }
+            pop() {
+                const removedElement = this.data.at(-1);
+                this.removeAt(-1, 1);
+                return removedElement;
+            }
+        }
         class Item {
             constructor(properties = {}) {
                 Object
