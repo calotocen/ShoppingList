@@ -677,6 +677,29 @@
                 return removedElement;
             }
         }
+        class CollectionFilter extends Collection {
+            constructor(collection, filter) {
+                super();
+                this.collection = collection;
+                this.filter = filter;
+            }
+
+            get data() {
+                return this.collection.filter(this.filter);
+            }
+        }
+        class Entities extends ObservableCollection {
+            constructor() {
+                super();
+                this.bind('beforeinsert', function (event) {
+                    event.elements = event.elements.filter((element, index, self) => !event.target.includes(element) && index === self.indexOf(element));
+                });
+            }
+
+            toJSON() {
+                return [...this];
+            }
+        }
         class Item {
             constructor(properties = {}) {
                 Object
