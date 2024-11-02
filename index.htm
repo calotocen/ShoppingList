@@ -703,7 +703,7 @@
         class Item {
             constructor(properties = {}) {
                 Object
-                    .entries({ name: '', amount: 0, unit: '', displayed: false, selected: false })
+                    .entries({ uuid: crypto.randomUUID(), name: '', amount: 0, unit: '', tags: [], displayed: false, selected: false })
                     .forEach(([key, value]) => this[key] = properties[key] ?? value);
             }
         }
