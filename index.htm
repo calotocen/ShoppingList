@@ -707,19 +707,28 @@
                     .forEach(([key, value]) => this[key] = properties[key] ?? value);
             }
         }
+        class Items extends ObservableCollection {
+            get displays() {
+                return new class extends CollectionFilter {
+                    constructor(collection, filter) {
+                        super(collection, filter);
+                    }
+
+                    get bundles() {
+                        return new BundledItems(this);
+                    }
+                }(this, ({ displayed }) => displayed);
+            }
+
+            get selections() {
+                return new CollectionFilter(this, ({ selected }) => selected);
+            }
+        }
         class ItemSet {
             constructor(properties = {}) {
                 Object
                     .entries({ name: '', items: [] })
                     .forEach(([key, value]) => this[key] = properties[key] ?? value);
-            }
-        }
-        class Items extends Array {
-            get displays() {
-                return this.filter(item => item.displayed);
-            }
-            get selections() {
-                return this.filter(item => item.selected);
             }
         }
 
