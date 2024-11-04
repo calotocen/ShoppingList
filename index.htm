@@ -736,6 +736,18 @@
                 this.items.forEach(item => item.selected = state);
             }
         }
+        class BundledItems extends Collection {
+            constructor(collection) {
+                super();
+                this.collection = collection;
+            }
+
+            get data() {
+                // it needs to convert the iterator to an array because iOS Safari does not support Iterator#map. 
+                return Array.from(Map.groupBy(this.collection, ({ name, unit }) => `name="${name}",unit="${unit}"`).values())
+                    .map(items => new BundledItem(items));
+            }
+        }
         class Items extends ObservableCollection {
             get displays() {
                 return new class extends CollectionFilter {
