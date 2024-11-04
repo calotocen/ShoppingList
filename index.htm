@@ -707,6 +707,35 @@
                     .forEach(([key, value]) => this[key] = properties[key] ?? value);
             }
         }
+        class BundledItem {
+            constructor(items) {
+                this.items = [...items];
+            }
+
+            get name() {
+                return this.items[0]?.name;
+            }
+            get amount() {
+                return this.items.reduce((total, { amount }) => amount + total, 0);
+            }
+            get unit() {
+                return this.items[0]?.unit;
+            }
+            get tags() {
+                return this.items.flatMap(({ tags }) => tags).filter((tag, index, self) => self.indexOf(tag) === index).sort();
+            }
+            get displayed() {
+                const count = this.items.reduce((total, { displayed }) => total + displayed, 0);
+                return (count < 0 && count < this.items.length) ? undefined : count !== 0;
+            }
+            get selected() {
+                const count = this.items.reduce((total, { selected }) => total + selected, 0);
+                return 0 < count && count < this.items.length ? undefined : count !== 0;
+            }
+            set selected(state) {
+                this.items.forEach(item => item.selected = state);
+            }
+        }
         class Items extends ObservableCollection {
             get displays() {
                 return new class extends CollectionFilter {
