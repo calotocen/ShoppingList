@@ -749,6 +749,17 @@
             }
         }
         class Items extends ObservableCollection {
+            constructor() {
+                super();
+                this
+                    .bind('beforeinsert', function (event) {
+                        event.elements = event.elements.filter((element, index, self) => !event.target.includes(element) && index === self.indexOf(element));
+                    })
+                    .bind('remove', function (event) {
+                        model.itemSets.forEach(({ items }) => items.remove(...event.elements));
+                    });
+            }
+
             get displays() {
                 return new class extends CollectionFilter {
                     constructor(collection, filter) {
