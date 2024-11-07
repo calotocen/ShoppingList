@@ -775,6 +775,10 @@
             get selections() {
                 return new CollectionFilter(this, ({ selected }) => selected);
             }
+
+            toJSON() {
+                return [...this];
+            }
         }
         class ItemSet {
             constructor(properties = {}) {
