@@ -782,9 +782,28 @@
         }
         class ItemSet {
             constructor(properties = {}) {
+                const myself = this;
+
                 Object
-                    .entries({ name: '', items: [] })
+                    .entries({ uuid: crypto.randomUUID(), name: '' })
                     .forEach(([key, value]) => this[key] = properties[key] ?? value);
+                this.items = new Entities()
+                    .bind('insert', function (event) {
+                        if (model.itemSets.includes(myself)) {
+                            model.items.push(...event.elements);
+                        }
+                    })
+                    .bind('remove', function (event) {
+                        if (model.itemSets.includes(myself)) {
+                            model.items.remove(...event.elements);
+                        }
+                    })
+                    .push(...(properties.items ?? []).map(item =>
+                        item?.constructor?.name === 'Item'
+                            ? item
+                            : typeof item === 'string'
+                                ? model.items.find(i => i.uuid === item)
+                                : new Item(item)));
             }
         }
 
