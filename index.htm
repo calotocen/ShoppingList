@@ -805,6 +805,11 @@
                                 ? model.items.find(i => i.uuid === item)
                                 : new Item(item)));
             }
+
+            set selected(state) {
+                this.items.forEach(item => item.displayed = state);
+                if (!state) this.items.forEach(item => item.selected = false);
+            }
         }
 
         class Model {
