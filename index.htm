@@ -810,6 +810,11 @@
                 this.items.forEach(item => item.displayed = state);
                 if (!state) this.items.forEach(item => item.selected = false);
             }
+            get selected() {
+                const diplayedItemCount = this.items.reduce((count, item) => count + item.displayed, 0);
+                return (0 < diplayedItemCount && diplayedItemCount < this.items.length) ? undefined : (diplayedItemCount != 0);
+            }
+
         }
 
         class Model {
