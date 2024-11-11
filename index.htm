@@ -815,6 +815,13 @@
                 return (0 < diplayedItemCount && diplayedItemCount < this.items.length) ? undefined : (diplayedItemCount != 0);
             }
 
+            toJSON() {
+                return {
+                    uuid: this.uuid,
+                    name: this.name,
+                    items: this.items.map(item => item.uuid),
+                };
+            }
         }
 
         class Model {
