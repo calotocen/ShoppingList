@@ -823,7 +823,29 @@
                 };
             }
         }
+        class ItemSets extends ObservableCollection {
+            constructor() {
+                super();
+                this
+                    .bind('beforeinsert', function (event) {
+                        event.elements = event.elements.filter((element, index, self) => !event.target.includes(element) && index === self.indexOf(element));
+                    })
+                    .bind('insert', function (event) {
+                        model.items.push(...event.elements.flatMap(itemSet => [...itemSet.items]));
+                    })
+                    .bind('remove', function (event) {
+                        model.items.remove(...event.elements.flatMap(itemSet => [...itemSet.items]));
+                    });
+            }
 
+            get selections() {
+                return new CollectionFilter(this, item => item.selected);
+            }
+
+            toJSON() {
+                return [...this];
+            }
+        }
         class Model {
             constructor() {
                 this.itemSets = [];
