@@ -848,39 +848,8 @@
         }
         class Model {
             constructor() {
-                this.itemSets = [];
-                this.draftItemSet = undefined;
-                this.independentItems = [];
-                this.draftIndependentItem = undefined;
-            }
-
-            get items() {
-                return new Items(...this.itemSets.flatMap(itemSet => itemSet.items), ...this.independentItems);
-            }
-
-            commitDraftItemSet() {
-                this.itemSets.push(draftItemSet);
-                this.draftItemSet = undefined;
-            }
-            discardDraftItemSet() {
-                this.draftItemSet = undefined;
-            }
-            
-            commitDraftIndependentItem() {
-                this.independentItems.push(draftIndependentItem);
-                this.draftIndependentItem = undefined;
-            }
-            discardDraftIndependentItem() {
-                this.draftIndependentItem = undefined;
-            }
-
-            save() {
-                localStorage['model'] = JSON.stringify(this);
-                return this;
-            }
-            load() {
-                Object.assign(this, JSON.parse(localStorage['model']));
-                return this;
+                this.items = new Items();
+                this.itemSets = new ItemSets();
             }
         }
     </script>
