@@ -852,6 +852,21 @@
                 this.itemSets = new ItemSets();
             }
         }
+        class LocalModelStorage {
+            save() {
+                localStorage['model'] = JSON.stringify(model);
+                return true;
+            }
+            load() {
+                const json = localStorage['model'];
+                if (json !== undefined) {
+                    const data = JSON.parse(json);
+                    model.items.removeAll().push(...(data.items?.map(item => new Item(item)) ?? []));
+                    model.itemSets.removeAll().push(...(data.itemSets?.map(itemSet => new ItemSet(itemSet)) ?? []));
+                }
+                return true;
+            }
+        }
     </script>
 </body>
 
