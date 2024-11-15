@@ -867,6 +867,22 @@
                 return true;
             }
         }
+        class WebModelLoader {
+            load(url) {
+                $.ajax(url, {
+                    async: false,
+                    dataType: 'json',
+                    success: function (data) {
+                        data.itemSets?.forEach(itemSet => itemSet.items = itemSet.items.map(item => new Item(item)));
+                        model.items.removeAll().push(...(data.itemSets?.flatMap(itemSet => itemSet.items) ?? []));
+                        model.itemSets.removeAll().push(...(data.itemSets?.map(itemSet => new ItemSet(itemSet)) ?? []));
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(textStatus)
+                    },
+                });
+            }
+        }
     </script>
 </body>
 
