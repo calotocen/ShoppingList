@@ -262,6 +262,47 @@
             </div>
         </div>
     </div>
+    <div id="itemSetTab" class="root-pane position-absolute top-0 left-0 w-100 h-100" style="display: none;" data-role="root-pane">
+        <div class="d-flex flex-column justify-content-start w-100 h-100">
+            <div class="sticky-top d-flex justify-content-between align-items-center">
+                <button type="button" class="btn btn-menu bi bi-list bi-fs-1"></button>
+                <button type="button" class="btn btn-main bi bi-journals bi-fs-1"></button>
+                <div class="dropdown">
+                    <button type="button" class="btn btn-menu bi bi-three-dots bi-fs-1 py-0" data-bs-toggle="dropdown"></button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item bi bi-plus-circle"><span class="ps-2">Add</span></a></li>
+                        <li><a class="dropdown-item bi bi-pencil-square"><span class="ps-2">Edit</span></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="flex-fill">
+                <div class="d-flex flex-column flex-fill" data-assign="model.itemSets">
+                    <template>
+                        <form class="d-flex px-3" data-action="">
+                            <label class="flex-fill bi circle-checkbox bi-fs-4 py-1">
+                                <input type="checkbox" data-assign="selected" data-action="change:ItemSetTab.toggleItemSet">
+                                <span data-assign="name"></span>
+                            </label>
+                            <button type="button" class="btn btn-edit bi bi-pencil-fill bi-fs-4 px-3 py-0 rounded-0" style="display: none;"></button>
+                            <button type="button" class="btn btn-danger bi bi-trash3 bi-fs-4 px-3 py-0 rounded-0" style="display: none;"></button>
+                        </form>
+                    </template>
+                </div>
+            </div>
+            <div class="fixed-bottom d-flex flex-column">
+                <div class="d-flex justify-content-end">
+                    <button type="button" class="btn bi bi-plus-circle-fill bi-fs-1 text-main"></button>
+                </div>
+                <div class="d-flex justify-content-around">
+                    <button type="button" class="btn btn-main bi bi-bag bi-fs-1" data-action="click: hideTab, ShoppingListTab.show"></button>
+                    <button type="button" class="btn btn-main bi bi-journals bi-fs-1" data-action="click: hideTab, ItemSetTab.show"></button>
+                    <button type="button" class="btn bi bi-cone bi-fs-1" style="color: transparent;"></button>
+                    <button type="button" class="btn bi bi-cone bi-fs-1" style="color: transparent;"></button>
+                    <button type="button" class="btn bi bi-cone bi-fs-1" style="color: transparent;"></button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
