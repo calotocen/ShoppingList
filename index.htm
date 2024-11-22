@@ -480,6 +480,13 @@
             }
         }
 
+        $(function () {
+            storage.load();
+            ActionMutationObserver.observe();
+            ModelAssigner.assign();
+            (new ShoppingListTabActions.ShowAction).run();
+        })
+
         class Action {
             constructor(event, $owner, $receiver) {
                 this.event = event;
