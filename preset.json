@@ -1,0 +1,606 @@
+{
+    "itemSets": [
+        {
+            "name": "インドカレー",
+            "items": [
+                {
+                    "name": "鶏もも肉",
+                    "amount": 300,
+                    "unit": "g",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "玉ねぎ",
+                    "amount": 1,
+                    "unit": "個",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "ニンジン",
+                    "amount": 1,
+                    "unit": "本",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "トマト缶",
+                    "amount": 1,
+                    "unit": "缶",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        },
+        {
+            "name": "ベーコンとほうれん草",
+            "items": [
+                {
+                    "name": "平ベーコン",
+                    "amount": 1,
+                    "unit": "パック",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "冷凍ほうれん草",
+                    "amount": 0.5,
+                    "unit": "袋",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "厚あげ",
+                    "amount": 1,
+                    "unit": "個",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "かつお節",
+                    "amount": 1,
+                    "unit": "袋",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        },
+        {
+            "name": "鮭しめじ",
+            "items": [
+                {
+                    "name": "鮭",
+                    "amount": 2,
+                    "unit": "切れ",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "しめじ",
+                    "amount": 2,
+                    "unit": "株",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        },
+        {
+            "name": "プルコギ",
+            "items": [
+                {
+                    "name": "豚こま",
+                    "amount": 250,
+                    "unit": "g",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "ニンジン",
+                    "amount": 1,
+                    "unit": "本",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "ピーマン",
+                    "amount": 4,
+                    "unit": "個",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        },
+        {
+            "name": "豚キャベツ",
+            "items": [
+                {
+                    "name": "豚こま",
+                    "amount": 250,
+                    "unit": "g",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "キャベツ",
+                    "amount": 0.25,
+                    "unit": "個",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        },
+        {
+            "name": "豚生姜焼き",
+            "items": [
+                {
+                    "name": "豚こま",
+                    "amount": 250,
+                    "unit": "g",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "玉ねぎ",
+                    "amount": 1,
+                    "unit": "個",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "刻み青ねぎ",
+                    "amount": 1,
+                    "unit": "パック",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        },
+        {
+            "name": "鶏ねぎ",
+            "items": [
+                {
+                    "name": "鶏もも肉",
+                    "amount": 300,
+                    "unit": "g",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "白ねぎ",
+                    "amount": 1,
+                    "unit": "本",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        },
+        {
+            "name": "麻婆",
+            "items": [
+                {
+                    "name": "豚挽肉",
+                    "amount": 300,
+                    "unit": "g",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "しいたけ",
+                    "amount": 1,
+                    "unit": "パック",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "白ねぎ",
+                    "amount": 1,
+                    "unit": "本",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        },
+        {
+            "name": "親子丼",
+            "items": [
+                {
+                    "name": "鶏もも肉",
+                    "amount": 300,
+                    "unit": "g",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "エリンギ",
+                    "amount": 1,
+                    "unit": "パック",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "玉ねぎ",
+                    "amount": 1,
+                    "unit": "個",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        },
+        {
+            "name": "ナポリタン",
+            "items": [
+                {
+                    "name": "ソーセージ",
+                    "amount": 1,
+                    "unit": "袋",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "エリンギ",
+                    "amount": 1,
+                    "unit": "パック",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "ピーマン",
+                    "amount": 4,
+                    "unit": "個",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "グラタンの素",
+                    "amount": 1,
+                    "unit": "箱",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        },
+        {
+            "name": "カルボナーラ",
+            "items": [
+                {
+                    "name": "角ベーコン",
+                    "amount": 1,
+                    "unit": "パック",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "エリンギ",
+                    "amount": 1,
+                    "unit": "パック",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "カルボナーラソース",
+                    "amount": 1,
+                    "unit": "パック",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        },
+        {
+            "name": "ラザニア",
+            "items": [
+                {
+                    "name": "合挽肉",
+                    "amount": 300,
+                    "unit": "g",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "ラザニアの素",
+                    "amount": 1,
+                    "unit": "箱",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "刻みチーズ",
+                    "amount": 1,
+                    "unit": "袋",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        },
+        {
+            "name": "オムライス",
+            "items": [
+                {
+                    "name": "ソーセージ",
+                    "amount": 1,
+                    "unit": "袋",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "マッシュルーム",
+                    "amount": 100,
+                    "unit": "g",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "コーン缶",
+                    "amount": 1,
+                    "unit": "缶",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "卵",
+                    "amount": 3,
+                    "unit": "個",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "バター",
+                    "amount": 2,
+                    "unit": "個",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        },
+        {
+            "name": "ドリア",
+            "items": [
+                {
+                    "name": "ソーセージ",
+                    "amount": 1,
+                    "unit": "袋",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "マッシュルーム",
+                    "amount": 100,
+                    "unit": "g",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "刻みチーズ",
+                    "amount": 1,
+                    "unit": "袋",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "卵",
+                    "amount": 2,
+                    "unit": "個",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        },
+        {
+            "name": "三食丼",
+            "items": [
+                {
+                    "name": "鶏もも挽肉",
+                    "amount": 250,
+                    "unit": "g",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "冷凍ほうれん草",
+                    "amount": 0.5,
+                    "unit": "袋",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "卵",
+                    "amount": 3,
+                    "unit": "個",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        },
+        {
+            "name": "焼きそば",
+            "items": [
+                {
+                    "name": "豚こま",
+                    "amount": 250,
+                    "unit": "g",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "焼きそば麺",
+                    "amount": 1.5,
+                    "unit": "袋",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "カット野菜",
+                    "amount": 1,
+                    "unit": "袋",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        },
+        {
+            "name": "グラタン",
+            "items": [
+                {
+                    "name": "鶏もも肉",
+                    "amount": 300,
+                    "unit": "g",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "玉ねぎ",
+                    "amount": 1,
+                    "unit": "個",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "グラタンの素",
+                    "amount": 1,
+                    "unit": "箱",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "刻みチーズ",
+                    "amount": 1,
+                    "unit": "袋",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "バター",
+                    "amount": 2,
+                    "unit": "個",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        },
+        {
+            "name": "うどん",
+            "items": [
+                {
+                    "name": "冷凍うどん",
+                    "amount": 1,
+                    "unit": "パック",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "きつねあげ",
+                    "amount": 1,
+                    "unit": "パック",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "乾燥わかめ",
+                    "amount": 4,
+                    "unit": "つまみ",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "卵",
+                    "amount": 2,
+                    "unit": "個",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "天ぷら",
+                    "amount": 3,
+                    "unit": "個",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "メンチカツ",
+                    "amount": 2,
+                    "unit": "個",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        },
+        {
+            "name": "ミートパスタ",
+            "items": [
+                {
+                    "name": "ミートソース",
+                    "amount": 1,
+                    "unit": "袋",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "合挽肉",
+                    "amount": 300,
+                    "unit": "g",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "エリンギ",
+                    "amount": 1,
+                    "unit": "パック",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        },
+        {
+            "name": "ロコモコ丼",
+            "items": [
+                {
+                    "name": "合挽肉",
+                    "amount": 300,
+                    "unit": "g",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "エリンギ",
+                    "amount": 1,
+                    "unit": "パック",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "卵",
+                    "amount": 2,
+                    "unit": "個",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "千切りキャベツ",
+                    "amount": 1,
+                    "unit": "袋",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        },
+        {
+            "name": "豚キムチ",
+            "items": [
+                {
+                    "name": "豚こま",
+                    "amount": 300,
+                    "unit": "g",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "キムチ",
+                    "amount": 1,
+                    "unit": "パック",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
+        }
+    ]
+}
