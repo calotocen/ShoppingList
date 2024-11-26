@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grossary List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <div class="container">
+        <ul id="main-grossary-list" class="list-group">
+        </ul>
+
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#grossaryInput">
+            <i class="bi bi-plus"></i>
+        </button>
+        <!--
+        <button onclick="addListItem($(this).prev)" class="btn btn-primary float-right">
+            <i class="bi bi-plus"></i>
+        </button>
+        -->
+    </div>
+
+    <div class="modal" id="grossaryInput" tabindex="-1" aria-labelledby="grossaryInput" aria-hidden="true"
+        style="display: none;">
+        <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">食材の追加</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-8">
+                                <input type="text" id="grossary-name" class="form-control" placeholder="食材">
+                            </div>
+                            <div class="col">
+                                <div class="input-group">
+                                    <input type="number" id="grossary-amount" class="form-control" placeholder="数量">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">個</button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="#">個</a></li>
+                                        <li><a class="dropdown-item" href="#">g</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+                    <button class="btn btn-primary" onclick="addGrossary()">追加</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function addGrossary() {
+        }
+        class GrossaryList {
+            constructor(name) {
+                this._name = name;
+                this._grossaries = [];
+            }
+
+            get name() {
+                return this._name;
+            }
+            set name(name) {
+                this._name = name;
+            }
+
+            get grossaries() {
+                return this._grossaries;
+            }
+
+            serialize() {
+                return JSON.stringify(this);
+            }
+
+            deserialize(serializedData) {
+                deserializedData = JSON.parse(serializedData);
+                this.name = deserializedData["name"];
+                this.grossaries = deserializedData["grossaries"];
+                return this;
+            }
+        }
+        class Context {
+            constructor() {
+                this._grossaryLists = [
+                    new GrossaryList("main"),
+                ];
+            }
+
+            get mainGrossaryList() {
+                return this._grossaryLists[0];
+            }
+
+            get grossaryLists() {
+                return this._grossaryLists;
+            }
+
+            serialize() {
+                return JSON.stringify({
+                    grossaryLists: this._grossaryLists.map(grossaryList => grossaryList.serialize())
+                });
+            }
+
+            deserialize(serializedData) {
+                deserializedData = JSON.parse(serializedData);
+                this.grossaryLists = deserializedData["grossaryLists"].map(deserializedGrossaryList => {
+                    grossaryList = new GrossaryList();
+                    grossaryList.deserialize(deserializedGrossaryList);
+                })
+                this.name = deserializedData["name"];
+                this.grossaries = deserializedData["grossaries"];
+            }
+        }
+        class Cookie {
+            export(context) {
+                document.cookie = `context=${context.serialize()}`;
+                return this;
+            }
+
+            import() {
+                let context = new Context();
+                let cookies = document.cookie.split(';').filter((cookie) => cookie.startsWith("context="));
+                if (cookies.length > 0) {
+                    context.deserialize(cookie.substring("context=".length, cookie.length));
+                }
+                return context;
+            }
+        }
+        class Screen {
+            update() {
+                $ul = $("#main-grossary-list");
+                $ul.empty();
+                context.mainGrossaryList.grossaries.forEach(grossary => {
+
+                });
+            }
+        }
+
+        let context
+
+        $(function () {
+            console.log(document.cookie)
+            context = (new Cookie).import()
+            console.log(context)
+            context.grossaryLists.push(new GrossaryList('default'));
+            console.log(context)
+            console.log(`context=${context.serialize()}`)
+            context = (new Cookie).export(context)
+        })
+        function addListItem($list) {
+            $input = $("<input>")
+                .addClass("form-control")
+                .attr("type", "text")
+                .attr("placeholder", "Enter item")
+                .css({ border: "none" });
+            $listItem = $("<li>")
+                .addClass("list-group-item")
+                .append($input)
+            $list = $(".list-group")
+            $list.append($listItem)
+
+            $input.focus()
+        }
+    </script>
+</body>
+
+</html>
