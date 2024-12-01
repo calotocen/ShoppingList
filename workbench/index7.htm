@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>買い物リスト</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+
+<body>
+    <div id="div1"></div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(function () {
+            let $header;
+            let $body;
+            let $footer;
+            $('#div1').append(
+                $('<div>')
+                    .css({
+                        backgroundColor: 'black',
+                        width: '100%',
+                        height: '100px',
+                    }),
+                $('<div>')
+                    .css({
+                        position: 'relative',
+                        backgroundColor: 'red',
+                    })
+                    .append(
+                        $header = $('<div>')
+                            .addClass('sticky-top')
+                            .css({
+                                backgroundColor: 'white',
+                                border: '1px solid blue',
+                                height: '300px',
+                            })
+                            .text('ヘッダー'),
+                        $body = $('<div>')
+                            .css({
+                                backgroundColor: 'white',
+                                border: '1px solid green',
+                            })
+                            .html('先頭<br>'
+                                + 'ボディ<br>'.repeat(100)
+                                + '末尾')
+                            .append($('<button>')
+                                .css({
+                                    position: 'absolute',
+                                    top: '350px',
+                                    left: '50px',
+                                })
+                                .text('toggle header')
+                                .click(function () {
+                                    $header.toggle();
+                                    if ($header.css('display') != 'none') {
+                                        $body.css({ paddingTop: 0 });
+                                    } else {
+                                        $body.css({ paddingTop: $header.css('height') })
+                                    }
+                                    $footer.toggle();
+                                })),
+                        $footer = $('<div>')
+                            .addClass('sticky-bottom')
+                            .css({
+                                backgroundColor: 'white',
+                                border: '1px solid pink',
+                            })
+                            .text('フッター'),
+                    ));
+            $(window).scroll(function () {
+                console.log(window.pageYOffset);
+                //console.log($body[0].getBoundingClientRect());
+                //header.css({ top: -body[0].getBoundingClientRect().top });
+            });
+        });
+    </script>
+</body>
+
+</html>
