@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>テスト</title>
+    <style>
+        .test {
+            background-color: red;
+        }
+
+        :is(ol, ul, menu:unsupported) :is(ol,ul) {
+            background-color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <span class="bi bi-circle">abc</span>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        class Css {
+            static get(uri) {
+                const response = $.ajax({ url: uri, async: false });
+                return response.responseText.replace(/(url\(['"]?)([^)]+)(['"]?\))/, function () {
+                    return `${arguments[1]}${arguments[2].replace(/^\./, uri.replace(/\/[^/]*$/, ''))}${arguments[3]}`;
+                });
+            }
+
+            static load(uri) {
+                $('head').append($('<style>').text(this.get(uri)));
+            }
+        }
+
+        class CssStyleRule {
+            constructor(name) {
+                this.name = name;
+            }
+
+            get data() {
+                return Array.from(document.styleSheets)
+                    ?.flatMap(styleSheet => Array.from(styleSheet.cssRules))
+                    ?.filter(cssRule => cssRule instanceof CSSStyleRule)
+                    ?.filter(cssRule => cssRule.selectorText === this.name)
+                    ?.at(0);
+            }
+
+            get style() {
+                console.log(this.data.style);
+                return Object.entries(this.data.style)
+                    .filter(entry => entry[1] !== '')
+                    .reduce((style, entry) => {
+                        style[entry[0]] = entry[1];
+                        return style;
+                    }, {});
+            }
+        }
+        $(function () {
+            Css.load('https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css');
+            Css.load('https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css');
+
+            console.log(document.styleSheets);
+            const s = new CssStyleRule(':lang(en, ja) > q');
+            console.log(s.data)
+        });
+    </script>
+</body>
+
+</html>
