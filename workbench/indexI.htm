@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>買い物リスト</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .dvh-100 {
+            height: 100dvh;
+        }
+
+        .bg-red {
+            background-color: red;
+        }
+
+        .notification {
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin: 10px;
+        }
+
+        .notification-information {
+            background-color: white;
+        }
+
+        .notification-information::before {
+            color: blue;
+        }
+
+        .bi-fs-1::before {
+            font-size: calc(1.375rem + 1.5vw) !important;
+        }
+
+        .bi-fs-2::before {
+            font-size: calc(1.325rem + 0.9vw) !important;
+        }
+
+        .bi-fs-3::before {
+            font-size: calc(1.3rem + 0.6vw) !important;
+        }
+
+        .bi-fs-4::before {
+            font-size: calc(1.275rem + 0.3vw) !important;
+        }
+
+        .bi-fs-5::before {
+            font-size: 1.25rem !important;
+        }
+
+        .bi-fs-6::before {
+            font-size: 1rem !important;
+        }
+
+        .bi-text-blue::before {
+            color: var(--bs-blue);
+        }
+
+        @keyframes slidein-to-bottom {
+            0% {
+                transform: translateY(-200%);
+            }
+
+            10% {
+                transform: translateY(0);
+            }
+
+            95% {
+                transform: translateY(0);
+            }
+
+            100% {
+                transform: translateY(-200%);
+                display: none;
+            }
+        }
+
+        .animation.slidein-to-bottom {
+            animation-name: slidein-to-bottom;
+            animation-fill-mode: forwards;
+            animation-duration: 5000ms;
+            animation-timing-function: linear;
+        }
+    </style>
+</head>
+
+<body class="dvh-100">
+    <div id="liveNotificationPlaceholder" class="fixed-top mx-3 mt-2 rounded-3 shadow bg-white p-3 d-flex align-items-center gap-2 bi bi-info-circle-fill bi-fs-1 bi-text-blue slidein-to-bottom"
+        style="visibility: hidden;">
+        <div class="lh-1">
+            <span class="text-secondary">Shopping List</span><br>A simple primary alert—check it out!
+        </div>
+    </div>
+    <!--
+    <div id="liveNotificationPlaceholder"></div>
+    <div class="fixed-top w-100">
+        <template>
+            <div class="position-absolute top-0 w-100 d-flex align-items-center gap-2 notification notification-information bi bi-info-circle-fill bi-fs-2 slidein-to-bottom">
+                <div class="lh-1">
+                    <span class="text-secondary">Shopping List</span><br>
+                    A simple primary alert—check it out!
+                </div>
+            </div>
+        </template>
+    </div>
+    -->
+    <button id="add" class="btn btn-primary fixed-bottom">Add</button>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script>
+        $(function () {
+            $('#add').click(function () {
+                $('#liveNotificationPlaceholder').css({ visibility: 'visible' })
+                $('#liveNotificationPlaceholder').removeClass('animation');
+                $('#liveNotificationPlaceholder').addClass('animation');
+            })
+        })
+    </script>
+</body>
+
+</html>
