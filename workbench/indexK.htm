@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>買い物リスト</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+</head>
+
+<body>
+    <div class="d-flex flex-column p-3">
+        <h1>Item</h1>
+        <div id="items">
+        </div>
+        <h1>Item Set</h1>
+        <div id="itemSets"></div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        Array.prototype.remove ??= function (...elements) {
+            const removedElements = [];
+            elements.forEach(element => {
+                for (let i = this.indexOf(element); i != -1; i = this.indexOf(element, i)) {
+                    removedElements.push(...this.splice(i, 1));
+                }
+            });
+            return removedElements;
+        }
+        function update() {
+            $('#items')
+                .empty()
+                .append(
+                    model.items.map(item =>
+                        $('<div>')
+                            .addClass('d-inline-block me-1')
+                            .append(
+                                $('<div>')
+                                    .addClass('d-flex')
+                                    .css({
+                                        width: 'fit-content',
+                                        color: 'snow',
+                                    })
+                                    .append(
+                                        $('<span>')
+                                            .addClass('bg-secondary rounded-start-3 ps-2')
+                                            .text(item.name),
+                                        $('<button>')
+                                            .attr({ type: 'button' })
+                                            .addClass('btn bi bi-x p-0 btn-secondary rounded-0 rounded-end-3')
+                                            .click(function () {
+                                                model.items.remove(item);
+                                                update();
+                                            })))));
+            $('#itemSets')
+                .empty()
+                .append(
+                    $('<table>')
+                        .addClass('table table-striped table-hover')
+                        .append(
+                            $('<tr>').append(
+                                $('<th>').attr({ scope: 'col' }).text('Name'),
+                                $('<th>').attr({ scope: 'col' }).text('In model?'),
+                                $('<th>').attr({ scope: 'col' }).text('Items')),
+                            $('<tbody>').append(
+                                itemSets.flatMap(itemSet =>
+                                    $('<tr>').append(
+                                        $('<td>').text(itemSet.name),
+                                        $('<td>').append(
+                                            model.itemSets.includes(itemSet) ? 'yes' : 'no',
+                                            $('<button>')
+                                                .attr({ type: 'button' })
+                                                .addClass(`btn btn-primary ms-2 px-2 py-0 bi bi-cloud-${model.itemSets.includes(itemSet) ? 'minus' : 'plus'}`)
+                                                .text(model.itemSets.includes(itemSet) ? ' leave' : ' join')
+                                                .click(function () {
+                                                    model.itemSets[model.itemSets.includes(itemSet) ? 'remove' : 'push'](itemSet);
+                                                    update();
+                                                })),
+                                        $('<td>').append(
+                                            itemSet.items.map(item =>
+                                                $('<div>')
+                                                    .addClass('d-inline-block me-1')
+                                                    .append(
+                                                        $('<div>')
+                                                            .addClass('d-flex')
+                                                            .css({
+                                                                width: 'fit-content',
+                                                                color: 'snow',
+                                                            })
+                                                            .append(
+                                                                $('<span>')
+                                                                    .addClass('bg-secondary rounded-start-3 ps-2')
+                                                                    .text(item.name),
+                                                                $('<button>')
+                                                                    .attr({ type: 'button' })
+                                                                    .addClass('btn bi bi-x p-0 btn-secondary rounded-0 rounded-end-3')
+                                                                    .click(function () {
+                                                                        itemSet.items.remove(item);
+                                                                        update();
+                                                                    })))),
+                                            $('<button>')
+                                                .attr({ type: 'button' })
+                                                .addClass('btn btn-primary ps-1 pe-2 py-0 bi bi-plus')
+                                                .text('add')
+                                                .click(function () {
+                                                    itemSet.items.push(new Item({ name: `item ${itemSn++}` }));
+                                                    update();
+                                                })))))),
+                    $('<button>')
+                        .attr({ type: 'button' })
+                        .addClass('btn btn-primary ps-1 pe-2 py-0 bi bi-plus')
+                        .text('add')
+                        .click(function () {
+                            itemSets.push(new ItemSet({ name: `itemSet ${itemSn++}` }));
+                            update();
+                        }));
+        }
+        $(function () {
+            update();
+        });
+        window.crypto.randomUUID ??= function () {
+            let random_numbers = new Uint8Array(16);
+            window.crypto.getRandomValues(random_numbers);
+            random_numbers[6] = 0x40 | (random_numbers[6] & 0x0f);
+            random_numbers[8] = 0x80 | (random_numbers[8] & 0x3f);
+            random_numbers = Array.from(random_numbers);
+            return 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'.replaceAll('xx', s => random_numbers.shift().toString(16).padStart(2, '0'));
+        }
+        class ObservableCollection {
+            #data;
+
+            constructor(...elements) {
+                this.#data = elements;
+                ['includes', 'forEach', 'map', Symbol.iterator].forEach(name => this[name] = Array.prototype[name].bind(this.#data));
+            }
+
+            get length() {
+                return this.#data.length;
+            }
+
+            insertAt(index, element) {
+                this.#data.splice(index, 0, element);
+                return this.length;
+            }
+            #insert(index, ...elements) {
+                for (let i = 0; i < elements.length; ++i) {
+                    this.insertAt(index + i, elements[i]);
+                }
+                return this.length;
+            }
+            insert(index, ...elements) {
+                return this.#insert(index, ...elements);
+            }
+
+            removeAt(index) {
+                return this.#data.splice(index, 1)[0];
+            }
+            remove(...elements) {
+                const removedElements = [];
+                elements.forEach(element => {
+                    for (let i = this.#data.indexOf(element); i != -1; i = this.#data.indexOf(element, i)) {
+                        removedElements.push(this.removeAt(i));
+                    }
+                });
+                return removedElements;
+            }
+
+            push(...elements) {
+                return this.#insert(this.#data.length, ...elements);
+            }
+            pop() {
+                return this.removeAt(this.#data.length - 1);
+            }
+        }
+        class Item {
+            constructor(properties = {}) {
+                Object
+                    .entries({ uuid: crypto.randomUUID(), name: '', amount: 0, unit: '', displayed: false, selected: false })
+                    .forEach(([key, value]) => this[key] = properties[key] ?? value);
+            }
+        }
+        class ItemSet {
+            constructor(properties = {}) {
+                const myself = this;
+
+                Object
+                    .entries({ uuid: crypto.randomUUID(), name: '' })
+                    .forEach(([key, value]) => this[key] = properties[key] ?? value);
+                this.items = new class extends ObservableCollection {
+                    insertAt(index, item) {
+                        const length = super.insertAt(index, item);
+                        if (model.itemSets.includes(myself)) {
+                            model.items.push(item);
+                        }
+                        return length;
+                    }
+                    removeAt(index) {
+                        const removedItem = super.removeAt(index);
+                        if (model.itemSets.includes(myself)) {
+                            model.items.remove(removedItem);
+                        }
+                        return removedItem;
+                    }
+                }(...(properties.items ?? []).map(item =>
+                    item?.constructor?.name === 'Item'
+                        ? item
+                        : typeof item === 'string'
+                            ? model.items.find(item => item.uuid === item)
+                            : new Item(item)));
+            }
+
+            set selected(state) {
+                this.items.forEach(item => item.displayed = state);
+            }
+            get selected() {
+                const diplayedItemCount = this.items.reduce((count, item) => count + item.displayed, 0);
+                return (0 < diplayedItemCount && diplayedItemCount < this.items.length) ? undefined : (diplayedItemCount != 0);
+            }
+
+            toJSON() {
+                return {
+                    uuid: this.uuid,
+                    name: this.name,
+                    items: this.items.map(item => item.uuid),
+                };
+            }
+        }
+        class Model {
+            constructor() {
+                this.items = [];
+                this.itemSets = new class extends ObservableCollection {
+                    insertAt(index, itemSet) {
+                        const length = super.insertAt(index, itemSet);
+                        model.items.push(...itemSet.items);
+                        return length;
+                    }
+                    removeAt(index) {
+                        const removedItemSet = super.removeAt(index);
+                        model.items.remove(...removedItemSet.items);
+                        return removedItemSet;
+                    }
+                };
+                /*
+                this.itemSets = new Proxy([], {
+                    set(target, property, value) {
+                        if (/^(?:0|[1-9]\d*)$/.test(property)) {
+                            target[property] = value;
+                            value.items.filter(item => !model.items.includes(item)).forEach(item => model.items.push(item));
+                        } else {
+                            target[property] = value;
+                        }
+                        return true;
+                    },
+                    deleteProperty(target, property) {
+                        if (/^(?:0|[1-9]\d*)$/.test(property)) {
+                            const itemSet = target[proeprty];
+                            delete target[property];
+                            model.items.removeIf(item => itemSet.items.includes(item));
+                        } else {
+                            delete target[property];
+                        }
+                        return true;
+                    },
+                });
+                */
+            }
+        }
+
+        let itemSn = 1;
+        let itemSetSn = 1;
+        model = new Model;
+        itemSets = [
+            new ItemSet({ name: `itemSet ${itemSetSn++}` }),
+            new ItemSet({ name: `itemSet ${itemSetSn++}` }),
+            new ItemSet({ name: `itemSet ${itemSetSn++}` }),
+        ];
+        model.itemSets.push(itemSets[0]);
+        itemSets[0].items.push(new Item({ name: `item ${itemSn++}` }))
+        itemSets[0].items.push(new Item({ name: `item ${itemSn++}` }))
+        itemSets[1].items.push(new Item({ name: `item ${itemSn++}` }))
+    </script>
+</body>
+
+</html>
