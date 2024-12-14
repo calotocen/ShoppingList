@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>買い物リスト</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+</head>
+
+<body>
+    <div class="d-flex flex-column p-3">
+        <h1>Item</h1>
+        <div id="items">
+        </div>
+        <h1>Item Set</h1>
+        <div id="itemSets"></div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        function update() {
+            for (let i = 0; i < itemSets.length; ++i) {
+                const newItemSet = model.itemSets.find(itemSet => itemSet.name === itemSets[i].name);
+                if (newItemSet !== undefined) {
+                    itemSets[i] = newItemSet;
+                }
+            }
+            itemSets.push(...this.model.itemSets.filter(itemSet => itemSets.every(is => is.name !== itemSet.name)));
+            $('#items')
+                .empty()
+                .append(
+                    model.items.map(item =>
+                        $('<div>')
+                            .addClass('d-inline-block me-1')
+                            .append(
+                                $('<div>')
+                                    .addClass('d-flex')
+                                    .css({
+                                        width: 'fit-content',
+                                        color: 'snow',
+                                    })
+                                    .append(
+                                        $('<span>')
+                                            .addClass('bg-secondary rounded-start-3 ps-2')
+                                            .text(item.name),
+                                        $('<button>')
+                                            .attr({ type: 'button' })
+                                            .addClass('btn bi bi-x p-0 btn-secondary rounded-0 rounded-end-3')
+                                            .click(function () {
+                                                model.items.remove(item);
+                                                update();
+                                            })))));
+            $('#itemSets')
+                .empty()
+                .append(
+                    $('<table>')
+                        .addClass('table table-striped table-hover')
+                        .append(
+                            $('<tr>').append(
+                                $('<th>').attr({ scope: 'col' }).text('Name'),
+                                $('<th>').attr({ scope: 'col' }).text('In model?'),
+                                $('<th>').attr({ scope: 'col' }).text('Items')),
+                            $('<tbody>').append(
+                                itemSets.flatMap(itemSet =>
+                                    $('<tr>').append(
+                                        $('<td>').text(itemSet.name),
+                                        $('<td>').append(
+                                            model.itemSets.includes(itemSet) ? 'yes' : 'no',
+                                            $('<button>')
+                                                .attr({ type: 'button' })
+                                                .addClass(`btn btn-primary ms-2 px-2 py-0 bi bi-cloud-${model.itemSets.includes(itemSet) ? 'minus' : 'plus'}`)
+                                                .text(model.itemSets.includes(itemSet) ? ' leave' : ' join')
+                                                .click(function () {
+                                                    model.itemSets[model.itemSets.includes(itemSet) ? 'remove' : 'push'](itemSet);
+                                                    update();
+                                                })),
+                                        $('<td>').append(
+                                            itemSet.items.map(item =>
+                                                $('<div>')
+                                                    .addClass('d-inline-block me-1')
+                                                    .append(
+                                                        $('<div>')
+                                                            .addClass('d-flex')
+                                                            .css({
+                                                                width: 'fit-content',
+                                                                color: 'snow',
+                                                            })
+                                                            .append(
+                                                                $('<span>')
+                                                                    .addClass('bg-secondary rounded-start-3 ps-2')
+                                                                    .text(item.name),
+                                                                $('<button>')
+                                                                    .attr({ type: 'button' })
+                                                                    .addClass('btn bi bi-x p-0 btn-secondary rounded-0 rounded-end-3')
+                                                                    .click(function () {
+                                                                        itemSet.items.remove(item);
+                                                                        update();
+                                                                    })))),
+                                            $('<button>')
+                                                .attr({ type: 'button' })
+                                                .addClass('btn btn-primary ps-1 pe-2 py-0 bi bi-plus')
+                                                .text('add')
+                                                .click(function () {
+                                                    itemSet.items.push(new Item({ name: `item ${itemSn++}` }));
+                                                    update();
+                                                })))))),
+                    $('<button>')
+                        .attr({ type: 'button' })
+                        .addClass('btn btn-primary ps-1 pe-2 py-0 bi bi-plus')
+                        .text('add')
+                        .click(function () {
+                            itemSets.push(new ItemSet({ name: `itemSet ${itemSn++}` }));
+                            update();
+                        }));
+        }
+        $(function () {
+            update();
+        });
+        window.crypto.randomUUID ??= function () {
+            let random_numbers = new Uint8Array(16);
+            window.crypto.getRandomValues(random_numbers);
+            random_numbers[6] = 0x40 | (random_numbers[6] & 0x0f);
+            random_numbers[8] = 0x80 | (random_numbers[8] & 0x3f);
+            random_numbers = Array.from(random_numbers);
+            return 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'.replaceAll('xx', s => random_numbers.shift().toString(16).padStart(2, '0'));
+        }
+        class ObservableCollection {
+            constructor() {
+                this.data = [];
+                this.handlers = {};
+                Reflect.ownKeys(Array.prototype)
+                    .filter(name => !['copyWithin', 'fill', 'length', 'pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift', Symbol.unscopables].includes(name))
+                    .forEach(name => this[name] = Array.prototype[name].bind(this.data));
+            }
+
+            bind(type, handler) {
+                this.handlers[type] ??= [];
+                this.handlers[type].push(handler);
+                return this;
+            }
+            unbind(type, handler) {
+                const index = this.handlers[type]?.indexOf(handler);
+                if (index !== undefined && index != -1) {
+                    this.handlers[type].splice(index, 1);
+                }
+                return this;
+            }
+            #callHandlers(type, event) {
+                this.handlers[type]?.forEach(handler => handler.call(this, event));
+            }
+
+            get length() {
+                return this.data.length;
+            }
+
+            insert(index, ...elements) {
+                const event = {
+                    target: this,
+                    index: index,
+                    elements: elements,
+                };
+                this.#callHandlers('beforeinsert', event);
+                this.data.splice(index, 0, ...event.elements);
+                this.#callHandlers('insert', { target: this, index: index, elements: event.elements });
+                return this;
+            }
+
+            removeAt(index, count = Infinity) {
+                if (index >= this.data.length || count === 0) return this;
+                if (index < 0) {
+                    index = Math.max(index + this.data.length, 0);
+                }
+                const removedElements = this.data.splice(index, count);
+                this.#callHandlers('remove', { target: this, index: index, elements: removedElements });
+                return this;
+            }
+            remove(...args) {
+                args.forEach(element => {
+                    for (let i = this.data.indexOf(element); i != -1; i = this.data.indexOf(element, i)) {
+                        this.removeAt(i, 1);
+                    }
+                });
+                return this;
+            }
+            removeAll() {
+                return this.removeAt(0);
+            }
+
+            push(...elements) {
+                return this.insert(this.data.length, ...elements);
+            }
+            pop() {
+                const removedElement = this.data.at(-1);
+                this.removeAt(-1, 1);
+                return removedElement;
+            }
+        }
+        class Entities extends ObservableCollection {
+            constructor() {
+                super();
+                this.bind('beforeinsert', function (event) {
+                    event.elements = event.elements.filter((element, index, self) => !event.target.includes(element) && index === self.indexOf(element));
+                });
+            }
+
+            toJSON() {
+                return [...this];
+            }
+        }
+        class Item {
+            constructor(properties = {}) {
+                Object
+                    .entries({ uuid: crypto.randomUUID(), name: '', amount: 0, unit: '', displayed: false, selected: false })
+                    .forEach(([key, value]) => this[key] = properties[key] ?? value);
+            }
+        }
+        class ItemSet {
+            constructor(properties = {}) {
+                const myself = this;
+
+                Object
+                    .entries({ uuid: crypto.randomUUID(), name: '' })
+                    .forEach(([key, value]) => this[key] = properties[key] ?? value);
+                this.items = new Entities()
+                    .bind('insert', function (event) {
+                        if (model.itemSets.includes(myself)) {
+                            model.items.push(...event.elements);
+                        }
+                    })
+                    .bind('remove', function (event) {
+                        if (model.itemSets.includes(myself)) {
+                            model.items.remove(...event.elements);
+                        }
+                    })
+                    .push(...(properties.items ?? []).map(item =>
+                        item?.constructor?.name === 'Item'
+                            ? item
+                            : typeof item === 'string'
+                                ? model.items.find(i => i.uuid === item)
+                                : new Item(item)));
+            }
+
+            set selected(state) {
+                this.items.forEach(item => item.displayed = state);
+            }
+            get selected() {
+                const diplayedItemCount = this.items.reduce((count, item) => count + item.displayed, 0);
+                return (0 < diplayedItemCount && diplayedItemCount < this.items.length) ? undefined : (diplayedItemCount != 0);
+            }
+
+            toJSON() {
+                return {
+                    uuid: this.uuid,
+                    name: this.name,
+                    items: this.items.map(item => item.uuid),
+                };
+            }
+        }
+        class Model {
+            constructor() {
+                this.items = new Entities()
+                    .bind('remove', function (event) {
+                        model.itemSets.forEach(itemSet => itemSet.items.remove(...event.elements));
+                    });
+                this.itemSets = new Entities()
+                    .bind('insert', function (event) {
+                        model.items.push(...event.elements.flatMap(itemSet => [...itemSet.items]));
+                    })
+                    .bind('remove', function (event) {
+                        model.items.remove(...event.elements.flatMap(itemSet => [...itemSet.items]));
+                    });
+            }
+        }
+        class LocalModelStorage {
+            constructor(model) {
+                this.model = model;
+            }
+
+            save() {
+                localStorage['model'] = JSON.stringify(this.model);
+                return true;
+            }
+            load() {
+                const json = localStorage['model'];
+                if (json !== undefined) {
+                    const data = JSON.parse(json);
+                    this.model.items.removeAll().push(...data.items.map(item => new Item(item)));
+                    this.model.itemSets.removeAll().push(...data.itemSets.map(itemSet => new ItemSet(itemSet)));
+                }
+                return true;
+            }
+        }
+
+        let itemSn = 1;
+        let itemSetSn = 1;
+        model = new Model;
+        storage = new LocalModelStorage(model);
+        itemSets = [
+            new ItemSet({ name: `itemSet ${itemSetSn++}` }),
+            new ItemSet({ name: `itemSet ${itemSetSn++}` }),
+            new ItemSet({ name: `itemSet ${itemSetSn++}` }),
+        ];
+        model.itemSets.push(itemSets[0]);
+        itemSets[0].items.push(new Item({ name: `item ${itemSn++}` }))
+        itemSets[0].items.push(new Item({ name: `item ${itemSn++}` }))
+        itemSets[1].items.push(new Item({ name: `item ${itemSn++}` }))
+        const item = new Item({ name: `item ${itemSn++}` })
+        model.items.push(item, item, item);
+        itemSets[2].items.push(item, item, item);
+        model.itemSets.push(itemSets[2], itemSets[2], itemSets[2], itemSets[2]);
+    </script>
+</body>
+
+</html>
