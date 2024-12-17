@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>買い物リスト</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+</head>
+
+<body class="vh-100">
+    <div id="square" class="sticky-top" style="width: 100px; height: 100px; background-color: red;"></div>
+    <button id="slidein" class="btn btn-primary">Slide In</button>
+    <button id="slideout" class="btn btn-danger">Slide Out</button>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        $(function () {
+            $('#slidein').click(function () {
+                $('#square').queue(async function () {
+                    $(this)
+                        .css({ visibility: '' })
+                        .dequeue();
+                });
+                $('#square').queue(async function () {
+                    this.getAnimations().forEach(animation => animation.cancel());
+                    await this.animate({ transform: ['translateY(100%)', 'translateY(0%)'] }, { fill: 'forwards', duration: 200 }).finished;
+                    $(this).dequeue();
+                });
+            });
+            $('#slideout').click(function () {
+                $('#square').queue(async function () {
+                    this.getAnimations().forEach(animation => animation.cancel());
+                    await this.animate({ transform: ['translateY(0%)', 'translateY(-100%)'] }, { fill: 'forwards', duration: 200 }).finished;
+                    $(this).dequeue();
+                });
+                $('#square').queue(async function () {
+                    $(this)
+                        .css({ visibility: 'hidden' })
+                        .dequeue();
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
