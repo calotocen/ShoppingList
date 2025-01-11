@@ -601,6 +601,32 @@
                     "selected": false
                 }
             ]
+        },
+        {
+            "name": "サーモン丼",
+            "items": [
+                {
+                    "name": "刺身用サーモン",
+                    "amount": 300,
+                    "unit": "g",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "刻みのり",
+                    "amount": 1,
+                    "unit": "パック",
+                    "displayed": false,
+                    "selected": false
+                },
+                {
+                    "name": "刻みネギ",
+                    "amount": 1,
+                    "unit": "パック",
+                    "displayed": false,
+                    "selected": false
+                }
+            ]
         }
     ]
 }
